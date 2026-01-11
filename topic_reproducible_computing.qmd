@@ -6,7 +6,10 @@ sidebar: false
 
 Covers reproducible computing in R, briefly GitHub, and some best practices for efficient coding in R
 
--   Reproducible computing [Git/Github/Project organization](repro_crash_course.qmd)
--   Reproducible computing [Debugging, vectorization, code profiling](what_is_ds_ii.qmd)
+-   Reproducible computing, [Project organization](repro_crash_course.qmd)
+-   Reproducible computing, [Version control](repro_crash_courseII.qmd)
+-   Reproducible computing, [Debugging, vectorization, code profiling](what_is_ds_ii.qmd)
 
 This paper on [good enough practices](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005510) for scientific computing gives an idea of what we want to achieve in this course, and why we want to achieve it.
+
+Also, check out this [editorial](https://www.tandfonline.com/doi/full/10.1080/01621459.2024.2340557) I co-wrote as one of the Associate Editor's for Reproducibility at JASA. It describes the JASA reproducibility process.

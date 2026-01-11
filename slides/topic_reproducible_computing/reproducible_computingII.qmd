@@ -1,0 +1,245 @@
+---
+title: "Version Control"
+author: "Julia Wrobel"
+format:
+  beamer:
+    theme: metropolis
+    aspectratio: 169
+    fontsize: 14pt
+    slide-level: 2
+execute:
+  echo: true
+  eval: false
+  warning: false
+  message: false
+header-includes:
+  - \usepackage{xcolor}
+  - \newcommand{\red}[1]{\textcolor{red}{#1}}
+  - \newcommand{\green}[1]{\textcolor{green}{#1}}
+---
+
+
+## Overview
+
+Today, we cover:
+
+- Course overview
+
+- Git/GitHub 
+
+- Lab with practice questions, if time allows
+
+::: notes
+Stuff
+:::
+
+---
+
+
+## Git/GitHub
+
+---
+
+## Basic GitHub workflow
+
+```bash
+git pull
+
+git status
+git add --all
+git commit -m "informative commit message!"
+git status
+
+git push
+```
+
+## What is Git?
+
+* Git is a version control system - lets you track your progress over time
+
+* Check that you have GIT installed by typing in the terminal/bash
+
+```{bash, eval = FALSE}
+git --version
+```
+
+
+- See [here](https://juliawrobel.com/reproducible_research/preread-installs.html) for details on installing git and registering a GitHub account if you don't have these already
+
+
+---
+
+
+## Why use (formal) version control?
+
+- Ability to share code online
+- Collaborate with multiple people on a single code bank
+- Try risky things without fear of losing stable code
+- Painlessly revert to older versions of code
+- See history of changes made to code
+- Expected skill in data science
+
+---
+
+## Terminology
+
+- **Repository**
+  - Directory of all-(or most)- files included in your project
+    
+
+- **Commit**
+  - a unique alpha-numeric identifier that references a particular
+state of your project
+ 
+  
+- **History**
+  - the history of all commits for a project
+  
+- **Local**
+  - the copy of the **repo** on your computer
+- **Remote**
+  - the copy of your repo online (e.g. on GitHub)
+  
+???
+- Some large files (html, data) are not best stored on GitHub
+ - a snapshot of your project at a particular point in time
+---
+
+
+## Initializing a repository
+
+- To initialize a repository, we use the `git init` command
+  - Make sure that you are in the correct directory first!
+  
+- This creates a subdirectory called `.git` that contains all
+files needed for version control
+
+- Deleting this directory removes the entire history of a project
+
+---
+
+
+
+
+## Basic git workflow
+
+
+1. Create a project folder
+2. Make sure there is an `.Rproj` file in the root directory
+3. Open the terminal and `cd` into that directory
+
+Execute the following `bash` code
+
+```{bash, eval = FALSE}
+# only once for each repo
+git init
+
+# used over and over 
+git status
+git add --a # adds everything
+git status
+git commit -m "my highly informative commit message"
+git status
+```
+
+
+
+???
+This is all local. We aren't talking about GitHub yet.
+---
+
+
+## When to commit
+
+How often you make commits is totally up to you
+- (And anyone you may be collaborating with)
+
+- More harmful to commit too little vs. too much
+- Commit code once it reaches a stable state
+- OK to include longer commit messages if they will be helpful
+for you or your collaborators
+---
+
+## What to commit
+
+- Generally, want to include only plain text files (i.e., code) as
+part of your version-controlled repository
+  - Commit source code and not outputs of code
+  
+- Generally, do not want to include binary files (e.g., pdf, jpeg,
+docx, .Rdata, .rds, .xlsx, etc…)
+
+- No real harm in including, but can make git slower
+
+- Be mindful of committing data – is it allowed under DUA?
+---
+
+## .gitignore files
+
+- If there are files that you know for sure you do not want to
+track, include these files in a `.gitignore` file
+
+- Create a new file and save it with name `.gitignore`
+- Any files listed in `.gitignore` will be specifically ignored
+when using commands like `git status` or `git commit`.
+- Use wildcards (e.g., `*.pdf`) to ignore files of a particular
+type found anywhere in the repository
+
+---
+
+
+## Creating a GitHub repo
+
+- From GitHub dashboard, click on the + symbol in the upper
+right-hand corner and select New repository
+- Give the repository a name
+- .red[DO NOT] check the “Add README file” box
+- .red[DO NOT] add a .gitignore
+- .red[DO NOT] choose a license
+- Click .green[Create repository]
+
+
+???
+There are a lot of ways to do this. I find it easiest to make the repo locally first, then make a repo on GitHub, then push the existing files.
+
+Important: want the remote repo to be empty when you initialize it!
+---
+
+
+## Adding a remote
+
+Once you have created the repo on GitHub, you can link it to your local folder
+- I created an empty repo on Git called `empty`
+
+Enter the following commands in the root directory of your local repo:
+
+```{bash, eval = FALSE}
+git remote add origin https://github.com/julia-wrobel/example.git
+git branch -M main
+git push -u origin main
+```
+
+???
+You'll need to replace this with your own user name and repo name
+---
+
+
+## Basic GitHub workflow
+
+- Set up repo locally
+- Set up repo remote
+- Link local and remote
+
+Each time you make changes and are ready for a new commit, do the following:
+
+```{bash, eval = FALSE}
+git pull # check that there aren't discrepancies between local and remote
+
+git status
+git add --a
+git commit -m "informative commit message!"
+git status # I like to check before I push
+
+git push 
+```
+
