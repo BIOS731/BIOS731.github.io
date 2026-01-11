@@ -34,5 +34,8 @@
   },
   "slides/topic_reproducible_computing/reproducible_computing.qmd": {
     "reproducible_computing.tex": "ff68dbef"
+  },
+  "slides/topic_reproducible_computing/reproducible_computingII.qmd": {
+    "reproducible_computingII.tex": "b4049d35"
   }
 }
