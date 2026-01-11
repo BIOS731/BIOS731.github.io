@@ -6,7 +6,7 @@ sidebar: false
 
 Covers reproducible computing in R, briefly GitHub, and some best practices for efficient coding in R
 
--   Reproducible computing [Git/Github/Project organization](what_is_ds_i.qmd)
+-   Reproducible computing [Git/Github/Project organization](repro_crash_course.qmd)
 -   Reproducible computing [Debugging, vectorization, code profiling](what_is_ds_ii.qmd)
 
 This paper on [good enough practices](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005510) for scientific computing gives an idea of what we want to achieve in this course, and why we want to achieve it.

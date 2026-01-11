@@ -28,5 +28,11 @@
   },
   "syllabus.qmd": {
     "syllabus.html": "bded730b"
+  },
+  "repro_crash_course.qmd": {
+    "repro_crash_course.html": "f0621ee8"
+  },
+  "slides/topic_reproducible_computing/reproducible_computing.qmd": {
+    "reproducible_computing.tex": "ff68dbef"
   }
 }

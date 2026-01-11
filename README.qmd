@@ -1,0 +1,47 @@
+---
+title: "README"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+  pdf:
+    toc: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+# BIOS731
+
+This repo contains materials for the course [BIOS731: Advanced Statistical Computing]. Course materials for the website can be accessed here.
+
+
+---
+
+
+# Acknowledgements
+
+Special thanks to:
+
+- Kristin Linn
+- Irina Gaynanova
+- Hao Wu
+- Jeff Goldsmith
+
+# Session Info
+
+Versions of software used in the course materials are below.
+
+```{r, echo = FALSE, message = FALSE}
+library(tidyverse)
+
+
+```
+
+
+```{r}
+sessionInfo()
+```
+
+

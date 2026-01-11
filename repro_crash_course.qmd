@@ -1,0 +1,63 @@
+---
+title: "What is Data Science?"
+format:
+  html:
+    toc: true
+    toc-location: right
+execute:
+  echo: false
+  fig-width: 6
+  fig-asp: 0.6
+  out-width: "90%"
+---
+
+In this, we'll provide a basic definition of "data science" and discuss the connotation of the term in several contexts.
+
+## Overview
+::: {.panel-tabset .panel-pills}
+
+### Slide Deck
+
+<div class="vid_container">
+  <iframe 
+    src="https://speakerdeck.com/player/5d70b1a8ec6344729af32f4821a312c5" 
+    allowfullscreen 
+    frameborder="0"
+    class="video">
+  </iframe>
+</div>
+
+<div style="margin-bottom:5px">
+<strong>
+<a href="https://speakerdeck.com/jeffgoldsmith/p8105-what-is-data-science" target="_blank">
+What is Data Science? (Part 1)
+</a>
+</strong>
+from
+<strong>
+<a href="https://speakerdeck.com/jeffgoldsmith" target="_blank">Jeff Goldsmith</a>
+</strong>.
+</div><br>
+
+***
+
+### Lab
+
+Define "data science" and understand its vital role in public health research.
+
+
+## Example
+
+For the purpose of this class, we'll use the following working definition of data science:
+
+> Data science is the study of formulating and rigorously answering questions using a data-centric process that emphasizes clarity, reproducibility, effective communication, and ethical practices.
+
+In coming modules, we'll learn about wrangling data, making visualizations, and conducting analyses.
+
+```{r}
+library(tidyverse)
+```
+
+
+***
+:::

@@ -1,0 +1,1438 @@
+---
+title: "Crash course on reproducible computing in R"
+author: "Julia Wrobel"
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+    nature:
+      titleSlideClass: ["left", "middle", "inverse"]
+---
+
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+extra_css <- list(
+    "ul" = list(`margin-bottom` = "0.5em",
+      `margin-top` = "0.5em"),
+  	"p" = list(`margin-bottom` = "0.25em"),
+	"ul li" = list(`margin-bottom` = "10px"),
+	"a" = list(color = "#007dba"),
+	"a:hover" = list("text-decoration" = "underline"),
+	".green" = list(color = "#348338"),
+	".red" = list(color = "#da291c"),
+  ".remark-slide-content" = list(`font-size` = "24px")
+)
+
+style_mono_accent(
+  base_color = "#012169",
+  header_font_google = google_font("DM Sans"),
+  text_font_google   = google_font("DM Sans", "400", "400i"),
+  code_font_google   = google_font("Courier Prime"),
+  extra_css = extra_css
+)
+```
+<style type="text/css">
+.remark-slide-content {
+    font-size: 24px
+}
+</style>
+
+
+
+## Overview
+
+Today, we cover:
+
+
+<br>
+* Course overview
+
+<br>
+* Basic principles of reproducible computing
+  * Coding style
+  * Using the command line 
+  * Project organization
+  * Git and GitHub
+
+<br>
+* Lab with practice questions, if time allows
+
+
+???
+How many of you have taken David Benekeser's data science class?  Some of this comes from his class, and I like his tone so I will keep it.
+---
+
+
+## About me
+
+
+**Research**
+
+- Functional data analysis
+- Spatial proteomics
+- Application areas: cannabis impairment, neurological disorders, ovarian cancer, wearables/sensor data 
+
+
+???
+I think this is the most fun you can have doing statistics
+What about you? What research are you doing?
+Course is supposed to give you tools to help with your research!
+---
+
+## Announcements
+
+- Discussion board post due tomorrow (1/15) at 10:00AM
+
+<br>
+- Homework 1 due Wednesday, 1/29 at 10:00AM
+
+---
+
+## Course objectives
+
+My goal for this course is for you to learn practical skills you need to become a statistical methods researcher. There are two main areas we will focus on:
+
+1. Computing 
+  - R focused  
+2. Algorithms
+  - Look under the hood at algorithms for commonly used methods like logistic regression, LASSO, mixed effects models
+
+
+???
+Units will go back and forth between these things.
+---
+
+
+## My teaching philosophy
+
+- Ask questions early and often
+  - It helps you stay engaged and others are likely to benefit from your question as well
+- What you learn is proportional to the effort you put in
+  - Try to think about this less as a class where you try to get a grade and more as a place where you are learning the skills to be a good researcher and help you write a **great** dissertation
+  - Use ChatGPT, but wisely
+- Feel free to work together 
+  
+
+
+???
+These concepts can be super fun to learn
+---
+
+## Emails vs. Discussion board
+
+**Discussion board**
+
+- All questions about course content should go on the discussion board!
+  - This includes homework questions
+  - I will monitor the discussion board daily
+  - This allows all students to benefit from questions asked about course content
+  - **Posting** and **answering** questions posted on the discussion board will count towards your participation grade
+
+**Emails**
+
+- Email should only be used for schedule purposes and personal matters
+
+---
+
+## Office hours and homework due dates
+
+Office hours
+
+- Tuesdays at 11:00AM
+- Thursdays at 2:00PM
+
+Homework policies
+
+- Homeworks will be due on Wednesdays at 10am 
+- Late assignments will receive a maximum of half credit. Assignments more than 3 days late will not be accepted.
+  - Let me know (if possible, in advance) if you have known conflicts with the due dates or a special circumstance (conference travel, family emergency)
+
+
+
+???
+I may be flexible about the due dates since the course is new
+---
+
+## Grading
+
+* Homework (50%)
+  * 7 assignments
+* Discussion board posts (10%)
+  * 4-5 posts
+* Participation (10%) 
+  * Participation can mean asking questions in class, posting on the discussion board, or attending office hours
+  * To quantify, 5+ posts on discussion board besides official posts
+  * I encourage you to post computing tricks, cool algorithms, etc
+* Final project (30%)
+  * Related to your research, if possible
+
+---
+
+## Syllabus
+
+* Course content will be posted on Canvas
+* Any other questions?
+
+---
+
+## Coding style
+
+---
+
+## Principles for scientific coding
+
+In this order: 
+
+1. Code that works.
+2. Code that is reproducible.
+3. Code that is readable.
+4. Code that is generalizable.
+5. Code that is efficient.
+
+A __minimal standard__ for scientific computing is 1-3. 
+
+???
+
+"Works" means code that gives the right answer. 
+
+As we've discussed, reproducible means that someone else could run the code and get the same answer. 
+
+The focus of this chapter will mostly be on point 3, which will enable an easier time achieving point 4. 
+
+Efficiency is far down the line of desirables. 
+
+---
+
+## Advice for beginner coders
+
+.red[Test code before relying on it.]
+
+It's OK to __copy/paste code__ from chatGPT or Stack Overflow, but make sure you __understand how it works__.
+* Run line by line and see what each does.
+* Change the code and see if it behaves as expected.
+
+Stakes for copy/paste can be high!
+* Incorrect analyses.
+* Expensive (inadvertent) cloud computing.
+
+For high stakes analyses, ask a colleague for a __code review__.
+
+???
+
+Reading other's solution to problems is how we learn a language. Just like a spoken language -- seeing how native speakers construct phrases is important! But we need to understand those phrases before we incorporate them into our dialect, lest we be misunderstood (or worse).
+
+If the code is implementing some statistical method, make sure you understand that method well enough to at least be able to accurately describe it in the methods section of a manuscript.
+* E.g., do you really know what `confint` does to a `glm` in `R`? 
+
+There are many horror stories of students running code from the internet to spin up premium AWS instances to do simple tasks, running costs into the thousands of dollars. 
+
+---
+
+## Advice for more advanced coders
+
+
+Getting code .green[correct] AND .green[readable] is __most important__.
+* Make your code more efficient later.
+* After a paper is submitted for review?
+
+Remember: you don't get bonus points for code that "looks impressive".
+
+???
+
+Early in my coding career, I heard from someone, somewhere that `for` loops should be avoided if at all possible. It struck fear in my heart -- I don't want people to think I'm a bad coder! I'm only starting to recover.
+
+No matter how many times I repeat this mantra, I still find myself trying to make my code way too smart way too soon. It's an ongoing process of learning the needed amount of generalizability/efficiency to hit on a first pass through code. 
+
+Get the code working and readable first, optimize and generalize later. 
+
+---
+
+## Think before you code
+
+Before you start writing code, think about what you want the code to do. 
+* For large coding projects, a white board may be helpful when you start.
+
+<br> 
+
+Plain English &#x2192; pseudo-code &#x2192; actual code
+
+<br> 
+
+This careful thought process can ultimately lead to __more efficient__ and __more robust__ code development.
+
+---
+
+
+## Don't repeat yourself
+
+Don't repeat yourself (DRY) is a fundamental concept in programming. 
+* *Ruthlessly eliminate duplication*, [Wilson et al](https://swcarpentry.github.io/good-enough-practices-in-scientific-computing/)
+
+For example, variables `score1=1`, `score2=2`, `score3=3` &#8594; `score=list(1,2,3)`. 
+
+If you write the same code more than once, it should be a function. 
+* Break large tasks into smaller calls to functions. 
+* Give functions (everything, really) meaningful names.
+	* self-documenting code
+	* use tab-completion
+
+???
+
+It is highly inefficient and dangerous to copy and paste multiple chunks of code. 
+* What if you need to change 1 thing? Needs to be changed in multiple places. Risk getting a wrong answer because we forgot to change one small thing.
+
+
+Meaningful names make reading code much easier. It's OK to make names long and informative. Most (good) text editors will have tab completion so that it won't slow you down typing (once you're used to using it). 
+
+---
+
+## Functions in `R`
+
+If you don't know how functions work in `R`, .red[learn about them now]. 
+* [Software carpentry: Creating R Functions](https://swcarpentry.github.io/r-novice-inflammation/02-func-R/)
+* [R for Data Science: Functions](https://r4ds.had.co.nz/functions.html)
+* [DataCamp: A Tutorial on Using Functions in R!](https://www.datacamp.com/community/tutorials/functions-in-r-a-tutorial)
+
+
+???
+I'm not planning to cover this... but it's super important! Learn it if you don't know it already.
+---
+
+
+## Generalize... some
+
+Write code __a bit more general__ than your data or specific task.
+* Don't assume particular dimensions.
+* Don't forget about missing values (even if *your* data have none).
+
+But .red[don't necessarily try to handle every case.] 
+* Try to anticipate what you might be asked for, but don't prepare for every possibility.
+* If you think of __extreme cases__ where code breaks, __document them__.
+* How general to make your code depends on its purpose!!
+
+Use __function arguments__ to handle different cases. 
+* Don't assume particular file names.
+* Don't assume particular tuning parameters. 
+* Don't assume particular regression formulas.
+
+???
+
+Do you hear your collaborators making an arbitrary decision in the analysis plan? Prepare for that decision to change. 
+- especially when it comes to which variables you want to put in the model!!
+
+Least general: analyze a specific dataset
+Most general: R package implementing a new method
+
+---
+
+## No magic numbers
+
+There are __many decision points__ in an analysis. Give them a name!
+* How many __bootstrap samples__?
+  * `nboot = 1e3`
+* What __tolerance for convergence__ of an algorithm?
+  * `tol_covergence = 1e-3`
+* What __threshold__ for excluding missing data?
+  * `tol_missingness = 3`
+
+Even better, include them as an __argument to a function__ (with default values and documentation, as needed)!
+* `get_bootstrap_ci <- function(..., nboot = 1e3)`
+* `my_algorithm <- function(..., tol_convergence = 1e-3)`
+
+???
+The variable name should roughly tell you what the number represents!
+---
+
+## Other guidelines
+
+* __Indent__!
+  * 2 or 4 spaces (join the debate)
+  * Tabs can get nasty across systems. In my experience, Windows is pretty dumb about this.
+
+* Use __white space__!
+  * After commas, operators
+  * after headers in Rmarkdown (following `#`)
+
+* Use `{}` and `()` to __avoid ambiguity__.
+
+* Keep __lines short__!
+  * Rule of thumb is 72 or 80 characters. 
+  * Most text editors have settings to help with this.
+
+???
+A pet peeve of mine is when people don't use enough white space in Rmd.  I have a lot of visual pet peeves, it turns out.
+
+---
+
+.large[__Other guidelines__]
+
+.large[🤮]
+
+```{r}
+# move values above/below quantiles to those quantiles
+winsorize<-function(vec,q=0.006){
+lohi<-quantile(vec,c(q,1-q),na.rm=TRUE)
+if(diff(lohi)<0)lohi<-rev(lohi)
+vec[!is.na(vec)&vec<lohi[1]]<-lohi[1]
+vec[!is.na(vec)&vec>lohi[2]]<-lohi[2]
+vec}
+```
+
+.large[😍]
+
+```{r}
+# move values above/below quantiles to those quantiles
+winsorize <- function(vec, q = 0.006){
+  lohi <- quantile(vec, c(q, 1 - q), na.rm = TRUE)
+  if(diff(lohi) < 0){
+    lohi <- rev(lohi)
+  }
+  vec[ !is.na(vec) & (vec < lohi[1]) ] <- lohi[1]
+  vec[ !is.na(vec) & (vec > lohi[2]) ] <- lohi[2]
+  return(vec)
+}
+```
+
+???
+
+The parenthesis around `vec < lohi[1]` are probably unnecessary, but want to illustrate the point. 
+Which function looks better?
+
+---
+
+## Naming objects
+
+Give objects informative names:
+* Names should be: 
+  1. most importantly, descriptive
+  2. as concise as possible while still being descriptive
+* Avoid `tmp1`, `tmp2`, ...
+  * ...as `tmp`ting as it may be.
+* Functions as verbs, objects as nouns
+
+???
+
+Please don't look too closely at my `R` packages. You may learn what a hypocrite I am.
+
+---
+
+## Naming objects
+
+Have __consistency__ in your naming systems:
+* E.g., `markers` vs. `mnames`; `nft` vs. `n_ft`
+
+Commit to a case:
+* `camelCase` vs. `pothole_case`
+
+Don't confuse yourself:
+* `total` vs. `totals`
+* `result` vs. `rslt`
+* `X` vs. `x` 
+* `z` vs. `zz`
+
+__Underscores__ should be preferred as separator when coding in `R` (as opposed to `.`).
+
+???
+
+I use pothole case, which is also called `snake_case`.  Typing uppercase letters is super annoying!
+---
+
+## Self-documenting code
+
+Many of these recommendations are to .green[make code self-documenting]. 
+
+Comments should be used mostly for __why__, not __what__.
+* The __what__ should be inherent from the code itself.
+
+This is really __hard to do__.
+* Sometimes its harder than its worth, but it is worth trying!
+
+---
+
+## Self-documenting code
+
+Here's an example of .red[bad code]:
+
+```{r}
+tmp1 <- 9.81
+tmp2 <- 5
+tmp3 <- 0.5 * tmp1 * tmp2^2
+```
+
+Here's an example of .green[documented] .red[bad code]:
+
+```{r}
+# gravitational constant
+tmp1 <- 9.81
+# time object is falling
+tmp2 <- 5
+# displacement of the object
+tmp3 <- 0.5 * tmp1 * tmp2^2
+```
+
+???
+
+The first chunk is bad because the variables have non-informative names and nothing is documented. We have to think really hard to understand what this code is doing.
+
+The second chunk is better; at least it is documented! But it's redundant and not self-documenting. 
+
+---
+
+## Self-documenting code
+
+Here's .green[self-documenting code]:
+
+```{r}
+gravitational_force <- 9.81
+time_in_seconds <- 5
+displacement <- 1/2 * gravitational_force * time_in_seconds^2
+```
+
+Now let's add a .green[comment] explaining the __why__:
+
+```{r}
+# compute displacement of falling object with Newton's equation
+gravitational_force <- 9.81
+time_in_seconds <- 5
+displacement <- 1/2 * gravitational_force * time_in_seconds^2
+```
+
+---
+
+## Self-documenting code
+
+Even better, .green[make it a function]!
+
+```{r}
+# for falling objects based on Newton's equation
+compute_displacement <- function(time_in_seconds){
+  gravitational_force <- 9.81
+  displacement <- 1/2 * gravitational_force * time_in_seconds^2
+  
+  return(displacement)
+}
+```
+
+---
+
+
+
+## Recap
+
+Why spend a lecture on coding style if everyone knows how to code?
+* Clear code is more likely to be __correct__.
+* Clear code is __easier to use__.
+* Clear code is __easier to revisit__ six months from now.
+* Software based on clear code is __easier to maintain__.
+* Clear code is __easier to extend__.
+
+---
+
+## My (non-exhaustive) list of coding pet peeves
+
+
+* dots (".") in variable names
+* upper case in variable names
+* Not putting a vertical line of white space after a section header in an `.Rmd` document 
+* Unnecessarily short and unreadable variable names
+* Calling libraries, loading data, or sourcing files in the middle of a script
+  * Always do it at the beginning!!
+
+---
+
+
+## Command line
+
+
+
+---
+
+## Operating systems
+
+* Windows
+  * Not always programmer friendly
+* Mac OSX
+  * Better for programming
+  * Under the hood, is just Unix
+* Unix-based OS (Linux, Solaris, etc...)
+  * Best for programming
+
+We'll learn to interact with our computer like it's a Unix OS. 
+* Best practices for programming
+* Needed for cluster computing and AWS (later)
+
+???
+Assess how many students have which types of operating systems.
+---
+
+
+## Some terminology
+
+__Shell__
+* user interface for interacting with a computer
+* the "outermost" layer of the operating system
+
+__Graphical user interface__ (GUI)
+* visual interface (icons, menus, etc...) for interacting with computer
+* "Point-and-click"
+
+__Command line interface__ (CLI)
+* text-based interface for interacting with computer
+* e.g., `bash`, `sh`, `tcsh`, `zsh`, ...
+
+???
+A shell is essentially a user interface that allows users to interact with the OS. It provides ways to execute commands, run programs, and manage the system. Can be graphical or command-line.
+
+GUIs are pretty and user-friendly because anyone who can read and operate
+a mouse can interact with them, even with very little about computers. 
+However, they are antithetical to our endeavor for reproducible research.
+
+We will instead rely on the CLI to run all our programs. We will focus on 
+`bash`. 
+---
+
+
+## Terminal
+
+If Windows, use [Ubuntu](https://www.microsoft.com/en-us/p/ubuntu/9nblggh4msv6?activetab=pivot:overviewtab) for Windows
+* Or other Linux distribution (e.g., [Debian](https://www.microsoft.com/en-us/p/debian/9msvkqc78pk6?rtc=1&activetab=pivot:overviewtab))
+* Biggest difference is how software installed
+
+<div>
+
+If Mac, use [Terminal](https://support.apple.com/guide/terminal/open-or-quit-terminal-apd5265185d-f365-44cb-8b09-71a064a42125/mac)
+* Or [iTerm2](https://www.iterm2.com/features.html) -- more features
+
+<div>
+
+If Linux, whatever terminal emulator comes with your distribution. 
+
+???
+Linux on Windows is a relatively new feature. I suggest Ubuntu or Debian
+as these are the most common distributions on resources you might use. 
+There's practically little difference for our purposes. Most of my 
+examples later will likely use Ubuntu though, so if you have no strong
+preference, then I'd stick to that. 
+
+
+???
+Who is comfortable using the terminal?  I think it makes me really fast.
+---
+
+## Terminal
+
+Your open terminal will look something like this: 
+
+<img src="terminal_open.png" style="width:75%">
+
+You'll see a _prompt_, which is an alphanumeric string that (usually) ends in __$__. Commands are typed after the __$__. 
+
+???
+Your open terminal will look something like this (mine is customized to be green which is not the default).
+In the screenshot provided I typed the command `cd Desktop`, which we'll get to shortly.
+
+The terminal is the way we interact with the shell by issuing text-based
+commands.
+
+We'll be working with bash. If for some reason bash is not the default 
+shell (and you want it to be) this can be changed in Terminal settings. For Mac the default is zsh, which functions similarly to bash.
+
+---
+
+## Using the terminal through RStudio
+
+You can also use the terminal directly in Rstudio!
+* Rstudio introduced the terminal tab in 2017
+* For our course, this may be the simplest approach
+
+__Display the Terminal tab__: If the tab isn't visible, you can display it by going to Tools > Terminal > Move Focus to Terminal. 
+* Can also use the keyboard shortcut Shift+Alt+M or Shift+Option+M on Mac.
+
+???
+Try opening Rstudio and seeing if you have a terminal tab.
+---
+
+## RStudio terminal
+
+<img src="terminal_Rstudio.png" style="width:105%">
+
+???
+Try opening your terminal, either through Rstudio or otherwise. It may be helpful to follow along and code with me during this section, so please ask questions or summon the TA if you are having trouble.
+---
+
+## Working directories
+
+What is a working directory?
+
+???
+a working directory is the folder on your computer where your files are currently being saved or accessed when you run a program or command. Think of it as the default location where your computer looks for files and where it saves new files unless you tell it to look somewhere else.
+
+---
+
+## Moving around directories
+
+Folders within you computer are called **directories**. 
+You can navigate around to different directories, remove or create directories, remove or create files, move files around, and list their contents all from the terminal.
+
+
+These next sections may seem fairly basic but these are also the commands I use the most often, so I'm going to spend some time on them. 
+
+---
+
+## Moving around directories
+
+| __Command__   | __Action__                   |
+|:-------------:|------------------------------|
+| `pwd`         | print working directory      |
+| `cd`          | change directory             |
+| `ls`          | list files in directory      |
+
+<div>
+
+* __cd__: Takes you to the home directory
+      * `cd ..`: Moves up one directory
+      * `cd ../..`: Moves up two directories
+* __ls -a__: list **hidden** files as well as other files
+      * Hidden files are often part of the instructions for the OS or a particular application
+      * Usually invisible when searching through folders
+      * Examples: .git, .gitignore, .Rhistory 
+      
+
+```{bash, eval = FALSE}
+pwd
+```
+
+---
+
+
+## Absolute vs. relative file paths
+
+
+
+.pull-left[.center[
+Absolute paths
+* .left[`/Users/juliawrobel`]
+* .left[`~/Documents`]
+* .left[`/`]
+]]
+
+.pull-right[.center[
+Relative paths
+* .left[`./Documents`]
+* .left[`../Documents`]
+* .left[`../../`]
+]]
+
+* Absolute paths include the __whole path__ for a directory
+* Relative paths depend on the working directory that they are executed in 
+  * The `./` means "in the current directory"
+  * The `../` means "in one directory
+up from the current directory".
+
+???
+When we get to project management, we will prefer relative paths. It makes
+sharing code easier -- between different users or, with yourself, on a 
+different computer (e.g., your laptop vs. AWS). The two file systems are probably 
+(definitely) structured differently, but if they share a  project folder with 
+the same relative structure, then code with relative paths should still work.
+
+---
+
+## Adding/removing files
+
+| __Command__     | __Action__                   |
+|:---------------:|------------------------------|
+| `mkdir`         | make a new directory         |
+| `rm`            | delete a file or directory   |
+| `mv`            | move a file or directory     |
+| `cp`            | copy a file or directory     |
+
+
+???
+Good to know that when you delete a file in bash, it's gone forever
+---
+
+## Structure of a bash command
+
+```{bash, eval = FALSE}
+command [options] [arguments]
+```
+
+1. `command`: the bash function you want to run, e.g. `ls`, `cd`, `echo`, etc.
+
+2. `options`: also called "flags", these are additional parameters to modify the behavior of the command, e.g., 
+  * `ls -R` lists all directories and contents recursively
+  * `ls -aR` recursively lists all files and hidden files
+
+3. `arguments`: inputs to the command, such as file names or other data that tell the command what to operate on
+  *  `rm` what? `cp` what?
+  * `ls \Documents` lists all files in the documents folder
+
+???
+We have already discussed a few bash commands (`pwd`, `ls`, `cd`). More generally, bash commands have the form.
+
+You can string together multiple `-` options, e.g., `ls -la` executes
+as `ls -l -a`.
+---
+
+
+## Solving computing problems
+
+* `man [command]` (bash version of `?command_name`)
+* Google (with `site:stackoverflow.com`?)
+* ChatGPT
+* Ask friends/classmates
+* .red[Try stuff!]
+
+
+
+???
+
+I find manuals for Unix commands are often cryptic and not always helpful. 
+Reading them on occasion is still useful. 
+
+Learning to code is a lot like a learning a language. It can be very
+frustrating that you know *what* you want to say, but you don't know 
+*how* to say it (or you know how, but in another language!). You only
+get better at language by forcing yourself to use it.
+
+Don't be satisfied with just copy/pasting an answer from StackOverflow. 
+Try (for at least a couple minutes) to understand how it works. This is 
+a worthwhile investment. 
+
+Also, keep in mind that ChatGPT is sometimes (confidently) wrong!
+---
+
+
+
+## Wild cards
+
+| __Command__     | __Action__                              |
+|:---------------:|-----------------------------------------|
+| `*`             | match anything                          |
+| `?`, `??`, ...  | match a single character                |
+| `[...]`         | match a range of characters             |
+
+```{bash, wildcards, eval = FALSE}
+# files in cwd with .txt extension
+ls -l *.txt
+# all files in cwd named a_file with three character extension
+ls a_file.???
+# .txt files in cwd name a_file, b_file, ..., e_file
+ls [a-e]_file.txt
+```
+
+---
+
+## Useful command line shortcuts
+
+| __Key stroke__         | __Action__                              |
+|:----------------------:|-----------------------------------------|
+| <code> &#8593;</code>  | move to previous command                |
+| <code> &#8595;</code>  | move to next command                    |
+| `tab`                  | autocomplete command or file            |
+| `ctrl+c`               | cancel (running) command                |
+| `ctrl+z`               | suspend command                         |
+| `ctrl+r`               | search for command in history           |
+| `ctrl+l`               | clear the screen                        |
+
+???
+
+If you take nothing else from this page, remember to use `tab`!
+
+---
+
+
+
+
+## Reproducible project organization
+
+
+<img src="repro.png" style="width:65%">
+.center[
+	.small[
+		Working terminology (figure produced using [scifigure](https://cran.r-project.org/web/packages/scifigure/vignettes/Visualizing_Scientific_Replication.html) R package)
+	]
+]
+
+???
+
+We will focus on building analyses that satisfy the reproducibility 
+definition outlined above. Could a different analyst sit down with your code, 
+execute it and get exactly the same results?
+
+Reproducibility is a *minimal* standard. Just because something is 
+*reproducible* does not necessarily imply that it is *correct*. The 
+code may have bugs. The methods may be poorly behaved. But reproducibility 
+is likely correlated with correctness -- if you are careful enough to 
+make everything reproducible, you're probably more likely to be careful
+in designing the analysis in the first place. 
+
+We will use replicability to mean a new experiment using the same methods
+coming to the same conclusions. 
+
+Generalizability refers to taking conclusions from your study population
+and generalizing them to a new population. 
+
+---
+
+
+## Why should I care about reproducibility?
+
+* Careful coding means more likely to produce __correct results__.
+* In the long run, you will __save (a lot of) time__.
+* Higher __impact__ of your science.
+* __Avoid embarrassment__ on a public stage. 
+
+???
+
+Doing reproducible science is time consuming, but is ultimately time-saving.
+As you practice these tools more and more, they will start to become
+habits. I do analyses now in a day or so (and at much higher quality) now
+that would take me a (frustrating) week seven or eight years ago. 
+
+One of my great fears as an academic is being accused of intentionally 
+doing bad science. Leaving a paper trail that any one else can follow is
+a bit intimidating -- we all make mistakes. Reproducible work indicates 
+that any mistakes made were likely honest.
+
+
+---
+
+
+## Basic principles
+
+* .red[Put everything in one version-controlled directory.]
+* Develop your own system. 
+* Be consistent, but look for ways to improve.
+  * naming conventions, file structure
+* Raw data are sacred. Keep them separate from everything else. 
+* Separate code and data.
+* Use meaningful file names.
+* Use YYYY-MM-DD date formatting.
+* .red[No absolute paths.]
+
+
+???
+
+There is not one correct way to organize a project, but there are many incorrect ways. Over time you will develop your own system for doing so. We'll discuss a few frameworks that may be helpful. 
+
+The biggest thing is to commit to using the same structure for as long as its working for you. As you are working on many projects, be self-aware during the process. Are you consistently losing track of certain types of files? Are there gaps in the workflow that make things hard to reproduce? What can you do to fill in the gaps?
+
+Organization might not seem like a big deal now, but remember your career is just getting started. Expect to work on 2-20 different projects a year for the rest of your working life. The number of projects you will work on is staggering! You need a way to keep track.
+
+---
+
+
+## What to organize?
+
+It is probably useful to have a system for organizing:
+* data analysis projects;
+* methods projects;
+* first-author papers;
+* talks.
+
+The systems should adhere to the same general principles, but different requirements may necessitate different structures. 
+
+.red[Think about organization of a project from the outset!]
+
+???
+
+Thinking about project organization from the outset is the most important thing. Map out (e.g., as comments in a README) how you see the project developing. Even if things change over time, it's good to have a structure in place from the beginning. 
+
+This pertains to project directories in particular, but also to your hard drive in general. What about projects that weren't finished when I got to Emory? What about projects that I continued developing once I got here. It's a mess. Don't be like me. 
+
+---
+
+
+## Example data analysis project 
+
+.code-box[
+YYYY_MM_PI_topic/ <br>
+&nbsp;&nbsp;&nbsp; data/ <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; data/raw_data.csv <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; data/tidied_data.Rdata <br>
+&nbsp;&nbsp;&nbsp; analysis/ <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; analysis/exploratory_data_analysis.Rmd <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; analysis/report.Rmd <br>
+&nbsp;&nbsp;&nbsp; source/ <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; source/01_clean_raw_data.R <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; source/02_modeling_functions.R <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; source/03_plotting_functions.R <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; source/utils.R <br>
+&nbsp;&nbsp;&nbsp; results/ <br>
+&nbsp;&nbsp;&nbsp; literature/ <br>
+&nbsp;&nbsp;&nbsp; README.md <br>
+]
+
+???
+This is MY process. 
+
+Goal is to find a workflow that will be AS EASY AS POSSIBLE FOR YOU TO ADOPT AND MAINTAIN IN THE LONG TERM.
+
+Also, the files I need for a methods project versus a more applied project may be very different
+
+Some notes:
+* separate raw data and processed data
+* separate folder for figures (could possible move R code for figures there)
+* `sandbox` is where I like to keep messy stuff that I'm trying out but never want to see the light of day
+* informative file names for `R` scripts broken down into logical steps of a workflow
+* `.gitignore` would include
+  * definitely: `figs/*`, `ref_papers/*`
+  * possibly: `raw_data`/`data` (if sensitive), `sandbox` (if informal)
+
+The `00`, `01`, ... number system is something that many people use because it helps create a sortable file system. It generally works, but some workflows don't really logically follow this sort of convention (e.g., things can happen in parallel).  
+
+---
+
+## Example data analysis project, cont'd 
+
+I typically have other ancillary files in my root directory as well. These are files I don't (often) modify but are important for workflow or reproducibility:
+
+.code-box[
+YYYY_MM_PI_topic/ <br>
+&nbsp;&nbsp;&nbsp; YYYY_MM_PI_topic.Rproj <br>
+&nbsp;&nbsp;&nbsp; .git <br>
+&nbsp;&nbsp;&nbsp; .gitignore <br>
+]
+
+???
+
+The `00`, `01`, ... number system is something that many people use because it helps create a sortable file system. It generally works, but some workflows don't really logically follow this sort of convention (e.g., things can happen in parallel).  
+
+
+* `.gitignore` would include
+  * definitely: `figs/*`, `ref_papers/*`
+  * possibly: `raw_data`/`data` (if sensitive), `sandbox` (if informal)
+  
+
+---
+
+## Organizing data
+
+Raw data are sacred... but may be a mess. 
+* You'll be surprised (and disheartened) by how many color-coded excel sheets you'll get in your life.
+
+Tempting to edit raw data by hand. .red[Don't!]
+* Everything scripted!
+
+Use meta-data files to describe raw and cleaned data.
+* structure as data (e.g., `.csv` so easy to read)
+
+**You should be able to get a new version of the data and easily re-run your analysis. Urge your collaborators to not mess with the structure of the data in between versions!**
+
+???
+
+The generation of the raw data may be the one thing out of your control in an analysis. But from the time the data are passed on to you, everything that happens should be reproducible. 
+
+This can be painful. For many projects, 90% of time might be devoted to wrangling raw data into a format that is usable. Save yourself from the danger of having to re-do all those painful bits when (not if) the data change.
+
+You should be able to get a new version of the data and easily re-run your analysis. Urge your collaborators to not mess with the structure of the data in between versions.
+---
+
+
+## Exploring data
+
+Write out a set of comments describing what you are try to accomplish and fill in code from there. 
+* I do this for every coding project.
+  * Data analysis, methods coding, package development
+
+Leave a search-able comment tag by code to return to later
+* I use e.g., `# TO DO: add math expression to labels; make colors prettier`.
+
+Other helpful ideas for formalizing exploratory data analysis:
+
+* `.Rhistory` files: all the commands used in an R session
+* `save` intermediate objects and document what they contain
+* Informal `.Rmd` documents. 
+  * easy way to organize code/comments into readable format
+  
+???
+
+From the outset, stop and think about what you want to do. Start filling in details from there. That simple approach will increase efficiency and reproducibility. 
+
+Sets "the bones" of a formal analysis in place while allowing for some creative flow. 
+---
+
+## .Rproj files
+
+You may have noticed a file with the extension `.Rproj` in the productTesting folder
+* These are called `R projects` 
+* `projectr::proj_start()` automatically sets up an `.Rproj`.
+
+<img src="Rproj_example.png" style="width:105%">
+
+I'm going to try to convince you that these are the best.
+
+---
+
+
+## Benefits of using R projects
+
+__Project organization__: 
+* Relative file paths: ensures file paths are relative to the project directory, making scripts portable and easier to share.
+* Separate workspaces: prevents conflicts between variables and packages across different projects.
+
+
+__Reproducibility__
+* Can hand off entire directory to someone else and have them rerun your analysis
+* Works great with the `here` package
+
+Double clicking the `202405_sarah_productTesting.Rproj` opens up an R Studio session and automatically sets your working directory to the `202405_sarah_productTesting` folder.
+
+
+???
+We will get to the here package next.
+---
+
+
+## Absolute vs. relative file paths
+
+
+.pull-left[.center[
+Absolute paths
+* .left[`/Users/juliawrobel`]
+* .left[`~/Documents`]
+* .left[`/`]
+]]
+
+.pull-right[.center[
+Relative paths
+* .left[`./Documents`]
+* .left[`../Documents`]
+* .left[`../../`]
+]]
+
+* Absolute paths include the __whole path__ for a directory
+* Relative paths depend on the working directory that they are executed in 
+  * The `./` means "in the current directory"
+  * The `../` means "in one directory
+up from the current directory".
+
+???
+In project management, we  prefer relative paths. It makes
+sharing code easier -- between different users or, with yourself, on a 
+different computer (e.g., your laptop vs. AWS). The two file systems are probably 
+(definitely) structured differently, but if they share a  project folder with 
+the same relative structure, then code with relative paths should still work.
+
+
+Why might you want to use relative rather than absolute file paths?
+
+---
+
+
+
+
+
+## The `here` package
+
+.red[No absolute paths.]
+* Absolute paths are the enemy of project reproducibility.
+
+For `R` projects, the [`here`](https://here.r-lib.org/) package provides a simple way to use relative file paths.
+* Read [Jenny Bryan and James Hester's chapter](https://rstats.wtf/project-oriented-workflow.html) on project-oriented work-flows.
+
+The use of `here` is simple and best illustrated by example.
+
+---
+
+## The `here` package
+
+Consider this simple project structure.
+
+.code-box[
+my_project/ <br>
+&nbsp;&nbsp;&nbsp; my_project.Rproj <br>
+&nbsp;&nbsp;&nbsp; data/ <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; my_data.csv <br>
+&nbsp;&nbsp;&nbsp; output/ <br>
+&nbsp;&nbsp;&nbsp; R/ <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; R/my_analysis.R <br>
+&nbsp;&nbsp;&nbsp; Rmd/ <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Rmd/my_report.Rmd <br>
+]
+
+Here, the folder `my_project` is the __root directory__.
+* Where `.Rproj` lives
+* All file paths should be .green[relative] to `my_project`!
+
+---
+
+## The `here` package
+
+Makes it easy to load data using a relative file path that works across different operating systems: 
+
+```{rm eval = FALSE}
+library(here)
+# relative path using here()
+here_path = here("data", "file_i_want.csv")
+my_data = read.csv(here_path)
+```
+
+In contrast to:
+
+```{r, eval = FALSE}
+# absolute path
+ugly_path = "/Users/JWROB/projects/my_project/data/file_i_want.csv"
+my_data = read.csv(ugly_path)
+```
+
+In contrast to:
+
+```{r, eval = FALSE}
+# relative path using NOT using here()
+relative_path = "./data/file_i_want.csv"
+my_data = read.csv(relative_path)
+```
+
+
+???
+The relative path is better, but still not reproducible across different OS. I want to be able to hand you my project folder and have you run it without having to change a single thing.
+---
+
+## The `here` package
+
+`here` works, regardless of where the associated source file lives inside your project
+* If you have an `.Rproj` file in your root directory of your project, here will set the location of the `.Rproj` to be the top-level directory 
+  * This is the behavior we want!
+* These paths will “just work” during interactive development, without incessant fiddling with the working directory of your IDE’s R process.    
+* I am oversimplifying the heuristics, feel free to [read more](https://github.com/jennybc/here_here?tab=readme-ov-file).
+
+
+???
+Raise your hand if you've ever gotten frustrated while interactively coding and the working directory is different from where your Rmarkdown lives... here has changed my life so much that I forgot that can even happen.
+---
+
+## The `here` package
+
+What if I want to load data in a document that lives in a subfolder such as `my_project\analysis\code.Rmd`?
+* Doesn't matter! You can use the same code within the `.Rmd` document to load the data
+```{r, eval = FALSE}
+library(here)
+path_to_data = here("data", "file_i_want.csv")
+my_data = read.csv(path_to_data)
+```
+
+
+What if my data I want to access is nested in a subfolder of data, such as `my_project\data\raw_data\raw_file.csv`?
+
+```{r, eval = FALSE}
+library(here)
+path_to_data = here("data", "raw_data", "raw_file.csv")
+my_data = read.csv(path_to_data)
+```
+
+???
+It's not only data you can access this way, but this is the most common use case.
+---
+
+## Git/GitHub
+
+---
+
+## Git/GitHub
+
+**Git** - version control system, allows to monitor changes to code/documents, can be easily integrated with Rstudio
+
+**Github** - website that provides powerful integration with Git, and allows easy sharing of the code with others. Stores your code remotely, can be used as backup system.
+
+- Combined, this is a system for version control and putting your version-controlled projects online
+- We are barely going to scratch the surface of what is possible
+  - I just want you to have the basics of working with git in the terminal, so your projects can stay organized
+
+---
+
+
+## What is Git?
+
+* Git is a version control system - lets you track your progress over time
+
+* Check that you have GIT installed by typing in the terminal/bash
+
+```{bash, eval = FALSE}
+git --version
+```
+
+
+- See [here](https://juliawrobel.com/reproducible_research/preread-installs.html) for details on installing git and registering a GitHub account if you don't have these already
+
+
+---
+
+
+## Why use (formal) version control?
+
+- Ability to share code online
+- Collaborate with multiple people on a single code bank
+- Try risky things without fear of losing stable code
+- Painlessly revert to older versions of code
+- See history of changes made to code
+- Expected skill in data science
+
+---
+
+## Terminology
+
+- **Repository**
+  - Directory of all-(or most)- files included in your project
+    
+
+- **Commit**
+  - a unique alpha-numeric identifier that references a particular
+state of your project
+ 
+  
+- **History**
+  - the history of all commits for a project
+  
+- **Local**
+  - the copy of the **repo** on your computer
+- **Remote**
+  - the copy of your repo online (e.g. on GitHub)
+  
+???
+- Some large files (html, data) are not best stored on GitHub
+ - a snapshot of your project at a particular point in time
+---
+
+
+## Initializing a repository
+
+- To initialize a repository, we use the `git init` command
+  - Make sure that you are in the correct directory first!
+  
+- This creates a subdirectory called `.git` that contains all
+files needed for version control
+
+- Deleting this directory removes the entire history of a project
+
+---
+
+
+
+
+## Basic git workflow
+
+
+1. Create a project folder
+2. Make sure there is an `.Rproj` file in the root directory
+3. Open the terminal and `cd` into that directory
+
+Execute the following `bash` code
+
+```{bash, eval = FALSE}
+# only once for each repo
+git init
+
+# used over and over 
+git status
+git add --a # adds everything
+git status
+git commit -m "my highly informative commit message"
+git status
+```
+
+
+
+???
+This is all local. We aren't talking about GitHub yet.
+---
+
+
+## When to commit
+
+How often you make commits is totally up to you
+- (And anyone you may be collaborating with)
+
+- More harmful to commit too little vs. too much
+- Commit code once it reaches a stable state
+- OK to include longer commit messages if they will be helpful
+for you or your collaborators
+---
+
+## What to commit
+
+- Generally, want to include only plain text files (i.e., code) as
+part of your version-controlled repository
+  - Commit source code and not outputs of code
+  
+- Generally, do not want to include binary files (e.g., pdf, jpeg,
+docx, .Rdata, .rds, .xlsx, etc…)
+
+- No real harm in including, but can make git slower
+
+- Be mindful of committing data – is it allowed under DUA?
+---
+
+## .gitignore files
+
+- If there are files that you know for sure you do not want to
+track, include these files in a `.gitignore` file
+
+- Create a new file and save it with name `.gitignore`
+- Any files listed in `.gitignore` will be specifically ignored
+when using commands like `git status` or `git commit`.
+- Use wildcards (e.g., `*.pdf`) to ignore files of a particular
+type found anywhere in the repository
+
+---
+
+
+## Creating a GitHub repo
+
+- From GitHub dashboard, click on the + symbol in the upper
+right-hand corner and select New repository
+- Give the repository a name
+- .red[DO NOT] check the “Add README file” box
+- .red[DO NOT] add a .gitignore
+- .red[DO NOT] choose a license
+- Click .green[Create repository]
+
+
+???
+There are a lot of ways to do this. I find it easiest to make the repo locally first, then make a repo on GitHub, then push the existing files.
+
+Important: want the remote repo to be empty when you initialize it!
+---
+
+
+## Adding a remote
+
+Once you have created the repo on GitHub, you can link it to your local folder
+- I created an empty repo on Git called `empty`
+
+Enter the following commands in the root directory of your local repo:
+
+```{bash, eval = FALSE}
+git remote add origin https://github.com/julia-wrobel/example.git
+git branch -M main
+git push -u origin main
+```
+
+???
+You'll need to replace this with your own user name and repo name
+---
+
+
+## Basic GitHub workflow
+
+- Set up repo locally
+- Set up repo remote
+- Link local and remote
+
+Each time you make changes and are ready for a new commit, do the following:
+
+```{bash, eval = FALSE}
+git pull # check that there aren't discrepancies between local and remote
+
+git status
+git add --a
+git commit -m "informative commit message!"
+git status # I like to check before I push
+
+git push 
+```
+
+
+
+  

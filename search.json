@@ -7,55 +7,6 @@
     "text": "In progress."
   },
   {
-    "objectID": "topic_optimization_II.html",
-    "href": "topic_optimization_II.html",
-    "title": "Optimization, Part II",
-    "section": "",
-    "text": "In progress."
-  },
-  {
-    "objectID": "topic_optimization.html",
-    "href": "topic_optimization.html",
-    "title": "Optimization, Part 1",
-    "section": "",
-    "text": "In progress."
-  },
-  {
-    "objectID": "topic_cloud_computing.html",
-    "href": "topic_cloud_computing.html",
-    "title": "Cloud Computing",
-    "section": "",
-    "text": "In progress."
-  },
-  {
-    "objectID": "topic_reproducible_computing.html",
-    "href": "topic_reproducible_computing.html",
-    "title": "Reproducible Computing",
-    "section": "",
-    "text": "Covers reproducible computing in R, briefly GitHub, and some best practices for efficient coding in R\n\nReproducible computing Git/Github/Project organization\nReproducible computing Debugging, vectorization, code profiling\n\nThis paper on good enough practices for scientific computing gives an idea of what we want to achieve in this course, and why we want to achieve it."
-  },
-  {
-    "objectID": "topic_R_packages.html",
-    "href": "topic_R_packages.html",
-    "title": "Building R Packages",
-    "section": "",
-    "text": "In progress."
-  },
-  {
-    "objectID": "topic_simulation.html",
-    "href": "topic_simulation.html",
-    "title": "Simulation and Resampling",
-    "section": "",
-    "text": "Covers best practices for simulation studies in the first lecture, then bootstrap and permutation tests in the second lecture\n\nSimulation studies\nResampling methods for statistical inference\nParallelization, parametric reports\n\nA couple of papers I highly recommend reading on these topics are:\n\nUsing simulation studies to evaluate statistical methods\nBootstrap"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "BIOS 731: Advanced Statistical Computing",
-    "section": "",
-    "text": "This course is being offered in the Spring of 2026 through the Biostatistics and Informatics Department at the Emory University Rollins School of Public Health.\n\nInstructor: Julia Wrobel"
-  },
-  {
     "objectID": "syllabus.html",
     "href": "syllabus.html",
     "title": "BIOS 731: Advanced Statistical Computing",
@@ -145,5 +96,75 @@
     "title": "BIOS 731: Advanced Statistical Computing",
     "section": "Class Schedule (Tentative)",
     "text": "Class Schedule (Tentative)\n\n\n\n\n\n\n\n\n\nDate\nModule\nTopic\nAssignment\n\n\n\n\n1/14\nReproducible Computing\nGit/GitHub, reproducible R\n—\n\n\n1/15\nReproducible Computing\nDebugging, profiling\n\n\n\n1/21\nSimulation & Resampling\nSimulation studies\nHW1 due\n\n\n1/22\nSimulation & Resampling\nBootstrap & permutation tests\n\n\n\n1/28\nReproducible Computing\nParallelization, parametric reports\n\n\n\n1/29\n—\nNo class\n\n\n\n2/4\nOptimization I\nIntroduction to optimization\nHW2 due\n\n\n2/5\nOptimization I\nGradient methods, GLMs\n\n\n\n2/11\nOptimization I\nEM I: applications\n\n\n\n2/18\nOptimization I\nEM II: theory\n\n\n\n2/19\nOptimization I\nMM algorithm\n\n\n\n2/25\nBayesian Computing\nNumerical integration & sampling\nHW3 due\n\n\n2/26\nBayesian Computing\nIntroduction to MCMC\n\n\n\n3/4\nBayesian Computing\nMCMC II\n\n\n\n3/5\nBayesian Computing\nVariational Bayes\nProject proposals due\n\n\n3/11\nSpring Break\nNo class\n\n\n\n3/12\nSpring Break\nNo class\n\n\n\n3/18\nENAR\nNo class\n\n\n\n3/19\nCloud Computing\nHPC usage (guest lecture)\nHW4 due\n\n\n3/25\nCloud Computing\nCluster project organization\n\n\n\n3/26\nR Packages\nPackage basics\nHW5 due\n\n\n4/1\nR Packages\nRcpp\n\n\n\n4/2\nOptimization II\nLP, quantile regression\n\n\n\n4/8\nOptimization II\nQP, LASSO\n\n\n\n4/9\nOptimization II\nHMM and ADMM\n\n\n\n4/15\nOptimization II\nStochastic gradient descent\n\n\n\n4/16\nSpecial Topics\nTBD\nHW6 due\n\n\n4/22\nFinal Presentations\nFirst half\n\n\n\n4/23\nFinal Presentations\nSecond half"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "BIOS 731: Advanced Statistical Computing",
+    "section": "",
+    "text": "This course is being offered in the Spring of 2026 through the Biostatistics and Informatics Department at the Emory University Rollins School of Public Health.\n\nInstructor: Julia Wrobel"
+  },
+  {
+    "objectID": "topic_simulation.html",
+    "href": "topic_simulation.html",
+    "title": "Simulation and Resampling",
+    "section": "",
+    "text": "Covers best practices for simulation studies in the first lecture, then bootstrap and permutation tests in the second lecture\n\nSimulation studies\nResampling methods for statistical inference\nParallelization, parametric reports\n\nA couple of papers I highly recommend reading on these topics are:\n\nUsing simulation studies to evaluate statistical methods\nBootstrap"
+  },
+  {
+    "objectID": "topic_R_packages.html",
+    "href": "topic_R_packages.html",
+    "title": "Building R Packages",
+    "section": "",
+    "text": "In progress."
+  },
+  {
+    "objectID": "topic_reproducible_computing.html",
+    "href": "topic_reproducible_computing.html",
+    "title": "Reproducible Computing",
+    "section": "",
+    "text": "Covers reproducible computing in R, briefly GitHub, and some best practices for efficient coding in R\n\nReproducible computing Git/Github/Project organization\nReproducible computing Debugging, vectorization, code profiling\n\nThis paper on good enough practices for scientific computing gives an idea of what we want to achieve in this course, and why we want to achieve it."
+  },
+  {
+    "objectID": "topic_cloud_computing.html",
+    "href": "topic_cloud_computing.html",
+    "title": "Cloud Computing",
+    "section": "",
+    "text": "In progress."
+  },
+  {
+    "objectID": "topic_optimization.html",
+    "href": "topic_optimization.html",
+    "title": "Optimization, Part 1",
+    "section": "",
+    "text": "In progress."
+  },
+  {
+    "objectID": "topic_optimization_II.html",
+    "href": "topic_optimization_II.html",
+    "title": "Optimization, Part II",
+    "section": "",
+    "text": "In progress."
+  },
+  {
+    "objectID": "repro_crash_course.html",
+    "href": "repro_crash_course.html",
+    "title": "What is Data Science?",
+    "section": "",
+    "text": "In this, we’ll provide a basic definition of “data science” and discuss the connotation of the term in several contexts."
+  },
+  {
+    "objectID": "repro_crash_course.html#overview",
+    "href": "repro_crash_course.html#overview",
+    "title": "What is Data Science?",
+    "section": "Overview",
+    "text": "Overview\n\nSlide DeckLab\n\n\n\n \n\n\n  What is Data Science? (Part 1)   from  Jeff Goldsmith .\n\n\n\n\n\nDefine “data science” and understand its vital role in public health research.\n\nExample\nFor the purpose of this class, we’ll use the following working definition of data science:\n\nData science is the study of formulating and rigorously answering questions using a data-centric process that emphasizes clarity, reproducibility, effective communication, and ethical practices.\n\nIn coming modules, we’ll learn about wrangling data, making visualizations, and conducting analyses.\n\n\n── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──\n✔ dplyr     1.1.4     ✔ readr     2.1.6\n✔ forcats   1.0.1     ✔ stringr   1.6.0\n✔ ggplot2   4.0.1     ✔ tibble    3.3.0\n✔ lubridate 1.9.4     ✔ tidyr     1.3.1\n✔ purrr     1.2.0     \n── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──\n✖ dplyr::filter() masks stats::filter()\n✖ dplyr::lag()    masks stats::lag()\nℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors"
+  },
+  {
+    "objectID": "repro_crash_course.html#example",
+    "href": "repro_crash_course.html#example",
+    "title": "What is Data Science?",
+    "section": "Example",
+    "text": "Example\nFor the purpose of this class, we’ll use the following working definition of data science:\n\nData science is the study of formulating and rigorously answering questions using a data-centric process that emphasizes clarity, reproducibility, effective communication, and ethical practices.\n\nIn coming modules, we’ll learn about wrangling data, making visualizations, and conducting analyses.\n\n\n── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──\n✔ dplyr     1.1.4     ✔ readr     2.1.6\n✔ forcats   1.0.1     ✔ stringr   1.6.0\n✔ ggplot2   4.0.1     ✔ tibble    3.3.0\n✔ lubridate 1.9.4     ✔ tidyr     1.3.1\n✔ purrr     1.2.0     \n── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──\n✖ dplyr::filter() masks stats::filter()\n✖ dplyr::lag()    masks stats::lag()\nℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors"
   }
 ]
