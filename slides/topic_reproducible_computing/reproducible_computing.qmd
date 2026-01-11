@@ -70,6 +70,8 @@ My goal for this course is for you to learn practical skills you need to become 
 2. Algorithms  
    - Look under the hood at algorithms for commonly used methods like logistic regression, LASSO, mixed effects models
 
+There is a [new course website](https://bios731.github.io/) where all materials (other than HW) will be shared.
+
 ::: notes
 Units will go back and forth between these things.
 :::

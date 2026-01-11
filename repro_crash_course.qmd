@@ -28,7 +28,7 @@ In this, we will cover basic topics in reproducible computing, including coding 
 
 ### Slide Deck: git/Github
 
-[![](./slides/topic_reproducible_computing/preview.png){width=70%}](./slides/topic_reproducible_computing/reproducible_computingII.pdf)
+[![](./slides/topic_reproducible_computing/preview2.png){width=70%}](./slides/topic_reproducible_computing/reproducible_computingII.pdf)
 
 **Crash course on reproducible computing in R**  
 [Download slides (PDF)](./slides/topic_reproducible_computing/reproducible_computingII.pdf)
