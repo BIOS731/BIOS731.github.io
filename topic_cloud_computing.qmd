@@ -1,0 +1,17 @@
+---
+title: "Cloud Computing"
+toc: true
+sidebar: false
+---
+
+
+
+In progress.
+
+```{r, eval = FALSE, echo = FALSE}
+- [Using the HPC](what_is_ds_ii.qmd)
+- [Project organization on the cluster](what_is_ds_ii.qmd)
+
+
+```
+

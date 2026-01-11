@@ -1,0 +1,19 @@
+---
+title: "Optimization, Part 1"
+toc: true
+sidebar: false
+---
+
+In progress.
+
+```{r, echo = FALSE, eval = FALSE}
+First part of optimization
+
+-   [Introduction to optimization](what_is_ds_i.qmd)
+-   [Gradient methods and GLMs](what_is_ds_ii.qmd)
+-   [EM 1: Applications](what_is_ds_ii.qmd)
+-   [EM 2: Theory and Inference](what_is_ds_ii.qmd)
+-   [MM Algorithm](what_is_ds_ii.qmd)
+
+```
+

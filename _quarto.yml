@@ -1,0 +1,39 @@
+project:
+  type: website
+  output-dir: "."          # matches output_dir: '.'
+
+website:
+  title: "BIOS731"
+  navbar:
+    right:
+      - text: Topics
+        menu:
+          - text: Reproducible Computing
+            href: topic_reproducible_computing.qmd
+          - text: Simulation and Resampling
+            href: topic_simulation.qmd
+          - text: Optimization I
+            href: topic_optimization.qmd
+          - text: Bayesian Computing
+            href: topic_bayesian_computing.qmd
+          - text: Cloud Computing
+            href: topic_cloud_computing.qmd
+          - text: R packages
+            href: topic_R_packages.qmd
+          - text: Optimization II
+            href: topic_optimization_II.qmd
+          - text: Other Materials
+            href: topic_other_material.qmd
+
+      - text: Datasets
+        menu:
+          - text: Cannabis
+            href: dataset_airbnb.qmd
+          - text: Craniosynothosis
+            href: dataset_brfss.qmd
+
+      - text: Syllabus
+        href: syllabus.qmd
+
+      - icon: github
+        href: https://github.com/julia-wrobel/BIOS731

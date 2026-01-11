@@ -1,0 +1,17 @@
+{
+  "hash": "c27e47a9429185ae2aaf0494e224e922",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Cloud Computing\"\ntoc: true\nsidebar: false\n---\n\n\n\nIn progress.\n\n\n::: {.cell}\n\n:::\n\n\n",
+    "supporting": [
+      "topic_cloud_computing_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "index.qmd": {
+    "index.html": "d3ba147e"
+  },
+  "about.qmd": {
+    "about.html": "1cbca59b"
+  },
+  "topic_reproducible_computing.qmd": {
+    "topic_reproducible_computing.html": "3a06f6fc"
+  },
+  "topic_R_packages.qmd": {
+    "topic_R_packages.html": "5a993898"
+  },
+  "topic_cloud_computing.qmd": {
+    "topic_cloud_computing.html": "0ba79957"
+  },
+  "topic_simulation.qmd": {
+    "topic_simulation.html": "0d8ee434"
+  },
+  "topic_optimization.qmd": {
+    "topic_optimization.html": "1ac3bb65"
+  },
+  "topic_optimization_II.qmd": {
+    "topic_optimization_II.html": "43e8294d"
+  },
+  "topic_bayesian_computing.qmd": {
+    "topic_bayesian_computing.html": "b7adab14"
+  },
+  "syllabus.qmd": {
+    "syllabus.html": "bded730b"
+  }
+}

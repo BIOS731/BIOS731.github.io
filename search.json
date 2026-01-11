@@ -1,0 +1,149 @@
+[
+  {
+    "objectID": "topic_bayesian_computing.html",
+    "href": "topic_bayesian_computing.html",
+    "title": "Bayesian Computing",
+    "section": "",
+    "text": "In progress."
+  },
+  {
+    "objectID": "topic_optimization_II.html",
+    "href": "topic_optimization_II.html",
+    "title": "Optimization, Part II",
+    "section": "",
+    "text": "In progress."
+  },
+  {
+    "objectID": "topic_optimization.html",
+    "href": "topic_optimization.html",
+    "title": "Optimization, Part 1",
+    "section": "",
+    "text": "In progress."
+  },
+  {
+    "objectID": "topic_cloud_computing.html",
+    "href": "topic_cloud_computing.html",
+    "title": "Cloud Computing",
+    "section": "",
+    "text": "In progress."
+  },
+  {
+    "objectID": "topic_reproducible_computing.html",
+    "href": "topic_reproducible_computing.html",
+    "title": "Reproducible Computing",
+    "section": "",
+    "text": "Covers reproducible computing in R, briefly GitHub, and some best practices for efficient coding in R\n\nReproducible computing Git/Github/Project organization\nReproducible computing Debugging, vectorization, code profiling\n\nThis paper on good enough practices for scientific computing gives an idea of what we want to achieve in this course, and why we want to achieve it."
+  },
+  {
+    "objectID": "topic_R_packages.html",
+    "href": "topic_R_packages.html",
+    "title": "Building R Packages",
+    "section": "",
+    "text": "In progress."
+  },
+  {
+    "objectID": "topic_simulation.html",
+    "href": "topic_simulation.html",
+    "title": "Simulation and Resampling",
+    "section": "",
+    "text": "Covers best practices for simulation studies in the first lecture, then bootstrap and permutation tests in the second lecture\n\nSimulation studies\nResampling methods for statistical inference\nParallelization, parametric reports\n\nA couple of papers I highly recommend reading on these topics are:\n\nUsing simulation studies to evaluate statistical methods\nBootstrap"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "BIOS 731: Advanced Statistical Computing",
+    "section": "",
+    "text": "This course is being offered in the Spring of 2026 through the Biostatistics and Informatics Department at the Emory University Rollins School of Public Health.\n\nInstructor: Julia Wrobel"
+  },
+  {
+    "objectID": "syllabus.html",
+    "href": "syllabus.html",
+    "title": "BIOS 731: Advanced Statistical Computing",
+    "section": "",
+    "text": "Department: Biostatistics and Bioinformatics\nCourse Number: BIOS 731\nSection Number: 1\nCredit Hours: 4\nSemester: Spring 2026\nClass Hours and Location:\nWednesday & Thursday, 10:00 AM – 11:50 AM, GCR P39\nInstructor:\nJulia Wrobel, PhD\nEmail:\njulia.wrobel@emory.edu\nSchool Address / Mailbox:\n1518 Clifton Rd, 1518-002-3AA\nOffice Hours:\nThursday 1:00 PM\nGCR Room 210\nTeaching Assistant:\nWeijia Qian (weijia.qian@emory.edu) TA Office Hours:"
+  },
+  {
+    "objectID": "syllabus.html#instructor-contact-information",
+    "href": "syllabus.html#instructor-contact-information",
+    "title": "BIOS 731: Advanced Statistical Computing",
+    "section": "",
+    "text": "Department: Biostatistics and Bioinformatics\nCourse Number: BIOS 731\nSection Number: 1\nCredit Hours: 4\nSemester: Spring 2026\nClass Hours and Location:\nWednesday & Thursday, 10:00 AM – 11:50 AM, GCR P39\nInstructor:\nJulia Wrobel, PhD\nEmail:\njulia.wrobel@emory.edu\nSchool Address / Mailbox:\n1518 Clifton Rd, 1518-002-3AA\nOffice Hours:\nThursday 1:00 PM\nGCR Room 210\nTeaching Assistant:\nWeijia Qian (weijia.qian@emory.edu) TA Office Hours:"
+  },
+  {
+    "objectID": "syllabus.html#course-description",
+    "href": "syllabus.html#course-description",
+    "title": "BIOS 731: Advanced Statistical Computing",
+    "section": "Course Description",
+    "text": "Course Description\nThis course, designed for Ph.D. biostatistics students, dives into the methods and applications of essential statistical computing techniques. Students will achieve two key goals:\n1. Master the implementation of algorithms behind widely used statistical models\n2. Build fluency in reproducible statistical programming\nWith a focus on practical implementation, the course balances foundational theory with hands-on computational experience. Topics include random number generation, bootstrap methods, optimization techniques, Expectation-Maximization (EM), Minorization-Maximization (MM), and Markov chain Monte Carlo (MCMC). On the programming side, students will explore simulation design, cluster computing, code profiling, parallelization, and R package development.\nThis course requires a significant amount of programming. Class examples and homework assignments will be predominantly in R. Because R can be relatively slow, students will learn how to optimize R for computational efficiency through code profiling and parallelization, and how to implement faster C++ backends using Rcpp.\nFor standard algorithms such as Newton–Raphson, EM, iteratively reweighted least squares, and Gibbs sampling, homework assignments will require students to directly implement the algorithm rather than use existing software packages. For more advanced topics—including ADMM, variational inference, and deep learning—assignments will focus on reading and summarizing journal articles and performing analyses using existing software.\nThe final project allows students to apply tools learned in class to topics related to their dissertation research.\nPrerequisites: BIOS 707, BIOS 709, or permission of the instructor.\nThe course will make heavy use of matrix algebra, including vector and matrix derivatives, norms, eigenvalues and eigenvectors, and matrix inverses.\nR is required for homework assignments unless otherwise specified."
+  },
+  {
+    "objectID": "syllabus.html#course-learning-objectives",
+    "href": "syllabus.html#course-learning-objectives",
+    "title": "BIOS 731: Advanced Statistical Computing",
+    "section": "Course Learning Objectives",
+    "text": "Course Learning Objectives\nUpon successful completion of the course, students should be able to:\n\nUnderstand the theoretical and computational foundations of algorithms covered in the course\n\nImplement algorithms using high-level programming languages\n\nApply methods to real-world data\n\nWrite efficient, reproducible R code locally and on computing clusters\n\n\nPhD Competency Assessed\n\nDevelop and assess new statistical methods\n\nHomework 1 involves designing and implementing a simulation study.\n\nConduct complex statistical analyses\n\nThe final project applies a recent computational method to a real dataset.\n\nConduct independent research in biostatistics\n\nThe final exam involves reading a research paper and implementing the proposed method."
+  },
+  {
+    "objectID": "syllabus.html#evaluation",
+    "href": "syllabus.html#evaluation",
+    "title": "BIOS 731: Advanced Statistical Computing",
+    "section": "Evaluation",
+    "text": "Evaluation\nEvaluation will be based on the following components:\n\n\n\nAssessment\nPercentage\n\n\n\n\nHomework (5 assignments)\n50%\n\n\nFinal Project and Presentation\n30%\n\n\nDiscussion Board (4 posts)\n10%\n\n\nParticipation\n10%\n\n\n\n\nGrading Scale\n\n\n\nGrade\nPercentage\nPoints\n\n\n\n\nA\n93–100%\n4.0\n\n\nA−\n90–93%\n3.7\n\n\nB+\n87–90%\n3.3\n\n\nB\n83–87%\n3.0\n\n\nB−\n80–83%\n2.7\n\n\nC\n65–80%\n2.0\n\n\nF\n&lt;65%\n0.0"
+  },
+  {
+    "objectID": "syllabus.html#homework-50",
+    "href": "syllabus.html#homework-50",
+    "title": "BIOS 731: Advanced Statistical Computing",
+    "section": "Homework (50%)",
+    "text": "Homework (50%)\nHomework must be neat, well organized, and typed. Raw computer output is not acceptable. Numerical output should be incorporated into text or tables, and plots must be clearly labeled.\nStudents may collaborate, but submitted work must be their own and not identical to others.\nLate assignments receive a maximum of half credit. Assignments more than three days late will not be graded."
+  },
+  {
+    "objectID": "syllabus.html#participation-10",
+    "href": "syllabus.html#participation-10",
+    "title": "BIOS 731: Advanced Statistical Computing",
+    "section": "Participation (10%)",
+    "text": "Participation (10%)\nStudents are expected to attend class in person. Participation credit requires attendance and engagement in at least 20 lectures through asking or answering questions."
+  },
+  {
+    "objectID": "syllabus.html#final-project-and-presentation-30",
+    "href": "syllabus.html#final-project-and-presentation-30",
+    "title": "BIOS 731: Advanced Statistical Computing",
+    "section": "Final Project and Presentation (30%)",
+    "text": "Final Project and Presentation (30%)\nStudents will select a computational method from the past five years, apply it to a dataset, and present results to the class.\n\n\n\nComponent\nWeight\n\n\n\n\nWritten report\n50%\n\n\nIn-class presentation\n50%"
+  },
+  {
+    "objectID": "syllabus.html#discussion-board-10",
+    "href": "syllabus.html#discussion-board-10",
+    "title": "BIOS 731: Advanced Statistical Computing",
+    "section": "Discussion Board (10%)",
+    "text": "Discussion Board (10%)\nFour discussion posts based on readings and/or seminar lectures."
+  },
+  {
+    "objectID": "syllabus.html#course-structure",
+    "href": "syllabus.html#course-structure",
+    "title": "BIOS 731: Advanced Statistical Computing",
+    "section": "Course Structure",
+    "text": "Course Structure\nThis course meets in person twice weekly. The first half of each class is lecture-based, and the second half focuses on problem-solving in small groups."
+  },
+  {
+    "objectID": "syllabus.html#course-policies",
+    "href": "syllabus.html#course-policies",
+    "title": "BIOS 731: Advanced Statistical Computing",
+    "section": "Course Policies",
+    "text": "Course Policies\n\nAttendance\nRegular attendance is expected. Classes will be recorded and posted on Canvas.\n\n\nReadings and Texts\nNo required textbook. Suggested references include:\n\nMatloff, The Art of R Programming\nWickham, Advanced R\nBoyd & Vandenberghe, Convex Optimization\nHastie et al., Statistical Learning with Sparsity\nHastie et al., The Elements of Statistical Learning\nGolub & Van Loan, Matrix Computations\n\n\n\nInclusivity\nThis course values diverse perspectives. Please share your preferred name and pronouns."
+  },
+  {
+    "objectID": "syllabus.html#rsph-policies",
+    "href": "syllabus.html#rsph-policies",
+    "title": "BIOS 731: Advanced Statistical Computing",
+    "section": "RSPH Policies",
+    "text": "RSPH Policies\n\nAccessibility and Accommodations\nStudents requiring accommodations must register with the Office of Accessibility Services.\n\n\nHonor Code and Academic Integrity\nStudents are expected to uphold the Laney Graduate School Honor Code."
+  },
+  {
+    "objectID": "syllabus.html#class-schedule-tentative",
+    "href": "syllabus.html#class-schedule-tentative",
+    "title": "BIOS 731: Advanced Statistical Computing",
+    "section": "Class Schedule (Tentative)",
+    "text": "Class Schedule (Tentative)\n\n\n\n\n\n\n\n\n\nDate\nModule\nTopic\nAssignment\n\n\n\n\n1/14\nReproducible Computing\nGit/GitHub, reproducible R\n—\n\n\n1/15\nReproducible Computing\nDebugging, profiling\n\n\n\n1/21\nSimulation & Resampling\nSimulation studies\nHW1 due\n\n\n1/22\nSimulation & Resampling\nBootstrap & permutation tests\n\n\n\n1/28\nReproducible Computing\nParallelization, parametric reports\n\n\n\n1/29\n—\nNo class\n\n\n\n2/4\nOptimization I\nIntroduction to optimization\nHW2 due\n\n\n2/5\nOptimization I\nGradient methods, GLMs\n\n\n\n2/11\nOptimization I\nEM I: applications\n\n\n\n2/18\nOptimization I\nEM II: theory\n\n\n\n2/19\nOptimization I\nMM algorithm\n\n\n\n2/25\nBayesian Computing\nNumerical integration & sampling\nHW3 due\n\n\n2/26\nBayesian Computing\nIntroduction to MCMC\n\n\n\n3/4\nBayesian Computing\nMCMC II\n\n\n\n3/5\nBayesian Computing\nVariational Bayes\nProject proposals due\n\n\n3/11\nSpring Break\nNo class\n\n\n\n3/12\nSpring Break\nNo class\n\n\n\n3/18\nENAR\nNo class\n\n\n\n3/19\nCloud Computing\nHPC usage (guest lecture)\nHW4 due\n\n\n3/25\nCloud Computing\nCluster project organization\n\n\n\n3/26\nR Packages\nPackage basics\nHW5 due\n\n\n4/1\nR Packages\nRcpp\n\n\n\n4/2\nOptimization II\nLP, quantile regression\n\n\n\n4/8\nOptimization II\nQP, LASSO\n\n\n\n4/9\nOptimization II\nHMM and ADMM\n\n\n\n4/15\nOptimization II\nStochastic gradient descent\n\n\n\n4/16\nSpecial Topics\nTBD\nHW6 due\n\n\n4/22\nFinal Presentations\nFirst half\n\n\n\n4/23\nFinal Presentations\nSecond half"
+  }
+]

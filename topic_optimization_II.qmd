@@ -1,0 +1,18 @@
+---
+title: "Optimization, Part II"
+toc: true
+sidebar: false
+---
+
+In progress.
+
+```{r, eval = FALSE, echo = FALSE}
+
+Touches on constrained optimization, stochastic gradient descent (maybe)
+
+-   [Linear programming](what_is_ds_ii.qmd)
+-   [Quadratic programming](what_is_ds_ii.qmd)
+-   [HMM and ADMM](what_is_ds_ii.qmd)
+
+```
+

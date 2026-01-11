@@ -1,0 +1,7 @@
+---
+title: "Bayesian Computing"
+toc: true
+sidebar: false
+---
+
+In progress.

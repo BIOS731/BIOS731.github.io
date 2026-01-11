@@ -1,0 +1,16 @@
+---
+title: "Building R Packages"
+toc: true
+sidebar: false
+---
+
+In progress.
+
+```{r, eval = FALSE, echo = FALSE}
+
+
+- [Introduction to R packages](what_is_ds_ii.qmd)
+- [RCPP](what_is_ds_ii.qmd)
+
+```
+
