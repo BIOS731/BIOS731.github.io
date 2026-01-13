@@ -158,6 +158,48 @@
     "href": "repro_crash_course.html#overview",
     "title": "A Crash Course in Reproducible Computing",
     "section": "Overview",
-    "text": "Overview\n\nSlide Deck: project organizationSlide Deck: git/GithubLab\n\n\n\nCrash course on reproducible computing in R\nDownload slides (PDF)\n\n\n\n\nCrash course on reproducible computing in R\nDownload slides (PDF)\n\n\n\nDo covid lab."
+    "text": "Overview\n\nSlide Deck: project organizationSlide Deck: git/GithubLab: CDC open data\n\n\n\nCrash course on reproducible computing in R\nDownload slides (PDF)\n\n\n\n\nCrash course on reproducible computing in R\nDownload slides (PDF)\n\n\n\nThe CDC has over 1300 open-source datasets available at data.cdc.gov.\n\nTopic areas include injury & violence, vaccination, smoking,pregnancy, chronic disease, and disease surveillance\nGreat source of Covid surveillance data\ndata.gov hosts additional 250K+ datasets\n\nThe Covid Wastewater dataset comes from the National Wastewater Surveillance System(NWSS) Public SARS-CoV-2 Concentration in Wastewater Data.\n\nContains SARS-CoV-2 concentration at different sampling locations across the U.S.\nUpdate Daily\n\nThere are two available datasets:\n\nLongitudinal data, which has four columns and provides concentrations over time\nCross-sectional data, which includes current concentration and other summaries, as well as information about state, county (16 total columns)\n\nOur goal is to produce an end-to-end reproducible workflow with this data. We will do the following:\n\nDownload the data directly into R by interacting with the CDC API.\nClean the data: Longitudinal data contains concentrations over time,and cross-sectional data contains information about county each data collection site is located in. We will merge these two datasets and subset to collection sites in Georgia only.\nAnalyze data.\nVisualize data.\n\nPull these steps together into a documented reproducible report.\n\n1: Create final report\nI’ve done most of these steps for us already by creating an example project folder. Download it here.\n\nDownload and unzip this folder\nCheck out the files in the source subfolder. What are each of these doing?\nBuild a final_report Quarto or R Markdown document that calls each of the steps of the data analysis, and explains what is being done at each step.\nAs you make changes to the project, commit changes using git.\nFeel free to add some of your own visualizations.\n\n\n\n2: Upload to GitHub\n\nPush your finished project to GitHub\nClone one of your classmate’s repos and try to run their final report document. Was it fully reproducible?"
+  },
+  {
+    "objectID": "homework/topic_reproducible_computing/HW_reproducibility.html",
+    "href": "homework/topic_reproducible_computing/HW_reproducibility.html",
+    "title": "Homework 1: Reproducible Computing",
+    "section": "",
+    "text": "This assignment reinforces ideas in Module 1: Reproducible Computing in R. We focus specifically on project organization and GitHub."
+  },
+  {
+    "objectID": "homework/topic_reproducible_computing/HW_reproducibility.html#context",
+    "href": "homework/topic_reproducible_computing/HW_reproducibility.html#context",
+    "title": "Homework 1: Reproducible Computing",
+    "section": "",
+    "text": "This assignment reinforces ideas in Module 1: Reproducible Computing in R. We focus specifically on project organization and GitHub."
+  },
+  {
+    "objectID": "homework/topic_reproducible_computing/HW_reproducibility.html#due-date-and-submission",
+    "href": "homework/topic_reproducible_computing/HW_reproducibility.html#due-date-and-submission",
+    "title": "Homework 1: Reproducible Computing",
+    "section": "Due date and submission",
+    "text": "Due date and submission\nPlease submit (via Canvas) the web address of the GitHub repo containing your work for this assignment; git commits after the due date will cause the assignment to be considered late.\nR Markdown or Quarto documents included as part of your solutions must not install packages, and should only load the packages necessary for your submission to knit."
+  },
+  {
+    "objectID": "homework/topic_reproducible_computing/HW_reproducibility.html#points",
+    "href": "homework/topic_reproducible_computing/HW_reproducibility.html#points",
+    "title": "Homework 1: Reproducible Computing",
+    "section": "Points",
+    "text": "Points\n\n\n\n\n\nProblem\nPoints\n\n\n\n\nProblem 0\n20\n\n\nProblem 1.1\n10\n\n\nProblem 1.2\n5\n\n\nProblem 1.3\n20\n\n\nProblem 1.4\n30\n\n\nProblem 1.5\n15"
+  },
+  {
+    "objectID": "homework/topic_reproducible_computing/HW_reproducibility.html#problem-1",
+    "href": "homework/topic_reproducible_computing/HW_reproducibility.html#problem-1",
+    "title": "Homework 1: Reproducible Computing",
+    "section": "Problem 1",
+    "text": "Problem 1\nThis “problem” focuses on structure of your submission, especially the use git and GitHub for reproducibility, R Projects to organize your work, R Markdown/Quarto to write reproducible reports, relative paths to load data from local files, and reasonable naming structures for your files.\nTo that end:\n\ncreate a public GitHub repo + local R Project; I suggest naming this repo / directory bios731_hw1_YourLastName (e.g. bios731_hw1_wrobel for Julia)\nSubmit your whole project folder to GitHub\nSubmit a PDF knitted from Rmd to Canvas. Your solutions to the problem here should be implemented in your .Rmd file, and your git commit history should reflect the process you used to solve these Problems.\n\n\nCreate a reproducible project, using the project structure learned in the project organization structure.\nPick a dataset and do a brief analysis with this dataset following structure from project organization. You may want to use a dataset from your own research, however your project will need to be fully reproducible and hosted publicly on GitHub, so please make sure your dataset can be uploaded to GH before you do so! There should be a data cleaning component, and modeling component, a data visualization component, and a final report.\nYour project should have a README that describes the dataset as well as the files within your project folder.\nPut your project in a public repository on GitHub, please use informative commit messages.\nYour final product should be fully reproducible. Your grade will depend on it. We should be able to clone your repo from GitHub and follow the readme to reproduce the workflow without changing any filepaths or any thing else!."
+  },
+  {
+    "objectID": "homework/topic_reproducible_computing/HW_reproducibility.html#rubric",
+    "href": "homework/topic_reproducible_computing/HW_reproducibility.html#rubric",
+    "title": "Homework 1: Reproducible Computing",
+    "section": "Rubric",
+    "text": "Rubric\n\nNeed to have Rproject\nShould have informative commit messages\nShould have code that is self documenting\nShould have a README explaining the workflow\nIf code doesn’t knit because we need to install a library first, no points should be deducted; however libraries should be loaded at the beginning of the document and readme should include sessionInfo()"
   }
 ]

@@ -36,9 +36,49 @@ In this, we will cover basic topics in reproducible computing, including coding 
 
 ***
 
-### Lab
+### Lab: CDC open data
 
-Do covid lab.
+The CDC has over 1300 open-source datasets available at [data.cdc.gov](https://data.cdc.gov/).
+
+- Topic areas include injury & violence, vaccination, smoking,pregnancy, chronic disease, and disease surveillance
+- Great source of Covid surveillance data
+- [data.gov](https://data.gov/) hosts additional 250K+ datasets
+
+The [**Covid Wastewater dataset**](https://www.cdc.gov/nwss/rv/COVID19-national-data.html#about-data) comes from the National Wastewater Surveillance System(NWSS) Public SARS-CoV-2 Concentration in Wastewater Data.
+
+- Contains SARS-CoV-2 concentration at different sampling locations across the U.S.
+- Update Daily
+
+There are two available datasets:
+  
+1. Longitudinal data, which has four columns and provides concentrations over time
+2. Cross-sectional data, which includes current concentration and other summaries, as well as information about state, county (16 total columns)
+
+Our goal is to produce an end-to-end reproducible workflow with this data. We will do the following:
+
+1. Download the data directly into R by interacting with the CDC API.
+2. Clean the data: Longitudinal data contains concentrations over time,and cross-sectional data contains information about county each data collection site is located in. We will merge these two datasets and subset to collection sites in Georgia only.
+3. Analyze data.
+4. Visualize data.
+
+Pull these steps together into a documented reproducible report.
+
+
+#### 1: Create final report
+
+
+I've done most of these steps for us already by creating an example project folder. Download it [here](labs/example_project.zip).
+
+- Download and unzip this folder
+- Check out the files in the `source` subfolder. What are each of these doing?
+- Build a `final_report` Quarto or R Markdown document that calls each of the steps of the data analysis, and explains what is being done at each step.
+- As you make changes to the project, commit changes using `git`.
+- Feel free to add some of your own visualizations.
+
+#### 2: Upload to GitHub
+
+- Push your finished project to GitHub
+- Clone one of your classmate's repos and try to run their final report document. Was it fully reproducible?
 
 
 

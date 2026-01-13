@@ -37,5 +37,11 @@
   },
   "slides/topic_reproducible_computing/reproducible_computingII.qmd": {
     "reproducible_computingII.tex": "b4049d35"
+  },
+  "homework/topic_reproducible_computing/HW_reproducibility.qmd": {
+    "HW_reproducibility.tex": "749cb6ed"
+  },
+  "homework/topic_reproducible_computing/HW_reproducibility.Rmd": {
+    "HW_reproducibility.html": "0c10abee"
   }
 }
