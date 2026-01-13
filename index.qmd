@@ -4,4 +4,4 @@ title: "BIOS 731: Advanced Statistical Computing"
 
 This course is being offered in the Spring of 2026 through the Biostatistics and Informatics Department at the Emory University Rollins School of Public Health.
 
-- Instructor: Julia Wrobel
+- Instructor: [Julia Wrobel](https://julia-wrobel.github.io/)

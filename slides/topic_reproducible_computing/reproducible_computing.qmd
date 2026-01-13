@@ -1219,7 +1219,7 @@ Raise your hand if you've ever gotten frustrated while interactively coding and 
 
 ## The `here` package
 
-\fontsize{8pt}{9pt}\selectfont
+\fontsize{9pt}{10pt}\selectfont
 What if I want to load data in a document that lives in a subfolder such as `my_project\analysis\code.Rmd`?
 
 * Doesn't matter! You can use the same code within the `.Rmd` document to load the data
@@ -1246,24 +1246,65 @@ It's not only data you can access this way, but this is the most common use case
 ---
 
 
-## The `projectr` package
+## Automated project initiation using `projectr`
 
-Not really a **real** package, but I use it all the time.
+Hosted on my GitHub, heavily adapted from [Jeff Goldsmith](https://github.com/jeff-goldsmith/projectr)
 
-- Right now only works if you have a Mac (sorry).
+```{r, eval = FALSE}
+devtools::install_github("julia-wrobel/projectr")
+
+projectr::proj_start(proj_dir = "~/projects/2024/202407_PERSON_PROJECT",
+                     data_dir = "~/Data/202407_data")
+```
+
+- **proj_dir**: where on your computer you want the project to live
+- **data_dir**: where you want the data to live, if not within your project folder
+  - Sets up a symbolic link from the project directory to this folder
+
+
+---
+
+## Symbolic links
+
+There are great reasons NOT to put raw data in the project folder
+
+* iOS uploads many folders automatically to the cloud
+* data has PHS so you can't put it on GitHub
+* data is stored on OneDrive/Box/AWS and you can't download a local copy
+
+![](projectr_example.png){width=80%}
+
+:::notes
+A symbolic link is basically just the Unix name for a shortcut. It allows the data to be accessed through the project directory data subfolder, even if the data is actually stored somewhere else.
+:::
+
+---
+
+## Setting up a symbolic link in the terminal
+
+Pseudo code for setting up a symbolic link:
+
+```bash
+ln -s /path/to/target /path/to/symlink
+```
+
+
+
+::: notes
+Knowing how to use the terminal will already come in handy! I've needed to set these up by hand a couple of times. For example, if I change the location of my data or if I get a new computer with a different username, which breaks the symbolic link
+:::
+
 
 ---
 
 ## The `projectr` package
 
-Talk about symbolic links.
+Right now only works if you have a Mac (sorry).
 
----
+In lab we will build our own code with similar functionality.
 
 
-## A function for doing basically the same thing
 
-We will play around with building one of these ourselves in the lab.
 
 
 
