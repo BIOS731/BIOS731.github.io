@@ -35,6 +35,144 @@ In this, we will cover basic topics in reproducible computing, including coding 
 
 
 ***
+### Lab: projectr
+
+
+I asked ChatGPT to write me some code for creating a reproducible file structure for a new project. The prompt I used is below:
+
+
+> Can you write me an R function that will take in a filepath, and name for a new directlry then create a new directory with that same that includes subfolders called "analysis", "source", "data", "results", and "literature", and also contains an initialized .git repo, a .Rproj file with the same name as the new directory in the root, and a README.md file?
+
+
+
+
+Below is the code it wrote me. What is it doing?  Modify it to suit your own preferences, and see if it works!
+
+- Also, we just spent a while talking about coding practices. What do you like about this code?  What do you dislike?
+
+```{r, eval = FALSE, echo = TRUE}
+create_r_project_skeleton <- function(base_path,
+                                      project_name,
+                                      open_rproj = FALSE,
+                                      git = TRUE) {
+  stopifnot(is.character(base_path), length(base_path) == 1, nzchar(base_path))
+  stopifnot(is.character(project_name), length(project_name) == 1, nzchar(project_name))
+
+  # Normalize inputs
+  base_path <- normalizePath(base_path, winslash = "/", mustWork = FALSE)
+
+  # Basic name safety (avoid characters that are awkward on Windows/macOS/Linux)
+  if (grepl("[/\\\\:*?\"<>|]", project_name)) {
+    stop("project_name contains invalid path characters. Use a simple folder name.")
+  }
+
+  project_path <- file.path(base_path, project_name)
+
+  if (dir.exists(project_path)) {
+    stop("Target project directory already exists: ", project_path)
+  }
+
+  # Create main directory
+  ok <- dir.create(project_path, recursive = TRUE, showWarnings = FALSE)
+  if (!ok || !dir.exists(project_path)) {
+    stop("Failed to create project directory: ", project_path)
+  }
+
+  # Create subdirectories
+  subdirs <- c("analysis", "source", "data", "results", "literature")
+  for (d in subdirs) {
+    dir.create(file.path(project_path, d), showWarnings = FALSE)
+  }
+
+  # Create .Rproj file
+  rproj_path <- file.path(project_path, paste0(project_name, ".Rproj"))
+  rproj_contents <- c(
+    "Version: 1.0",
+    "",
+    "RestoreWorkspace: No",
+    "SaveWorkspace: No",
+    "AlwaysSaveHistory: Default",
+    "",
+    "EnableCodeIndexing: Yes",
+    "UseSpacesForTab: Yes",
+    "NumSpacesForTab: 2",
+    "Encoding: UTF-8",
+    "",
+    "RnwWeave: Sweave",
+    "LaTeX: pdfLaTeX"
+  )
+  writeLines(rproj_contents, con = rproj_path, useBytes = TRUE)
+
+  # Create README.md
+  readme_path <- file.path(project_path, "README.md")
+  readme_contents <- c(
+    paste0("# ", project_name),
+    "",
+    "## Overview",
+    "Describe the purpose of this project.",
+    "",
+    "## Structure",
+    "- `analysis/` - analysis scripts and notebooks",
+    "- `source/` - reusable functions and modules",
+    "- `data/` - raw and intermediate data (consider a data management policy)",
+    "- `results/` - figures, tables, and outputs",
+    "- `literature/` - papers, notes, and references",
+    "",
+    "## Reproducibility",
+    "- Record package versions (e.g., `renv::init()`) as needed."
+  )
+  writeLines(readme_contents, con = readme_path, useBytes = TRUE)
+
+  # Initialize git repo (optional)
+  if (isTRUE(git)) {
+    git_available <- nzchar(Sys.which("git"))
+    if (!git_available) {
+      warning("git=TRUE but Git executable not found on PATH; skipping git init.")
+    } else {
+      old_wd <- getwd()
+      on.exit(setwd(old_wd), add = TRUE)
+      setwd(project_path)
+
+      # Initialize repository
+      system2("git", c("init"), stdout = TRUE, stderr = TRUE)
+
+      # Optional: create a minimal .gitignore tailored to typical R projects
+      gitignore_path <- file.path(project_path, ".gitignore")
+      gitignore_contents <- c(
+        ".Rhistory",
+        ".RData",
+        ".Ruserdata",
+        ".DS_Store",
+        "Thumbs.db",
+        "results/",
+        "data/"
+      )
+      writeLines(gitignore_contents, con = gitignore_path, useBytes = TRUE)
+    }
+  }
+
+  # Optionally open the project in RStudio if available
+  if (isTRUE(open_rproj)) {
+    if (interactive() && nzchar(Sys.which("rstudio"))) {
+      system2("rstudio", rproj_path, wait = FALSE)
+    } else if (interactive()) {
+      message("open_rproj=TRUE but could not find 'rstudio' on PATH; created: ", rproj_path)
+    }
+  }
+
+  invisible(list(
+    project_path = project_path,
+    subdirs = file.path(project_path, subdirs),
+    rproj = rproj_path,
+    readme = readme_path,
+    git_initialized = isTRUE(git) && nzchar(Sys.which("git"))
+  ))
+}
+
+```
+
+
+
 
 ### Lab: CDC open data
 

@@ -1243,6 +1243,27 @@ my_data = read.csv(path_to_data)
 It's not only data you can access this way, but this is the most common use case.
 :::
 
+---
+
+
+## The `projectr` package
+
+Not really a **real** package, but I use it all the time.
+
+- Right now only works if you have a Mac (sorry).
+
+---
+
+## The `projectr` package
+
+Talk about symbolic links.
+
+---
+
+
+## A function for doing basically the same thing
+
+We will play around with building one of these ourselves in the lab.
 
 
 

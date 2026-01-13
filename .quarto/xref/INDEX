@@ -33,7 +33,8 @@
     "repro_crash_course.html": "f0621ee8"
   },
   "slides/topic_reproducible_computing/reproducible_computing.qmd": {
-    "reproducible_computing.tex": "ff68dbef"
+    "reproducible_computing.tex": "ff68dbef",
+    "reproducible_computing.html": "1a62a632"
   },
   "slides/topic_reproducible_computing/reproducible_computingII.qmd": {
     "reproducible_computingII.tex": "b4049d35"

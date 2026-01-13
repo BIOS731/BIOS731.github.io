@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Julia Wrobel">
+
+<title>Crash course on reproducible computing in R – BIOS731</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-ff63373b1067ca6f91cf1456aa1f00a2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+</head><body class="nav-fixed quarto-light">\usepackage{xcolor}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\green}[1]{\textcolor{green}{#1}}
+
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">BIOS731</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-topics" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Topics</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-topics">    
+        <li>
+    <a class="dropdown-item" href="../../topic_reproducible_computing.html">
+ <span class="dropdown-text">Reproducible Computing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_simulation.html">
+ <span class="dropdown-text">Simulation and Resampling</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_optimization.html">
+ <span class="dropdown-text">Optimization I</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_bayesian_computing.html">
+ <span class="dropdown-text">Bayesian Computing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_cloud_computing.html">
+ <span class="dropdown-text">Cloud Computing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_R_packages.html">
+ <span class="dropdown-text">R packages</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_optimization_II.html">
+ <span class="dropdown-text">Optimization II</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_other_material.qmd">
+ <span class="dropdown-text">Other Materials</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-datasets" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Datasets</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-datasets">    
+        <li>
+    <a class="dropdown-item" href="../../dataset_airbnb.qmd">
+ <span class="dropdown-text">Cannabis</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../dataset_brfss.qmd">
+ <span class="dropdown-text">Craniosynothosis</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../syllabus.html"> 
+<span class="menu-text">Syllabus</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/julia-wrobel/BIOS731"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="reproducible_computing.pdf"><i class="bi bi-file-pdf"></i>Beamer</a></li></ul></div></div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Crash course on reproducible computing in R</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Julia Wrobel </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>Today, we cover:</p>
+<ul>
+<li><p>Course overview</p></li>
+<li><p>Basic principles of reproducible computing</p>
+<ul>
+<li>Coding style<br>
+</li>
+<li>Using the command line<br>
+</li>
+<li>Project organization</li>
+</ul></li>
+<li><p>Lab with practice questions, if time allows</p></li>
+</ul>
+<div class="notes">
+<p>How many of you have taken David Benkeser’s data science class? Some of this comes from his class, and I like his tone so I will keep it.</p>
+</div>
+<hr>
+</section>
+<section id="about-me" class="level2">
+<h2 class="anchored" data-anchor-id="about-me">About me</h2>
+<p><strong>Research</strong></p>
+<ul>
+<li>Functional data analysis</li>
+<li>Spatial proteomics</li>
+<li>Application areas: cannabis impairment, wearables/sensor data, ovarian cancer</li>
+</ul>
+<div class="notes">
+<p>I think this is the most fun you can have doing statistics. What about you? What research are you doing? Course is supposed to give you tools to help with your research!</p>
+</div>
+<hr>
+</section>
+<section id="announcements" class="level2">
+<h2 class="anchored" data-anchor-id="announcements">Announcements</h2>
+<ul>
+<li>Discussion board post due tomorrow (1/15) at 10:00AM</li>
+<li>Homework 1 due Wednesday, 1/21 at 10:00AM</li>
+</ul>
+<hr>
+</section>
+<section id="course-objectives" class="level2">
+<h2 class="anchored" data-anchor-id="course-objectives">Course objectives</h2>
+<p>My goal for this course is for you to learn practical skills you need to become a statistical methods researcher. There are two main areas we will focus on:</p>
+<ol type="1">
+<li>Computing
+<ul>
+<li>R focused<br>
+</li>
+</ul></li>
+<li>Algorithms
+<ul>
+<li>Look under the hood at algorithms for commonly used methods like logistic regression, LASSO, mixed effects models</li>
+</ul></li>
+</ol>
+<p>There is a <a href="https://bios731.github.io/">new course website</a> where all materials (other than HW) will be shared.</p>
+<div class="notes">
+<p>Units will go back and forth between these things.</p>
+</div>
+<hr>
+</section>
+<section id="my-teaching-philosophy" class="level2">
+<h2 class="anchored" data-anchor-id="my-teaching-philosophy">My teaching philosophy</h2>
+<ul>
+<li>Ask questions early and often
+<ul>
+<li>It helps you stay engaged and others are likely to benefit from your question as well</li>
+</ul></li>
+<li>What you learn is proportional to the effort you put in
+<ul>
+<li>Try to think about this less as a class where you try to get a grade and more as a place where you are learning the skills to be a good researcher and help you write a <strong>great</strong> dissertation</li>
+<li>Use ChatGPT, but wisely</li>
+</ul></li>
+<li>Feel free to work together</li>
+</ul>
+<div class="notes">
+<p>These concepts can be super fun to learn</p>
+</div>
+<hr>
+</section>
+<section id="emails-vs.-discussion-board" class="level2">
+<h2 class="anchored" data-anchor-id="emails-vs.-discussion-board">Emails vs.&nbsp;Discussion board</h2>
+<p><strong>Discussion board</strong></p>
+<ul>
+<li>All questions about course content should go on the discussion board!
+<ul>
+<li>This includes homework questions</li>
+<li>This allows all students to benefit from questions asked about course content</li>
+<li><strong>Posting</strong> and <strong>answering</strong> questions posted on the discussion board will count towards your participation grade</li>
+</ul></li>
+</ul>
+<p><strong>Emails</strong></p>
+<ul>
+<li>Email should only be used for schedule purposes and personal matters</li>
+</ul>
+<hr>
+</section>
+<section id="office-hours-and-homework-due-dates" class="level2">
+<h2 class="anchored" data-anchor-id="office-hours-and-homework-due-dates">Office hours and homework due dates</h2>
+<p>Office hours</p>
+<ul>
+<li>Tuesdays at 11:00AM (Weijia)</li>
+<li>Thursdays at 1:00PM (Me)</li>
+</ul>
+<p>Homework policies</p>
+<ul>
+<li>Homeworks will be due on Wednesdays at 10am</li>
+<li>Late assignments will receive a maximum of half credit. Assignments more than 3 days late will not be accepted.
+<ul>
+<li>Let me know (if possible, in advance) if you have known conflicts with the due dates or a special circumstance (conference travel, family emergency)</li>
+</ul></li>
+</ul>
+<div class="notes">
+<p>I may be flexible about the due dates since the course is new</p>
+</div>
+<hr>
+</section>
+<section id="grading" class="level2">
+<h2 class="anchored" data-anchor-id="grading">Grading</h2>
+<ul>
+<li>Homework (50%)
+<ul>
+<li>6-7 assignments</li>
+</ul></li>
+<li>Discussion board posts (10%)
+<ul>
+<li>4-5 posts</li>
+</ul></li>
+<li>Participation (10%)
+<ul>
+<li>Participation can mean asking questions in class, posting on the discussion board, or attending office hours</li>
+<li>To quantify, 5+ posts on discussion board besides official posts</li>
+<li>I encourage you to post computing tricks, cool algorithms, etc</li>
+</ul></li>
+<li>Final project (30%)
+<ul>
+<li>Related to your research, if possible</li>
+</ul></li>
+</ul>
+<hr>
+</section>
+<section id="syllabus" class="level2">
+<h2 class="anchored" data-anchor-id="syllabus">Syllabus</h2>
+<ul>
+<li>Course content will be hosted on Course Website</li>
+<li>Homework will be posted on Canvas</li>
+<li>Any other questions?</li>
+</ul>
+<hr>
+</section>
+<section id="coding-style" class="level2">
+<h2 class="anchored" data-anchor-id="coding-style">Coding style</h2>
+<hr>
+</section>
+<section id="principles-for-scientific-coding" class="level2">
+<h2 class="anchored" data-anchor-id="principles-for-scientific-coding">Principles for scientific coding</h2>
+<p>In this order:</p>
+<ol type="1">
+<li>Code that works.</li>
+<li>Code that is reproducible.</li>
+<li>Code that is readable.</li>
+<li>Code that is generalizable.</li>
+<li>Code that is efficient.</li>
+</ol>
+<p>A <strong>minimal standard</strong> for scientific computing is 1-3.</p>
+<hr>
+</section>
+<section id="advice-for-beginner-coders" class="level2">
+<h2 class="anchored" data-anchor-id="advice-for-beginner-coders">Advice for beginner coders</h2>
+<p>It’s OK to <strong>copy/paste code</strong> from ChatGPT or Stack Overflow, but make sure you <strong>understand how it works</strong>.</p>
+<ul>
+<li>Run line by line and see what each does.</li>
+<li>Change the code and see if it behaves as expected.</li>
+</ul>
+<p>Stakes for copy/paste can be high!</p>
+<ul>
+<li>Incorrect analyses.</li>
+<li>Expensive (inadvertent) cloud computing.</li>
+</ul>
+<p>For high stakes analyses, ask a colleague for a <strong>code review</strong>.</p>
+<hr>
+</section>
+<section id="advice-for-more-advanced-coders" class="level2">
+<h2 class="anchored" data-anchor-id="advice-for-more-advanced-coders">Advice for more advanced coders</h2>
+<p>Getting code AND is <strong>most important</strong>.</p>
+<ul>
+<li>Make your code more efficient later.</li>
+<li>After a paper is submitted for review?</li>
+</ul>
+<p>Remember: you don’t get bonus points for code that “looks impressive”.</p>
+<hr>
+</section>
+<section id="think-before-you-code" class="level2">
+<h2 class="anchored" data-anchor-id="think-before-you-code">Think before you code</h2>
+<p>Before you start writing code, think about what you want the code to do.</p>
+<p>Plain English → pseudo-code → actual code</p>
+<p>This careful thought process can ultimately lead to <strong>more efficient</strong> and <strong>more robust</strong> code development.</p>
+<hr>
+</section>
+<section id="dont-repeat-yourself" class="level2">
+<h2 class="anchored" data-anchor-id="dont-repeat-yourself">Don’t repeat yourself</h2>
+<p>Don’t repeat yourself (DRY) is a fundamental concept in programming.</p>
+<ul>
+<li><em>Ruthlessly eliminate duplication</em>, <a href="https://swcarpentry.github.io/good-enough-practices-in-scientific-computing/">Wilson et al</a></li>
+</ul>
+<p>For example, variables <code>score1=1</code>, <code>score2=2</code>, <code>score3=3</code> → <code>score=list(1,2,3)</code>.</p>
+<p>If you write the same code more than once, it should be a function.</p>
+<ul>
+<li>Break large tasks into smaller calls to functions.</li>
+<li>Give functions (everything, really) meaningful names.
+<ul>
+<li>self-documenting code</li>
+</ul></li>
+</ul>
+<div class="notes">
+<p>It is highly inefficient and dangerous to copy and paste multiple chunks of code. * What if you need to change 1 thing? Needs to be changed in multiple places. Risk getting a wrong answer because we forgot to change one small thing.</p>
+<p>Meaningful names make reading code much easier. It’s OK to make names long and informative. Most (good) text editors will have tab completion so that it won’t slow you down typing (once you’re used to using it).</p>
+</div>
+<hr>
+</section>
+<section id="functions-in-r" class="level2">
+<h2 class="anchored" data-anchor-id="functions-in-r">Functions in <code>R</code></h2>
+<p>If you don’t know how functions work in <code>R</code>, .</p>
+<ul>
+<li><a href="https://swcarpentry.github.io/r-novice-inflammation/02-func-R/">Software carpentry: Creating R Functions</a></li>
+<li><a href="https://r4ds.had.co.nz/functions.html">R for Data Science: Functions</a></li>
+<li><a href="https://www.datacamp.com/community/tutorials/functions-in-r-a-tutorial">DataCamp: A Tutorial on Using Functions in R!</a></li>
+</ul>
+<div class="notes">
+<p>I’m not planning to cover this… but it’s super important! Learn it if you don’t know it already.</p>
+</div>
+<hr>
+</section>
+<section id="generalize-some" class="level2">
+<h2 class="anchored" data-anchor-id="generalize-some">Generalize… some</h2>
+<p>Write code <strong>a bit more general</strong> than your data or specific task.</p>
+<ul>
+<li>Don’t assume particular dimensions.</li>
+<li>Don’t forget about missing values (even if <em>your</em> data have none).</li>
+</ul>
+<p>But </p>
+<ul>
+<li>Try to anticipate what you might be asked for, but don’t prepare for every possibility.</li>
+<li>If you think of <strong>extreme cases</strong> where code breaks, <strong>document them</strong>.</li>
+</ul>
+<div class="notes">
+<p>Do you hear your collaborators making an arbitrary decision in the analysis plan? Prepare for that decision to change. - especially when it comes to which variables you want to put in the model!!</p>
+</div>
+</section>
+<section id="generalize-some-1" class="level2">
+<h2 class="anchored" data-anchor-id="generalize-some-1">Generalize… some</h2>
+<p>Use <strong>function arguments</strong> to handle different cases.</p>
+<ul>
+<li>Don’t assume particular file names.</li>
+<li>Don’t assume particular tuning parameters.</li>
+<li>Don’t assume particular regression formulas.</li>
+</ul>
+<p>How general to make your code depends on its purpose!!</p>
+<div class="notes">
+<p>Least general: analyze a specific dataset Most general: R package implementing a new method</p>
+</div>
+<hr>
+</section>
+<section id="no-magic-numbers" class="level2">
+<h2 class="anchored" data-anchor-id="no-magic-numbers">No magic numbers</h2>
+<p>There are <strong>many decision points</strong> in an analysis. Give them a name!</p>
+<ul>
+<li>How many <strong>bootstrap samples</strong>?
+<ul>
+<li><code>nboot = 1e3</code></li>
+</ul></li>
+<li>What <strong>tolerance for convergence</strong> of an algorithm?
+<ul>
+<li><code>tol_covergence = 1e-3</code></li>
+</ul></li>
+<li>What <strong>threshold</strong> for excluding missing data?
+<ul>
+<li><code>tol_missingness = 3</code></li>
+</ul></li>
+</ul>
+</section>
+<section id="no-magic-numbers-1" class="level2">
+<h2 class="anchored" data-anchor-id="no-magic-numbers-1">No magic numbers</h2>
+<p>Even better, include them as an <strong>argument to a function</strong> (with default values and documentation, as needed)!</p>
+<ul>
+<li><code>get_bootstrap_ci &lt;- function(..., nboot = 1e3)</code></li>
+<li><code>my_algorithm &lt;- function(..., tol_convergence = 1e-3)</code></li>
+</ul>
+<div class="notes">
+<p>The variable name should roughly tell you what the number represents!</p>
+</div>
+<hr>
+</section>
+<section id="other-guidelines" class="level2">
+<h2 class="anchored" data-anchor-id="other-guidelines">Other guidelines</h2>
+<ul>
+<li><p><strong>Indent</strong>!</p>
+<ul>
+<li>2 or 4 spaces (join the debate)</li>
+<li>Tabs can get nasty across systems.</li>
+</ul></li>
+<li><p>Use <strong>white space</strong>!</p>
+<ul>
+<li>After commas, operators</li>
+<li>after headers in Rmarkdown (following <code>#</code>)</li>
+</ul></li>
+<li><p>Use <code>{}</code> and <code>()</code> to <strong>avoid ambiguity</strong>.</p></li>
+<li><p>Keep <strong>lines short</strong>!</p>
+<ul>
+<li>Rule of thumb is 72 or 80 characters.</li>
+<li>Most text editors have settings to help with this.</li>
+</ul></li>
+</ul>
+<div class="notes">
+<p>A pet peeve of mine is when people don’t use enough white space in Rmd. I have a lot of visual pet peeves, it turns out.</p>
+</div>
+<hr>
+</section>
+<section id="other-guidelines-1" class="level2">
+<h2 class="anchored" data-anchor-id="other-guidelines-1">Other guidelines</h2>
+<p>Bad!</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># move values above/below quantiles to those quantiles</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>winsorize<span class="ot">&lt;-</span><span class="cf">function</span>(vec,<span class="at">q=</span><span class="fl">0.006</span>){</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>lohi<span class="ot">&lt;-</span><span class="fu">quantile</span>(vec,<span class="fu">c</span>(q,<span class="dv">1</span><span class="sc">-</span>q),<span class="at">na.rm=</span><span class="cn">TRUE</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="fu">diff</span>(lohi)<span class="sc">&lt;</span><span class="dv">0</span>)lohi<span class="ot">&lt;-</span><span class="fu">rev</span>(lohi)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>vec[<span class="sc">!</span><span class="fu">is.na</span>(vec)<span class="sc">&amp;</span>vec<span class="sc">&lt;</span>lohi[<span class="dv">1</span>]]<span class="ot">&lt;-</span>lohi[<span class="dv">1</span>]</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>vec[<span class="sc">!</span><span class="fu">is.na</span>(vec)<span class="sc">&amp;</span>vec<span class="sc">&gt;</span>lohi[<span class="dv">2</span>]]<span class="ot">&lt;-</span>lohi[<span class="dv">2</span>]</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>vec}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Better!</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># move values above/below quantiles to those quantiles</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>winsorize <span class="ot">&lt;-</span> <span class="cf">function</span>(vec, <span class="at">q =</span> <span class="fl">0.006</span>){</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  lohi <span class="ot">&lt;-</span> <span class="fu">quantile</span>(vec, <span class="fu">c</span>(q, <span class="dv">1</span> <span class="sc">-</span> q), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">diff</span>(lohi) <span class="sc">&lt;</span> <span class="dv">0</span>){</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    lohi <span class="ot">&lt;-</span> <span class="fu">rev</span>(lohi)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  vec[ <span class="sc">!</span><span class="fu">is.na</span>(vec) <span class="sc">&amp;</span> (vec <span class="sc">&lt;</span> lohi[<span class="dv">1</span>]) ] <span class="ot">&lt;-</span> lohi[<span class="dv">1</span>]</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  vec[ <span class="sc">!</span><span class="fu">is.na</span>(vec) <span class="sc">&amp;</span> (vec <span class="sc">&gt;</span> lohi[<span class="dv">2</span>]) ] <span class="ot">&lt;-</span> lohi[<span class="dv">2</span>]</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(vec)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="notes">
+<p>The parenthesis around <code>vec &lt; lohi[1]</code> are probably unnecessary, but want to illustrate the point. Which function looks better?</p>
+</div>
+<hr>
+</section>
+<section id="naming-objects" class="level2">
+<h2 class="anchored" data-anchor-id="naming-objects">Naming objects</h2>
+<p>Give objects informative names:</p>
+<ul>
+<li>Names should be:
+<ol type="1">
+<li>most importantly, descriptive</li>
+<li>as concise as possible while still being descriptive</li>
+</ol></li>
+<li>Avoid <code>tmp1</code>, <code>tmp2</code>, …
+<ul>
+<li>…as <code>tmp</code>ting as it may be.</li>
+</ul></li>
+<li>Functions as verbs, objects as nouns</li>
+</ul>
+<div class="notes">
+<p>Please don’t look too closely at my <code>R</code> packages. You may learn what a hypocrite I am.</p>
+</div>
+<hr>
+</section>
+<section id="naming-objects-1" class="level2">
+<h2 class="anchored" data-anchor-id="naming-objects-1">Naming objects</h2>
+<p>Have <strong>consistency</strong> in your naming systems:</p>
+<ul>
+<li>E.g., <code>markers</code> vs.&nbsp;<code>mnames</code>; <code>nft</code> vs.&nbsp;<code>n_ft</code></li>
+</ul>
+<p>Commit to a case:</p>
+<ul>
+<li><code>camelCase</code> vs.&nbsp;<code>pothole_case</code></li>
+</ul>
+<p>Don’t confuse yourself:</p>
+<ul>
+<li><code>total</code> vs.&nbsp;<code>totals</code></li>
+<li><code>result</code> vs.&nbsp;<code>rslt</code></li>
+<li><code>X</code> vs.&nbsp;<code>x</code></li>
+<li><code>z</code> vs.&nbsp;<code>zz</code></li>
+</ul>
+<p><strong>Underscores</strong> should be preferred as separator when coding in <code>R</code> (as opposed to <code>.</code>).</p>
+<div class="notes">
+<p>I use pothole case, which is also called <code>snake_case</code>. Typing uppercase letters is super annoying!</p>
+</div>
+<hr>
+</section>
+<section id="self-documenting-code" class="level2">
+<h2 class="anchored" data-anchor-id="self-documenting-code">Self-documenting code</h2>
+<p>Many of these recommendations are to .</p>
+<p>Comments should be used mostly for <strong>why</strong>, not <strong>what</strong>.</p>
+<ul>
+<li>The <strong>what</strong> should be inherent from the code itself.</li>
+</ul>
+<p>This is really <strong>hard to do</strong>.</p>
+<ul>
+<li>Sometimes its harder than its worth, but it is worth trying!</li>
+</ul>
+<hr>
+</section>
+<section id="self-documenting-code-1" class="level2">
+<h2 class="anchored" data-anchor-id="self-documenting-code-1">Self-documenting code</h2>
+<p>Here’s an example of :</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>tmp1 <span class="ot">&lt;-</span> <span class="fl">9.81</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>tmp2 <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>tmp3 <span class="ot">&lt;-</span> <span class="fl">0.5</span> <span class="sc">*</span> tmp1 <span class="sc">*</span> tmp2<span class="sc">^</span><span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Here’s an example of :</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># gravitational constant</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>tmp1 <span class="ot">&lt;-</span> <span class="fl">9.81</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># time object is falling</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>tmp2 <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># displacement of the object</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>tmp3 <span class="ot">&lt;-</span> <span class="fl">0.5</span> <span class="sc">*</span> tmp1 <span class="sc">*</span> tmp2<span class="sc">^</span><span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="notes">
+<p>The first chunk is bad because the variables have non-informative names and nothing is documented. We have to think really hard to understand what this code is doing.</p>
+<p>The second chunk is better; at least it is documented! But it’s redundant and not self-documenting.</p>
+</div>
+<hr>
+</section>
+<section id="self-documenting-code-2" class="level2">
+<h2 class="anchored" data-anchor-id="self-documenting-code-2">Self-documenting code</h2>
+<p>Here’s :</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>gravitational_force <span class="ot">&lt;-</span> <span class="fl">9.81</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>time_in_seconds <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>displacement <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span> <span class="sc">*</span> gravitational_force <span class="sc">*</span> time_in_seconds<span class="sc">^</span><span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Now let’s add a explaining the <strong>why</strong>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># compute displacement of falling object with Newton's equation</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>gravitational_force <span class="ot">&lt;-</span> <span class="fl">9.81</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>time_in_seconds <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>displacement <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span> <span class="sc">*</span> gravitational_force <span class="sc">*</span> time_in_seconds<span class="sc">^</span><span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="self-documenting-code-3" class="level2">
+<h2 class="anchored" data-anchor-id="self-documenting-code-3">Self-documenting code</h2>
+<p>Even better, !</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># for falling objects based on Newton's equation</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>compute_displacement <span class="ot">&lt;-</span> <span class="cf">function</span>(time_in_seconds){</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  gravitational_force <span class="ot">&lt;-</span> <span class="fl">9.81</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  displacement <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span> <span class="sc">*</span> gravitational_force <span class="sc">*</span> time_in_seconds<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(displacement)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="recap" class="level2">
+<h2 class="anchored" data-anchor-id="recap">Recap</h2>
+<p>Why spend a lecture on coding style if everyone knows how to code?</p>
+<ul>
+<li>Clear code is more likely to be <strong>correct</strong>.</li>
+<li>Clear code is <strong>easier to use</strong>.</li>
+<li>Clear code is <strong>easier to revisit</strong> six months from now.</li>
+<li>Software based on clear code is <strong>easier to maintain</strong>.</li>
+<li>Clear code is <strong>easier to extend</strong>.</li>
+</ul>
+<hr>
+</section>
+<section id="my-non-exhaustive-list-of-coding-pet-peeves" class="level2">
+<h2 class="anchored" data-anchor-id="my-non-exhaustive-list-of-coding-pet-peeves">My (non-exhaustive) list of coding pet peeves</h2>
+<ul>
+<li>dots (“.”) in variable names</li>
+<li>upper case in variable names</li>
+<li>Not putting a vertical line of white space after a section header in an <code>.Rmd</code> document</li>
+<li>Unnecessarily short and unreadable variable names</li>
+<li>Calling libraries, loading data, or sourcing files in the middle of a script
+<ul>
+<li>Always do it at the beginning!!</li>
+</ul></li>
+</ul>
+<hr>
+</section>
+<section id="command-line" class="level2">
+<h2 class="anchored" data-anchor-id="command-line">Command line</h2>
+<hr>
+</section>
+<section id="operating-systems" class="level2">
+<h2 class="anchored" data-anchor-id="operating-systems">Operating systems</h2>
+<ul>
+<li>Windows
+<ul>
+<li>Not always programmer friendly</li>
+</ul></li>
+<li>Mac OSX
+<ul>
+<li>Better for programming</li>
+<li>Under the hood, is just Unix</li>
+</ul></li>
+<li>Unix-based OS (Linux, Solaris, etc…)
+<ul>
+<li>Best for programming</li>
+</ul></li>
+</ul>
+<p>We’ll learn to interact with our computer like it’s a Unix OS.</p>
+<ul>
+<li>Best practices for programming</li>
+<li>Needed for cluster computing and AWS (later)</li>
+</ul>
+<div class="notes">
+<p>Assess how many students have which types of operating systems.</p>
+</div>
+<hr>
+</section>
+<section id="some-terminology" class="level2">
+<h2 class="anchored" data-anchor-id="some-terminology">Some terminology</h2>
+<p><strong>Shell</strong></p>
+<ul>
+<li>user interface for interacting with a computer</li>
+<li>the “outermost” layer of the operating system</li>
+</ul>
+<p><strong>Graphical user interface</strong> (GUI)</p>
+<ul>
+<li>visual interface (icons, menus, etc…) for interaction</li>
+<li>“Point-and-click”</li>
+</ul>
+<p><strong>Command line interface</strong> (CLI)</p>
+<ul>
+<li>text-based interface for interacting with computer</li>
+<li>e.g., <code>bash</code>, <code>sh</code>, <code>tcsh</code>, <code>zsh</code>, …</li>
+</ul>
+<div class="notes">
+<p>A shell is essentially a user interface that allows users to interact with the OS. It provides ways to execute commands, run programs, and manage the system. Can be graphical or command-line.</p>
+<p>GUIs are pretty and user-friendly because anyone who can read and operate a mouse can interact with them, even with very little about computers. However, they are antithetical to our endeavor for reproducible research.</p>
+<p>We will instead rely on the CLI to run all our programs. We will focus on <code>bash</code>.</p>
+</div>
+<hr>
+</section>
+<section id="terminal" class="level2">
+<h2 class="anchored" data-anchor-id="terminal">Terminal</h2>
+<p>If Windows, use <a href="https://www.microsoft.com/en-us/p/ubuntu/9nblggh4msv6?activetab=pivot:overviewtab">Ubuntu</a> for Windows</p>
+<ul>
+<li>Or other Linux distribution (e.g., <a href="https://www.microsoft.com/en-us/p/debian/9msvkqc78pk6?rtc=1&amp;activetab=pivot:overviewtab">Debian</a>)</li>
+<li>Biggest difference is how software installed</li>
+</ul>
+<p>If Mac, use <a href="https://support.apple.com/guide/terminal/open-or-quit-terminal-apd5265185d-f365-44cb-8b09-71a064a42125/mac">Terminal</a></p>
+<ul>
+<li>Or <a href="https://www.iterm2.com/features.html">iTerm2</a> – more features</li>
+</ul>
+<p>If Linux, whatever terminal emulator comes with your distribution.</p>
+<div class="notes">
+<p>Linux on Windows is a relatively new feature. I suggest Ubuntu or Debian as these are the most common distributions on resources you might use. There’s practically little difference for our purposes. Most of my examples later will likely use Ubuntu though, so if you have no strong preference, then I’d stick to that.</p>
+</div>
+<hr>
+</section>
+<section id="terminal-1" class="level2">
+<h2 class="anchored" data-anchor-id="terminal-1">Terminal</h2>
+<p>Your open terminal will look something like this:</p>
+<p><img src="terminal_open.png" class="img-fluid" style="width:50.0%"></p>
+<ul>
+<li>You’ll see a <em>prompt</em>, which is an alphanumeric string that (usually) ends in “$”. Commands are typed after the “$”.</li>
+</ul>
+<div class="notes">
+<p>Your open terminal will look something like this (mine is customized to be green which is not the default). In the screenshot provided I typed the command <code>cd Desktop</code>, which we’ll get to shortly.</p>
+<p>The terminal is the way we interact with the shell by issuing text-based commands.</p>
+<p>We’ll be working with bash. If for some reason bash is not the default shell (and you want it to be) this can be changed in Terminal settings. For Mac the default is zsh, which functions similarly to bash.</p>
+</div>
+<hr>
+</section>
+<section id="using-the-terminal-through-rstudio" class="level2">
+<h2 class="anchored" data-anchor-id="using-the-terminal-through-rstudio">Using the terminal through RStudio</h2>
+<p>You can also use the terminal directly in Rstudio!</p>
+<ul>
+<li>Rstudio introduced the terminal tab in 2017</li>
+<li>For our course, this may be the simplest approach</li>
+</ul>
+<p><strong>Display the Terminal tab</strong>: If the tab isn’t visible, you can display it by going to Tools &gt; Terminal &gt; Move Focus to Terminal.</p>
+<ul>
+<li>Can also use the keyboard shortcut Shift+Alt+M or Shift+Option+M on Mac.</li>
+</ul>
+<hr>
+</section>
+<section id="rstudio-terminal" class="level2">
+<h2 class="anchored" data-anchor-id="rstudio-terminal">RStudio terminal</h2>
+<p><img src="terminal_Rstudio.png" class="img-fluid" style="width:75.0%"></p>
+<hr>
+</section>
+<section id="working-directories" class="level2">
+<h2 class="anchored" data-anchor-id="working-directories">Working directories</h2>
+<p>What is a working directory?</p>
+<div class="notes">
+<p>a working directory is the folder on your computer where your files are currently being saved or accessed when you run a program or command. Think of it as the default location where your computer looks for files and where it saves new files unless you tell it to look somewhere else.</p>
+</div>
+<hr>
+</section>
+<section id="moving-around-directories" class="level2">
+<h2 class="anchored" data-anchor-id="moving-around-directories">Moving around directories</h2>
+<p>Folders within you computer are called <strong>directories</strong>. You can navigate around to different directories, remove or create directories, remove or create files, move files around, and list their contents all from the terminal.</p>
+<p>These next sections may seem fairly basic but these are also the commands I use the most often, so I’m going to spend some time on them.</p>
+<hr>
+</section>
+<section id="moving-around-directories-1" class="level2">
+<h2 class="anchored" data-anchor-id="moving-around-directories-1">Moving around directories</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"><strong>Command</strong></th>
+<th><strong>Action</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><code>pwd</code></td>
+<td>print working directory</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><code>cd</code></td>
+<td>change directory</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><code>ls</code></td>
+<td>list files in directory</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p><strong>cd</strong>: Takes you to the home directory</p>
+<pre><code>* `cd ..`: Moves up one directory
+* `cd ../..`: Moves up two directories</code></pre></li>
+<li><p><strong>ls -a</strong>: list <strong>hidden</strong> files as well as other files</p>
+<pre><code>* Hidden files are often part of the instructions for the OS or a particular application
+* Usually invisible when searching through folders
+* Examples: .git, .gitignore, .Rhistory </code></pre></li>
+</ul>
+<hr>
+</section>
+<section id="absolute-vs.-relative-file-paths" class="level2">
+<h2 class="anchored" data-anchor-id="absolute-vs.-relative-file-paths">Absolute vs.&nbsp;relative file paths</h2>
+<p>Absolute paths</p>
+<ul>
+<li><code>/Users/juliawrobel</code></li>
+<li><code>~/Documents</code></li>
+<li><code>/</code></li>
+</ul>
+<p>Relative paths</p>
+<ul>
+<li><code>./Documents</code></li>
+<li><code>../Documents</code></li>
+<li><code>../../</code></li>
+</ul>
+<hr>
+</section>
+<section id="absolute-vs.-relative-file-paths-1" class="level2">
+<h2 class="anchored" data-anchor-id="absolute-vs.-relative-file-paths-1">Absolute vs.&nbsp;relative file paths</h2>
+<ul>
+<li>Absolute paths include the <strong>whole path</strong> for a directory</li>
+<li>Relative paths depend on the working directory that they are executed in
+<ul>
+<li>The <code>./</code> means “in the current directory”</li>
+<li>The <code>../</code> means “in one directory up from the current directory”.</li>
+</ul></li>
+</ul>
+<div class="notes">
+<p>When we get to project management, we will prefer relative paths. It makes sharing code easier – between different users or, with yourself, on a different computer (e.g., your laptop vs.&nbsp;AWS). The two file systems are probably (definitely) structured differently, but if they share a project folder with the same relative structure, then code with relative paths should still work.</p>
+</div>
+<hr>
+</section>
+<section id="addingremoving-files" class="level2">
+<h2 class="anchored" data-anchor-id="addingremoving-files">Adding/removing files</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"><strong>Command</strong></th>
+<th><strong>Action</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><code>mkdir</code></td>
+<td>make a new directory</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><code>rm</code></td>
+<td>delete a file or directory</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><code>mv</code></td>
+<td>move a file or directory</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><code>cp</code></td>
+<td>copy a file or directory</td>
+</tr>
+</tbody>
+</table>
+<div class="notes">
+<p>Good to know that when you delete a file in bash, it’s gone forever</p>
+</div>
+<hr>
+</section>
+<section id="structure-of-a-bash-command" class="level2">
+<h2 class="anchored" data-anchor-id="structure-of-a-bash-command">Structure of a bash command</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">command</span> <span class="pp">[</span><span class="ss">options</span><span class="pp">]</span> <span class="pp">[</span><span class="ss">arguments</span><span class="pp">]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>. <code>command</code>: the bash function you want to run, e.g.&nbsp;<code>ls</code>, <code>cd</code>, <code>echo</code>, etc.</p>
+<ol start="2" type="1">
+<li><code>options</code>: also called “flags”, these are additional parameters to modify the behavior of the command, e.g.,</li>
+</ol>
+<ul>
+<li><code>ls -R</code> lists all directories and contents recursively</li>
+<li><code>ls -aR</code> recursively lists all files and hidden files</li>
+</ul>
+<ol start="3" type="1">
+<li><code>arguments</code>: inputs to the command, such as file names or other data that tell the command what to operate on</li>
+</ol>
+<ul>
+<li><code>rm</code> what? <code>cp</code> what?</li>
+<li><code>ls \Documents</code> lists all files in the documents folder</li>
+</ul>
+<div class="notes">
+<p>We have already discussed a few bash commands (<code>pwd</code>, <code>ls</code>, <code>cd</code>). More generally, bash commands have the form.</p>
+<p>You can string together multiple <code>-</code> options, e.g., <code>ls -la</code> executes as <code>ls -l -a</code>.</p>
+</div>
+<hr>
+</section>
+<section id="solving-computing-problems" class="level2">
+<h2 class="anchored" data-anchor-id="solving-computing-problems">Solving computing problems</h2>
+<ul>
+<li><code>man [command]</code> (bash version of <code>?command_name</code>)</li>
+<li>Google (with <code>site:stackoverflow.com</code>?)</li>
+<li>ChatGPT</li>
+<li>Ask friends/classmates</li>
+<li></li>
+</ul>
+<div class="notes">
+<p>I find manuals for Unix commands are often cryptic and not always helpful. Reading them on occasion is still useful.</p>
+<p>Learning to code is a lot like a learning a language. It can be very frustrating that you know <em>what</em> you want to say, but you don’t know <em>how</em> to say it (or you know how, but in another language!). You only get better at language by forcing yourself to use it.</p>
+<p>Don’t be satisfied with just copy/pasting an answer from StackOverflow. Try (for at least a couple minutes) to understand how it works. This is a worthwhile investment.</p>
+<p>Also, keep in mind that ChatGPT is sometimes (confidently) wrong!</p>
+</div>
+<hr>
+</section>
+<section id="wild-cards" class="level2">
+<h2 class="anchored" data-anchor-id="wild-cards">Wild cards</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"><strong>Command</strong></th>
+<th><strong>Action</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><code>*</code></td>
+<td>match anything</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><code>?</code>, <code>??</code>, …</td>
+<td>match a single character</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><code>[...]</code></td>
+<td>match a range of characters</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># files in cwd with .txt extension</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-l</span> <span class="pp">*</span>.txt</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># all files in cwd named a_file with three character extension</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> a_file.<span class="pp">???</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># .txt files in cwd name a_file, b_file, ..., e_file</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="pp">[</span><span class="ss">a</span><span class="pp">-</span><span class="ss">e</span><span class="pp">]</span>_file.txt</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="useful-command-line-shortcuts" class="level2">
+<h2 class="anchored" data-anchor-id="useful-command-line-shortcuts">Useful command line shortcuts</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"><strong>Key stroke</strong></th>
+<th><strong>Action</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><code> ↑</code></td>
+<td>move to previous command</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><code> ↓</code></td>
+<td>move to next command</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><code>tab</code></td>
+<td>autocomplete command or file</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><code>ctrl+c</code></td>
+<td>cancel (running) command</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><code>ctrl+z</code></td>
+<td>suspend command</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><code>ctrl+r</code></td>
+<td>search for command in history</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><code>ctrl+l</code></td>
+<td>clear the screen</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="reproducible-project-organization" class="level2">
+<h2 class="anchored" data-anchor-id="reproducible-project-organization">Reproducible project organization</h2>
+<p><img src="project_org.png" class="img-fluid" style="width:55.0%"></p>
+<div class="notes">
+<p>We will focus on building analyses that satisfy the reproducibility definition outlined above. Could a different analyst sit down with your code, execute it and get exactly the same results?</p>
+<p>Reproducibility is a <em>minimal</em> standard. Just because something is <em>reproducible</em> does not necessarily imply that it is <em>correct</em>. The code may have bugs. The methods may be poorly behaved. But reproducibility is likely correlated with correctness – if you are careful enough to make everything reproducible, you’re probably more likely to be careful in designing the analysis in the first place.</p>
+<p>We will use replicability to mean a new experiment using the same methods coming to the same conclusions.</p>
+<p>Generalizability refers to taking conclusions from your study population and generalizing them to a new population.</p>
+</div>
+<hr>
+</section>
+<section id="why-should-i-care-about-reproducibility" class="level2">
+<h2 class="anchored" data-anchor-id="why-should-i-care-about-reproducibility">Why should I care about reproducibility?</h2>
+<ul>
+<li>Careful coding means more likely to produce <strong>correct results</strong>.</li>
+<li>In the long run, you will <strong>save (a lot of) time</strong>.</li>
+<li>Higher <strong>impact</strong> of your science.</li>
+<li><strong>Avoid embarrassment</strong> on a public stage.</li>
+</ul>
+<div class="notes">
+<p>Doing reproducible science is time consuming, but is ultimately time-saving. As you practice these tools more and more, they will start to become habits. I do analyses now in a day or so (and at much higher quality) now that would take me a (frustrating) week seven or eight years ago.</p>
+<p>One of my great fears as an academic is being accused of intentionally doing bad science. Leaving a paper trail that any one else can follow is a bit intimidating – we all make mistakes. Reproducible work indicates that any mistakes made were likely honest.</p>
+</div>
+<hr>
+</section>
+<section id="basic-principles" class="level2">
+<h2 class="anchored" data-anchor-id="basic-principles">Basic principles</h2>
+<ul>
+<li></li>
+<li>Develop your own system.</li>
+<li>Be consistent, but look for ways to improve.
+<ul>
+<li>naming conventions, file structure</li>
+</ul></li>
+<li>Raw data are sacred. Keep them separate from everything else.</li>
+<li>Separate code and data.</li>
+<li>Use meaningful file names.</li>
+<li>Use YYYY-MM-DD date formatting.</li>
+<li></li>
+</ul>
+<div class="notes">
+<p>There is not one correct way to organize a project, but there are many incorrect ways. Over time you will develop your own system for doing so. We’ll discuss a few frameworks that may be helpful.</p>
+<p>The biggest thing is to commit to using the same structure for as long as its working for you. As you are working on many projects, be self-aware during the process. Are you consistently losing track of certain types of files? Are there gaps in the workflow that make things hard to reproduce? What can you do to fill in the gaps?</p>
+<p>Organization might not seem like a big deal now, but remember your career is just getting started. Expect to work on 2-20 different projects a year for the rest of your working life. The number of projects you will work on is staggering! You need a way to keep track.</p>
+</div>
+<hr>
+</section>
+<section id="what-to-organize" class="level2">
+<h2 class="anchored" data-anchor-id="what-to-organize">What to organize?</h2>
+<p>It is probably useful to have a system for organizing:</p>
+<ul>
+<li>data analysis projects;</li>
+<li>methods projects;</li>
+<li>first-author papers;</li>
+<li>talks.</li>
+</ul>
+<p>The systems should adhere to the same general principles, but different requirements may necessitate different structures.</p>
+<div class="notes">
+<p>Thinking about project organization from the outset is the most important thing. Map out (e.g., as comments in a README) how you see the project developing. Even if things change over time, it’s good to have a structure in place from the beginning.</p>
+<p>This pertains to project directories in particular, but also to your hard drive in general. What about projects that weren’t finished when I got to Emory? What about projects that I continued developing once I got here. It’s a mess. Don’t be like me.</p>
+</div>
+<hr>
+</section>
+<section id="example-data-analysis-project" class="level2">
+<h2 class="anchored" data-anchor-id="example-data-analysis-project">Example data analysis project</h2>
+<pre class="text"><code>YYYY_MM_PI_topic/
+├── data/
+│   ├── raw_data.csv
+│   └── tidied_data.Rdata
+├── analysis/
+│   ├── exploratory_data_analysis.Rmd
+│   └── report.Rmd
+├── source/
+│   ├── 01_clean_raw_data.R
+│   ├── 02_modeling_functions.R
+│   ├── 03_plotting_functions.R
+│   └── utils.R
+├── results/
+├── literature/
+└── README.md</code></pre>
+<div class="notes">
+<p>This is MY process.</p>
+<p>Goal is to find a workflow that will be AS EASY AS POSSIBLE FOR YOU TO ADOPT AND MAINTAIN IN THE LONG TERM.</p>
+<p>Also, the files I need for a methods project versus a more applied project may be very different</p>
+<p>Some notes: * separate raw data and processed data * separate folder for figures (could possible move R code for figures there) * <code>sandbox</code> is where I like to keep messy stuff that I’m trying out but never want to see the light of day * informative file names for <code>R</code> scripts broken down into logical steps of a workflow * <code>.gitignore</code> would include * definitely: <code>figs/*</code>, <code>ref_papers/*</code> * possibly: <code>raw_data</code>/<code>data</code> (if sensitive), <code>sandbox</code> (if informal)</p>
+<p>The <code>00</code>, <code>01</code>, … number system is something that many people use because it helps create a sortable file system. It generally works, but some workflows don’t really logically follow this sort of convention (e.g., things can happen in parallel).</p>
+</div>
+<hr>
+</section>
+<section id="example-data-analysis-project-contd" class="level2">
+<h2 class="anchored" data-anchor-id="example-data-analysis-project-contd">Example data analysis project, cont’d</h2>
+<p>I typically have other ancillary files in my root directory as well. These are files I don’t (often) modify but are important for workflow or reproducibility:</p>
+<pre class="text"><code>YYYY_MM_PI_topic/
+├── YYYY_MM_PI_topic.Rproj
+├── .git/
+└── .gitignore</code></pre>
+<hr>
+</section>
+<section id="organizing-data" class="level2">
+<h2 class="anchored" data-anchor-id="organizing-data">Organizing data</h2>
+<p>Raw data are sacred… but may be a mess.</p>
+<ul>
+<li>You’ll be surprised (and disheartened) by how many color-coded excel sheets you’ll get in your life.</li>
+</ul>
+<p>Tempting to edit raw data by hand. </p>
+<ul>
+<li>Everything scripted!</li>
+<li>Use meta-data files to describe raw and cleaned data.</li>
+</ul>
+<p><strong>You should be able to get a new version of the data and easily re-run your analysis. Urge your collaborators to not mess with the structure of the data in between versions!</strong></p>
+<div class="notes">
+<p>The generation of the raw data may be the one thing out of your control in an analysis. But from the time the data are passed on to you, everything that happens should be reproducible.</p>
+<p>This can be painful. For many projects, 90% of time might be devoted to wrangling raw data into a format that is usable. Save yourself from the danger of having to re-do all those painful bits when (not if) the data change.</p>
+<p>You should be able to get a new version of the data and easily re-run your analysis. Urge your collaborators to not mess with the structure of the data in between versions.</p>
+</div>
+<hr>
+</section>
+<section id="exploring-data" class="level2">
+<h2 class="anchored" data-anchor-id="exploring-data">Exploring data</h2>
+<p>Write out a set of comments describing what you are try to accomplish and fill in code from there.</p>
+<ul>
+<li>I do this for every coding project.
+<ul>
+<li>Data analysis, methods coding, package development</li>
+</ul></li>
+</ul>
+<p>Leave a search-able comment tag by code to return to later</p>
+<ul>
+<li>I use e.g., <code># TO DO: add math expression to labels; make colors prettier</code>.</li>
+</ul>
+<hr>
+</section>
+<section id="exploring-data-1" class="level2">
+<h2 class="anchored" data-anchor-id="exploring-data-1">Exploring data</h2>
+<p>Other helpful ideas for formalizing exploratory data analysis:</p>
+<ul>
+<li><code>.Rhistory</code> files: all the commands used in an R session</li>
+<li><code>save</code> intermediate objects and document what they contain</li>
+<li>Informal <code>.Rmd</code> documents.
+<ul>
+<li>easy way to organize code/comments into readable format</li>
+</ul></li>
+</ul>
+<div class="notes">
+<p>From the outset, stop and think about what you want to do. Start filling in details from there. That simple approach will increase efficiency and reproducibility.</p>
+<p>Sets “the bones” of a formal analysis in place while allowing for some creative flow.</p>
+</div>
+<hr>
+</section>
+<section id="rproj-files" class="level2">
+<h2 class="anchored" data-anchor-id="rproj-files">.Rproj files</h2>
+<p>You may have noticed a file with the extension <code>.Rproj</code> in the productTesting folder</p>
+<ul>
+<li>These are called <code>R projects</code></li>
+<li><code>projectr::proj_start()</code> automatically sets up an <code>.Rproj</code>.</li>
+</ul>
+<p><img src="Rproj_example.png" class="img-fluid" style="width:65.0%"></p>
+<p>I’m going to try to convince you that these are the best.</p>
+<hr>
+</section>
+<section id="benefits-of-using-r-projects" class="level2">
+<h2 class="anchored" data-anchor-id="benefits-of-using-r-projects">Benefits of using R projects</h2>
+<p><strong>Project organization</strong>:</p>
+<ul>
+<li>Relative file paths: ensures file paths are relative to the project directory, making scripts portable and easier to share.</li>
+<li>Separate workspaces: prevents conflicts between variables and packages across different projects.</li>
+</ul>
+<p><strong>Reproducibility</strong></p>
+<ul>
+<li>Can hand off entire directory to someone else and have them rerun your analysis</li>
+<li>Works great with the <code>here</code> package</li>
+</ul>
+<p>Double clicking the <code>202405_sarah_productTesting.Rproj</code> opens up an R Studio session and automatically sets your working directory to the <code>202405_sarah_productTesting</code> folder.</p>
+<hr>
+</section>
+<section id="the-here-package" class="level2">
+<h2 class="anchored" data-anchor-id="the-here-package">The <code>here</code> package</h2>
+<ul>
+<li>Absolute paths are the enemy of project reproducibility.</li>
+</ul>
+<p>For <code>R</code> projects, the <a href="https://here.r-lib.org/"><code>here</code></a> package provides a simple way to use relative file paths.</p>
+<ul>
+<li>Read <a href="https://rstats.wtf/project-oriented-workflow.html">Jenny Bryan and James Hester’s chapter</a> on project-oriented work-flows.</li>
+</ul>
+<p>The use of <code>here</code> is simple and best illustrated by example.</p>
+<hr>
+</section>
+<section id="the-here-package-1" class="level2">
+<h2 class="anchored" data-anchor-id="the-here-package-1">The <code>here</code> package</h2>
+<p>Consider this simple project structure.</p>
+<pre class="text"><code>my_project/
+├── my_project.Rproj
+├── data/
+│   └── my_data.csv
+├── output/
+├── R/
+│   └── my_analysis.R
+└── Rmd/
+    └── my_report.Rmd</code></pre>
+<p>Here, the folder <code>my_project</code> is the <strong>root directory</strong>.</p>
+<ul>
+<li>Where <code>.Rproj</code> lives</li>
+<li>All file paths should be to <code>my_project</code>!</li>
+</ul>
+<hr>
+</section>
+<section id="the-here-package-2" class="level2">
+<h2 class="anchored" data-anchor-id="the-here-package-2">The <code>here</code> package</h2>
+<p>Makes it easy to load data using a relative file path that works across different operating systems:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># relative path using here()</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>here_path <span class="ot">=</span> <span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"file_i_want.csv"</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>my_data <span class="ot">=</span> <span class="fu">read.csv</span>(here_path)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>In contrast to:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># absolute path</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>ugly_path <span class="ot">=</span> <span class="st">"/Users/JWROB/projects/my_project/data/file_i_want.csv"</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>my_data <span class="ot">=</span> <span class="fu">read.csv</span>(ugly_path)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>In contrast to:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># relative path using NOT using here()</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>relative_path <span class="ot">=</span> <span class="st">"./data/file_i_want.csv"</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>my_data <span class="ot">=</span> <span class="fu">read.csv</span>(relative_path)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="notes">
+<p>The relative path is better, but still not reproducible across different OS. I want to be able to hand you my project folder and have you run it without having to change a single thing.</p>
+</div>
+<hr>
+</section>
+<section id="the-here-package-3" class="level2">
+<h2 class="anchored" data-anchor-id="the-here-package-3">The <code>here</code> package</h2>
+<p><code>here</code> works, regardless of where the associated source file lives inside your project</p>
+<ul>
+<li>If you have an <code>.Rproj</code> file in your root directory of your project, here will set the location of the <code>.Rproj</code> to be the top-level directory
+<ul>
+<li>This is the behavior we want!</li>
+</ul></li>
+<li>These paths will “just work” during interactive development, without incessant fiddling with the working directory of your IDE’s R process.<br>
+</li>
+<li>I am oversimplifying the heuristics, feel free to <a href="https://github.com/jennybc/here_here?tab=readme-ov-file">read more</a>.</li>
+</ul>
+<div class="notes">
+<p>Raise your hand if you’ve ever gotten frustrated while interactively coding and the working directory is different from where your Rmarkdown lives… here has changed my life so much that I forgot that can even happen.</p>
+</div>
+<hr>
+</section>
+<section id="the-here-package-4" class="level2">
+<h2 class="anchored" data-anchor-id="the-here-package-4">The <code>here</code> package</h2>
+<p>What if I want to load data in a document that lives in a subfolder such as <code>my_project\analysis\code.Rmd</code>?</p>
+<ul>
+<li>Doesn’t matter! You can use the same code within the <code>.Rmd</code> document to load the data</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>path_to_data <span class="ot">=</span> <span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"file_i_want.csv"</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>my_data <span class="ot">=</span> <span class="fu">read.csv</span>(path_to_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>What if my data I want to access is nested in a subfolder of data, such as <code>my_project\data\raw_data\raw_file.csv</code>?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>path_to_data <span class="ot">=</span> <span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"raw_data"</span>, <span class="st">"raw_file.csv"</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>my_data <span class="ot">=</span> <span class="fu">read.csv</span>(path_to_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="notes">
+<p>It’s not only data you can access this way, but this is the most common use case.</p>
+</div>
+<hr>
+</section>
+<section id="the-projectr-package" class="level2">
+<h2 class="anchored" data-anchor-id="the-projectr-package">The <code>projectr</code> package</h2>
+<p>Not really a <strong>real</strong> package, but I use it all the time.</p>
+<ul>
+<li>Right now only works if you have a Mac (sorry).</li>
+</ul>
+<hr>
+</section>
+<section id="the-projectr-package-1" class="level2">
+<h2 class="anchored" data-anchor-id="the-projectr-package-1">The <code>projectr</code> package</h2>
+<p>Talk about symbolic links.</p>
+<hr>
+</section>
+<section id="a-function-for-doing-basically-the-same-thing" class="level2">
+<h2 class="anchored" data-anchor-id="a-function-for-doing-basically-the-same-thing">A function for doing basically the same thing</h2>
+<p>We will play around with building one of these ourselves in the lab.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
