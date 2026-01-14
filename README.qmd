@@ -1,11 +1,6 @@
 ---
 title: "README"
-format:
-  html:
-    toc: true
-    toc-depth: 2
-  pdf:
-    toc: true
+format: gfm
 execute:
   echo: false
   warning: false
@@ -22,12 +17,12 @@ This repo contains materials for the course [BIOS731: Advanced Statistical Compu
 
 # Acknowledgements
 
-Special thanks to:
+Special thanks to the following people for help in preparing the materials for this course:
 
-- Kristin Linn
-- Irina Gaynanova
-- Hao Wu
-- Jeff Goldsmith
+- [Kristin Linn](https://kalinn.github.io/kristinlinn/)
+- [Irina Gaynanova](https://irinagain.github.io/)
+- [Hao Wu](https://www.haowulab.org/)
+- [Jeff Goldsmith](https://jeffgoldsmith.com/)
 
 # Session Info
 
