@@ -1,0 +1,1161 @@
+---
+title: "Best practices for using simulation studies to evaluate statistical methods"
+author: "Julia Wrobel"
+format:
+  beamer:
+    theme: metropolis
+    aspectratio: 169
+    fontsize: 14pt
+    slide-level: 2
+execute:
+  echo: true
+  eval: false
+  warning: false
+  message: false
+header-includes:
+  - \usepackage{xcolor}
+  - \newcommand{\red}[1]{\textcolor{red}{#1}}
+  - \newcommand{\green}[1]{\textcolor{green}{#1}}
+---
+
+
+## Overview
+
+
+Today, we cover:
+
+
+- Simulation studies
+  - Design
+  - Implementation
+  - Presentation
+- Lab
+
+Announcements
+
+- HW2 posted and due 1/28 at 10:00AM
+
+
+
+::: notes
+Just for today if you haven't done it I will let you do it later today and only take a couple of points off.
+
+Lots of science/math funded my practical purposes- in this case the atom bomb
+:::
+
+---
+
+## Motivation
+
+- In statistics, simulations are typically used to establish **properties** of
+statistical methods, particularly when it is difficult or impossible to
+derive **exact analytic expressions**:
+  - Is my estimator biased in finite samples?
+  - Does my confidence interval achieve nominal coverage?
+  - How powerful is my test under different alternatives to the null
+hypothesis?
+  - How does my method compare to a competing method?
+
+- Exact or approximate analytic results may require assumptions 
+  - e.g. normality
+  - Simulations can be used to study behavior when these
+assumptions are violated
+
+
+::: notes
+When I was a PhD student, I would use simulation to help me intuitively understand the theory
+
+What have you all used simulations for in the past?
+:::
+
+---
+
+## Monte Carlo Simulation
+
+- The questions on the previous slides can be answered using **Monte
+Carlo simulation**
+- A Monte Carlo simulation is a computer experiment involving (pseudo-)random sampling
+
+
+- Simulation is used for:
+  - Simulation studies (focus of this lecture)
+  - Multiple imputation methods
+  - Markov Chain Monte Carlo methods (focus of later lectures)
+
+---
+
+## Monte Carlo History
+
+- New supercomputer (ENIAC) inspired former Manhattan Project scientists Stan Ulam
+and John von Neumann to try a statistical approach to solving an
+intractable system of equations related to creation of an atomic bomb
+
+
+![](jasa_mc.png){width=80%}
+
+- Named for Monte Carlo, Monaco
+  - Las Vegas of Europe
+
+::: notes
+Who has heard of Stan, the Bayesian computing language?
+:::
+
+---
+
+
+## Monte Carlo History
+
+- Ulam was playing solitaire and wondered: what are the chances that a hand laid out with 52 cards will come out successfully?
+  - ~ $8 \times 10^{67}$ ways to sort a deck of cards
+    - Intractable analytically
+
+
+
+
+- What if instead he could simply lay out the cards one hundred times and count the number of successful plays?
+
+
+
+::: notes
+This works under the assumption that each play started with randomized conditions.
+
+Also, he quickly thought in the new era of computing this would generalize well to mathematical physics problems
+Now this type of computing is ubiquitous, interesting to see how quickly the world has changed
+:::
+
+---
+
+
+
+
+## Simulation studies in biostatistics
+
+Many uses!
+
+- Check algebra (and code) to provide reassurance no error has been made when a new statistical method has been derived analytically
+- Assess relevance of large-sample theory in finite samples
+- For absolute evaluation of a new method
+  - Does it work well in the scenarios for which it was designed?
+- For comparative evaluation of two or more methods
+
+::: notes
+Some uses include the following.
+- An estimator or test statistic has a **true sampling distribution** under
+a particular set of conditions (e.g., finite sample size, true generative
+distribution)
+- Monte Carlo simulation can be used to *approximate* the sampling
+distribution under a particular set of *known* conditions
+- Useful when derivation of the true sampling distribution is not
+tractable
+- Also when true sampling distribution is known (e.g., asymptotically normal) but you want to check:
+     - If your derivations are correct
+     - If your method works in small sample sizes
+- Importantly, the **true value(s)** of the target parameter(s) are known and used to generate the data.
+:::
+
+---
+
+
+## Simulation Study Design
+
+- Simulation studies are **empirical experiments**
+
+- As statisticians, we should apply principles of **experimental design** when conducting simulation studies
+- Burton, Altman, Royston, and Holder (2006): Before writing code, develop a **protocol** that provides details about how the study will be performed, analysed, and reported
+
+---
+
+## Simulation Study Design
+
+- Morris, White, and Crowther (2019) advocate for **ADEMP**:
+  - Aims 
+  - Data-generating Mechanisms
+  - Estimands
+  - Methods
+  - Performance Measures
+
+::: notes
+Morris is a good paper! I recommend reading it. I learned a lot from reading it in preparation of this lecture.
+:::
+
+---
+
+## ADEMP Structure
+
+
+![](table1.png){width=90%}
+
+
+::: notes
+This is part of Table 1 in the paper.  At a high level explain each of these concepts
+:::
+
+---
+
+
+
+
+## Planning Stage (notation)
+
+
+![](table2.png){width=90%}
+
+::: notes
+Table 2 in paper
+:::
+
+---
+
+
+## Estimands 
+
+What is an estimand?
+
+
+::: notes
+An estimand is the precise quantity or parameter of interest that a study aims to estimate to address its research question.
+
+Especially in causal inference, but also more generally- define your estimand
+::: 
+
+---
+
+## Estimands 
+
+What is an estimand?
+
+- An estimand is the precise quantity or parameter of interest that a study aims to estimate to address its research question.
+
+
+---
+
+
+## Estimands 
+
+What is an estimand?
+
+- An estimand is the precise quantity or parameter of interest that a study aims to estimate to address its research question.
+
+**Example**: treatment effect in a clinical trial
+
+
+::: notes
+Say we have an RCT, and we want to know if treatment works better than placebo. Treatment effect might be the estimand of interest.  How can we estimate treatment effect?
+:::
+
+---
+
+
+
+## Simple exam: linear regression
+
+$$Y_i = \beta_0 + \beta_{treatment}X_{i1} + \mathbf{Z_i}^T\boldsymbol{\gamma} + \epsilon_i$$
+
+- $Y_i$: continuous outcome
+- $X_{i1}$: treatment group indicator; $X_{i1}=1$ for treated 
+- $\mathbf{Z_i}$: vector of potental confounders
+
+
+
+
+- $\beta_{treatment}$: average treatment effect, adjusting for $\mathbf{Z_i}$
+- $\boldsymbol{\gamma}$: vector of regression coefficient values for confounders 
+- $\epsilon_i$: iid error, $\sim N(0, \sigma^2)$
+
+::: notes
+X_i is a binary treatment variable
+
+What is our estimand in this example?
+
+beta_treat, since we explicitly stated that before, but we could also have other quantities of interest
+:::
+
+---
+
+
+
+## Planning Stage: Aims
+
+
+Desirable (asymptotic) properties of an estimator $\hat{\theta}$ from a frequentist perspective:
+
+1. $\hat{\theta}$ should be consistent: as $n\to \infty$, $\hat{\theta} \to \theta$
+  - Also desirable that $\hat{\theta}$ is unbiased: $E(\hat{\theta}) = \theta$
+2. The sample estimate $\widehat{Var(\hat{\theta})}$ consistent estimate of true sampling variance of $\hat{\theta}$, $Var(\hat{\theta})$
+3. Confidence intervals should have **good coverage**: at least $100(1-\alpha)$% of intervals contain $\theta$
+4. $\hat{\theta}$ should be efficient: $Var(\hat{\theta})$ should be as small as possible
+
+
+::: notes
+Aims is the A in ADEMP
+These properties are typically what you would evaluate in a simulation study
+:::
+
+---
+
+
+## Planning Stage: Aims
+
+
+Desirable properties of an estimator $\hat{\theta}$ from a frequentist perspective:
+
+1. $\hat{\theta}$ should be consistent: as $n\to \infty$, $\hat{\theta} \to \theta$
+  - Also desirable that $\hat{\theta}$ is unbiased: $E(\hat{\theta}) = \theta$
+2. The sample estimate $\widehat{Var(\hat{\theta})}$ consistent estimate of true sampling variance of $\hat{\theta}$, $Var(\hat{\theta})$
+3. Confidence intervals should have **good coverage**: at least $100(1-\alpha)$% of intervals contain $\theta$
+4. $\hat{\theta}$ should be efficient: $Var(\hat{\theta})$ should be as small as possible
+
+
+
+
+* \green{Computational efficiency}
+
+::: notes
+Typically, in simulation studies we are assessing these things or a combination of these things
+:::
+
+---
+
+
+## Planning Stage: Aims
+
+Proof-of-concept vs. stretching simulation studies
+
+
+* Proof-of-concept: aim to show that a method is viable in some settings 
+* Stretch/break objective:: identify settings where the method may fail
+
+
+Examples of each in the linear regression setting?
+
+::: notes
+1st might check that the treatment effect can be well captured when errors are normally distributed and sample size is large
+2nd might check how this works for binary outcome, or very small sample size, or highly correlated errors
+:::
+
+---
+
+
+## Data-generating mechanisms
+
+Refers to how random numbers are used to generate a simulated dataset.
+
+
+
+1. Parametric draws from a known model 
+  - true data generating model is known
+  - more flexible but may be overly simplistic for real data
+2. Repeated resampling with replacement from a specific dataset
+  - true data generating model is unknown
+  - less flexible but relevant for at least the study at hand
+
+::: notes
+We are still in the planning stage
+This is the D of ADEMP
+1. is more common 
+2. Comes into play in bootstrapping next week
+:::
+
+---
+
+
+## Data-generating mechanisms
+
+
+If using a parametric model, need to fully specify your generative model:
+
+- Functional form(s)
+- True values of the parameters
+- Error distributions and their parameters
+
+
+
+Without every detail of the data generation process, others will not be
+able to reproduce your simulation results!
+
+---
+
+
+## Data-generating mechanisms
+ 
+Suppose you want to calculate coverage for $\hat{\beta}_{treatment}$ under several conditions:
+
+- Sample sizes $n \in \{50, 100, 200\}$
+- Error variances $\sigma^2 \in \{1, 3\}$
+- True treatment effects $\beta_{treatment} \in \{0, 0.5, 2\}$
+
+
+- **Full factorial design**: evaluate all combinations of these conditions/factors
+  - $3 \times 2 \times 3 = 18$ simulation scenarios
+  - This is the preferred approach, but can be computationally demanding
+  
+  
+::: notes
+Other approach us "base case" where you vary factors one at a time around a base case approach
+:::
+
+---
+
+
+## Estimands and other targets
+
+- Most simulation studies evaluate or compare methods for estimating one or more population quantities, which we term **estimands** and denote by $\theta$
+- Choice of estimand(s) depends on the aims of your study!
+    - If you are interested in how well treatment works: $\beta_{treatment}$
+    - If interested in the patient outcome value for a given set of characteristics: $E(Y_i|X_i, \beta)$
+
+
+- Not all simulation studies involve an estimand.  These other quantities we might want to focus on are referred to as **targets** of a simulation study
+
+::: notes
+This is the E of ADEMP
+:::
+
+
+---
+
+
+## Estimands and other targets
+
+
+![](table3.png){width=75%}
+
+::: notes
+Table 3 of the paper
+Possible targets of a simulation study and relevant performance measures
+:::
+
+---
+
+
+## Planning: Methods
+
+What method is being evaluated? Is it being compared to other methods?
+
+
+- When comparing across multiple methods, it is important to consider:
+  - Are all relevant methods in the literature being included in your study?
+     - If not, what is your justification?
+  - Do competing methods have open source implementations?
+    - Will you need to contact author(s) for code?
+  - What are the assumptions of each method?
+    - Will your simulation design favor one method over another?
+
+::: notes
+M of ADEMP
+Justifications include no code, method has already been shown to be poor for the same settings in another paper 
+Definitely you will encounter trying to compare a method you develop with another method, only to discover that they have no code. 
+When you email them about the code, and you get no response, what do you do?
+In bioinformatics, this is less of a problem
+:::
+
+
+---
+
+## Planning: Performance measures
+
+A **performance measure** is a numerical quantity used to assess the performance of a method.  Examples of common measures:
+
+* bias: $E[\hat{\theta}]-\theta$
+  * used for estimands
+* coverage: $Pr(\hat{\theta}_{low}\le \theta \le \hat{\theta}_{high})$
+  * used for estimands
+* power and type 1 error
+  * used in evaluating a method that targets a hypothesis test
+
+::: notes
+P of ADEMP
+We will discuss this in more detail through examples
+:::
+
+---
+
+
+
+
+## Implementing the simulation study
+
+
+![](table1_rest.png){width=95%}
+
+
+
+---
+
+
+
+## Simulations for estimands
+
+Simple example: consider three estimators for mean $\mu$ of a distribution based on iid draws $Y_1\ldots Y_n$:
+- $\theta_1$: sample mean
+- $\theta_2$: sample 20% trimmed mean
+- $\theta_3$: sample median
+
+
+If the distribution is symmetric, all three estimators should estimate
+the mean
+- If the distribution is skewed, they will give different answers 
+
+
+
+---
+
+
+## Simulations for estimands
+
+For a particular choice of $\mu$, $n$, and true underlying distribution:
+
+- Generate independent draws $Y_1\ldots Y_n$ from the distribution
+- Compute $\theta_1$, $\theta_2$, $\theta_3$ and repeat $n_{sim}$ times to get:
+  - $\theta_{1,1}, \ldots, \theta_{1,n_{sim}}$
+  - $\theta_{2,1}, \ldots, \theta_{2,n_{sim}}$
+  - $\theta_{3,1}, \ldots, \theta_{3,n_{sim}}$
+
+
+::: notes
+This is a super simple example. More details for best practices will be filled in later.
+:::
+
+---
+
+
+
+## Simulations for estimands
+
+For $k = 1,2,3$, compute:
+
+- $\hat{E}[\hat{\theta}_k]$
+- $\widehat{bias}(\hat{\theta})$
+- $\widehat{Var}(\hat{\theta})$
+- $\widehat{coverage}(\hat{\theta})$
+
+
+1. What is the estimand(s)?
+2. What is the estimator(s)?
+3. What is the performance measure(s)?
+
+::: notes
+Estimand is the population mean. Estimators are theat1, theat2, theta3
+Performance measures are what we see on this screen
+:::
+
+---
+
+
+## Simulations for hypothesis tests
+
+Consider a t-test for whether the mean is equal to a specified value:
+
+$$H_0: \mu = \mu_0 \mbox{ vs. } H_1: \mu \ne \mu_0$$
+
+Suppose we want to evaluate whether the size/level of test achieves
+the advertised $\alpha$. We would:
+
+- Generate data under the **null hypothesis** and calculate proportion of
+rejections of $H_0$.
+- This approximates Pr(reject $H_0$| $H_0$ true)
+  - Should be $\approx \alpha$ if the method works well
+  
+
+::: notes
+- This is an estimate of your **Type I error**
+- what do we mean when we say generate data under the null hypothesis?
+:::
+
+---
+
+
+
+## Simulations for hypothesis tests
+
+Suppose we want to evaluate **power**. We would:
+
+- Generate data under some value of the alternative hypothesis $\mu \ne \mu_0$ and calculate proportion of rejection of $H_0$
+- Approximates power, or Pr(reject $H_0$| $H_1$ true)
+
+
+---
+
+
+
+## Simulations for hypothesis tests
+
+\fontsize{9pt}{10pt}\selectfont
+Size/level
+
+```{r}
+set.seed(125)
+nsim = 10000; n = 20; sigma = sqrt(5/3)
+mu0 = 1
+# Generate data from null distribution:
+dat = matrix (rnorm (n*nsim, mu0, sigma), ncol=nsim, byrow=T)
+opmean = apply (dat, 2, mean)
+ses = sqrt(apply(dat, 2, var)/n)
+tstats = (opmean - mu0)/ses
+t05 = qt (0.975, n-1)
+type1 = sum (abs (tstats) > t05)/nsim
+type1
+```
+
+
+::: notes
+What do nsim and n represent here?
+:::
+
+
+---
+
+
+
+## Simulations for hypothesis tests
+
+\fontsize{9pt}{10pt}\selectfont
+Power
+
+```{r}
+set.seed(125)
+nsim = 10000; n = 20; sigma = sqrt(5/3)
+mu0 = 1
+mu = 1.85 ## Generate data from alternative
+dat = matrix (rnorm (n*nsim, mu, sigma), ncol=nsim, byrow=T)
+opmean = apply (dat, 2, mean)
+ses = sqrt(apply(dat, 2, var)/n)
+tstats = (opmean - mu0)/ses
+t05 = qt (0.975, n-1)
+power = sum (abs (tstats) > t05)/nsim
+power
+```
+
+
+::: notes
+If we want higher power, what should we change?
+:::
+
+---
+
+
+## Setting the seed
+
+Simulations use pseudo-random numbers generated by a random number generating algorithm
+
+
+Each random number is a deterministic function of the current *state* of the random number generator
+
+- After a random number is produced, the state changes, ready to produce next random number 
+- State is set using a **seed**
+  - After enough random draws, the state will eventually repeat (the path is circular)
+
+
+Setting the seed ensures **reproducibility** of the simulation results.
+
+::: notes
+At least, reproducibility is ensured if you're using the same type of random number generator, and same computing language.
+:::
+
+---
+
+
+## Setting the seed 
+
+How do you typically set the seed?
+
+
+::: notes
+I typically set a different seed for each simulated dataset, and store that seed with the dataset so that I can regenerate the same dataset if I need to.
+
+Morris is different, and gets a little wonky.
+:::
+
+---
+
+## Setting the seed 
+
+Morris et. al. recommends setting seed *once per simulation scenario*
+
+- All $n_{sim}$ simulated datasets will be generated with the same seed 
+- Avoids potential non-independence in simulated datasets
+
+A simple simulation study shows that using sequential seeds for each dataset is a problem in Stata:
+
+
+![](stata.png){width=50%}
+
+::: notes
+4 datasets generated with nsim = nobs = 4, use seed 1:4 in stata
+obvious overlap in datasets
+
+Why might this be a problem?
+results for each simulation run will be highly correlated, you will get an underestimate of the standard error 
+:::
+
+---
+    
+## Setting the seed 
+
+Using sequential seeds for each dataset appears to be less of a problem in R: 
+
+```{r}
+nobs = nsim = 4
+set.seed(2025) # Morris approach
+for(i in 1:nsim){
+  # set.seed(i) # common approach
+  print(runif(nobs))
+}
+```
+
+::: notes
+Very good to check though- if you are using a different language or a different random number generator, to make sure your values are trully random.
+:::
+
+---
+
+
+## Setting the seed
+
+
+Morris et. al. recommends setting seed *once per simulation scenario*
+
+- In practice this is often unrealistic
+  - Simulation code is often run in parallel or on a cluster
+  - *Common approach is to set seed for each simulated dataset*
+
+```{r}
+nobs = nsim = 4
+# set.seed(2025) # Morris approach
+for(i in 1:nsim){
+  set.seed(i) # common approach
+  print(runif(nobs))
+}
+```
+
+
+---
+
+
+## Setting the seed, best practices 
+
+- *Common approach is to set seed for each simulated dataset*
+   - Best practice for this approach is to draw a random seed
+       
+
+```{r}
+nobs = nsim = 3
+seeds = sample(1:10000, nsim)
+print(seeds)
+for(i in 1:nsim){
+  # set.seed(i) # common approach
+  set.seed(seeds[i]) # slightly better approach
+  print(runif(nobs))
+}
+```
+
+::: notes
+This approach is going to be more robust to the type of issue we see with the stat code
+:::
+
+---
+
+
+## Setting the seed, best practices 
+
+
+- Do not set the seed again later in the program, even if the methods being used have a stochastic component
+- When writing functions and R packages, **do not hard code** a certain seed into the function/package
+  - In fact, don't set a seed in the function or package at all, leave that up to the user 
+
+
+::: notes
+This is different from what I have done in the past, but is what I will do in the future.
+:::
+
+---
+
+## Monte Carlo standard errors
+
+Monte Carlo standard errors quantify simulation uncertainty: they provide an estimate of the SE of (estimated) performance due to using finite $n_{sim}$
+
+
+![](table6.png){width=50%}
+
+
+
+
+
+::: notes
+Assume normally distributed $\hat{\theta}$
+
+Monte Carlo SE targets the sampling distribution of repeatedly running the same simulation study (with nsim repetitions) under different random-number seeds
+
+who has used MC SE in any of their simulation studies or papers? amounts to error bars in your plots
+:::
+  
+--- 
+
+## Number of simulations
+
+How many simulated datasets do you need to capture the true sampling distribution of your estimator?
+
+- Often this is chosen arbitrarily
+  - $n_{sim} = 50, 100$ chosen to evaluate bias
+  - $n_{sim} = 500, 1000$ chosen to evaluate coverage
+
+Are these values large enough?
+
+---
+
+## Number of simulations
+
+How many simulated datasets do you need to capture the true sampling distribution of your estimator?
+
+- Often this is chosen arbitrarily
+  - $n_{sim} = 50, 100$ chosen to evaluate bias
+  - $n_{sim} = 500, 1000$ chosen to evaluate coverage
+
+Are these values large enough?
+
+- each simulated dataset yields a draw from the true sampling distribution of the estimator, so $n_{sim}$ is the "**sample size**" on which Monte Carlo estimates of the mean, bias, SD, etc are based
+- **result**: we can use Central Limit Theorem to choose $n_{sim}$ in a more principled way
+
+::: notes
+idea is to select a desired precision for your estimates than choose $n_{sim}$ that achieves this precision
+:::
+
+---
+
+## Number of simulations (bias)
+
+Let's say we are interested in the **bias** of an estimator $\theta$ (whose true value is $\theta_0$.  )
+
+
+---
+
+
+
+## Number of simulations (bias)
+
+
+Let's say we are interested in the **bias** of an estimator $\theta$ (whose true value is $\theta_0$.  )
+
+- True bias: $bias(\hat{\theta}) = E(\hat{\theta})-\theta_0$
+- Estimated bias: $\widehat{bias(\hat{\theta}})=\frac{1}{n_{sim}}\sum_{i = 1}^{n_{sim}}\hat{\theta}_i - \theta_0$
+
+
+- True variance: $Var(\hat{\theta}) = E\left[(\hat{\theta}-\theta_0)^2\right]$
+- Estimated variance: $\widehat{Var(\hat{\theta}})= \frac{1}{n_{sim}-1}\sum_i^{n_{sim}}(\hat{\theta}_i-\bar{\theta})^2$
+
+
+::: notes
+estimated bias uses sample mean
+estimated variance uses sample variance
+
+Let's talk a little bit about using precise notation here
+:::
+
+---
+
+
+
+## Number of simulations (bias)
+
+\fontsize{9pt}{10pt}\selectfont
+Derive the Monte Carlo standard error of $\widehat{bias(\hat{\theta}})$
+
+
+$$SE\left(\widehat{bias(\hat{\theta}})\right) = \sqrt{Var\left(\widehat{bias(\hat{\theta}})\right)} = \sqrt{Var\left(\frac{1}{n_{sim}}\sum_{i = 1}^{n_{sim}}\hat{\theta}_i - \theta_0)\right)}$$ 
+
+<br>
+$$= \sqrt{\frac{1}{n_{sim}(n_{sim}-1)}\sum_{i=1}^{n_{sim}}(\hat{\theta}_i-\bar{\theta})^2}$$
+$$= \frac{\sqrt{\widehat{Var(\hat{\theta}})}}{\sqrt{n_{sim}}}$$
+
+---
+
+
+## Number of simulations (bias)
+
+\fontsize{9pt}{10pt}\selectfont
+To ensure our estimate of the bias has an acceptable amount of Monte Carlo standard error $e$, we can set
+
+
+$$\frac{\sqrt{\widehat{Var(\hat{\theta}})}}{\sqrt{n_{sim}}} = e$$
+
+Solving for $n_{sim}$ gives:
+
+
+$$n_{sim} = \frac{\widehat{Var(\hat{\theta}})}{e^2}$$
+
+Can guess $\widehat{Var(\hat{\theta}})$ from prior knowledge or preliminary runs.
+
+::: notes
+Essentially, we are choosing the standard error of our estimator to be no larger than e
+:::
+
+---
+
+
+## Number of simulations (coverage)
+
+**Coverage** is the probability that a confidence interval contains $\theta$.
+
+
+- If $\alpha$ is set to $0.05$, estimated coverage should be about $0.95$ if a method is performing well
+- Common performance measure for an estimator for $\theta$
+
+The Monte Carlo standard errors for coverage are
+
+$$SE\left(\widehat{coverage(\hat{\theta}})\right) = \frac{\sqrt{\widehat{cover}(1-\widehat{cover})}}{\sqrt{n_{sim}}}$$
+
+::: notes
+in this equation, coverage hat is the coverage in your data
+coverage should be equal to 1-alpha
+:::
+
+---
+
+
+## Number of simulations (coverage)
+
+Rearranging the previous equation, we get
+$$n_{sim} = \frac{\widehat{cover}(1-\widehat{cover})}{\left(SE(\widehat{coverage(\hat{\theta}}))\right)^2}$$
+
+Let's assume $\alpha = 0.05$ and we want the Monte Carlo SE to be no more than 0.5% (.005):
+
+$$n_{sim} = \frac{0.95(1-0.95)}{(0.005)^2} = 1900$$
+
+---
+
+
+
+## Presenting your results
+
+- **Key principle**: your simulation is useless unless other people (and your future self) can clearly understand what you did, why you did it, and what it means
+
+::: notes
+I actually find the simulation section to be the easiest section of an academic paper to write, because you just explain what you did.
+:::
+
+---
+
+## Presenting the results
+
+- **Key principle**: your simulation is useless unless other people can clearly understand what you did, why you did it, and what it means
+- Before giving results, you must give the reader enough information to appreciate them.
+  - State the objectives: Why do this simulation? What specific
+questions are you trying to answer?
+  - State the **rationale** for choice of factors studied, assumptions
+made
+  - Review all methods under study – be precise and detailed
+  - Describe exactly how you generated data for each choice of
+factors. Enough detail should be given so that a reader could
+write his/her own program to reproduce your results
+
+---
+
+## Presenting the results
+
+- Results must be presented in a form that:
+  - Clearly answers the questions
+  - Makes it easy to appreciate the main conclusions
+- Some basic principles:
+  - Only present a subset of results ("Results were qualitatively
+similar for all other scenarios we tried.")
+  - Only present information that is interesting ("Relative biases for
+all estimators were less than 2% under all scenarios and hence
+are not shown in the table.")
+  - The mode of presentation should be friendly... 
+
+---
+
+
+## Presenting the results
+
+- **Tables** are an obvious way to present results, however, some caveats:
+  - Would a figure be more clear/compelling?
+  - Place things to be compared adjacent to one another
+  
+<br>
+Simple example: consider three estimators for mean $\mu$ of a distribution based on iid draws $Y_1\ldots Y_n$:
+- $\theta_1$: sample mean
+- $\theta_2$: sample 20% trimmed mean
+- $\theta_3$: sample median
+
+
+---
+
+
+## Presenting the results
+
+What's bad about this table?
+
+
+
+![](mean_table.png){width=80%}
+
+---
+
+## Presenting the results
+
+Improved version
+
+
+![](mean_table2.png){width=80%}
+
+---
+
+
+## Presenting the results
+
+\fontsize{9pt}{10pt}\selectfont
+- Graphs/figures are often more effective than tables
+- Example: Power of the t-test for $H_0: \mu = 1$ vs. $H_1: \mu \ne 1$ for
+normal data with $n_{sim} = 10000$, $n = 15$
+
+
+![](mean_power.png){width=70%}
+
+---
+
+## Final Takeaways
+
+* **Principle 1**: A Monte Carlo simulation is just like any other experiment and requires planning
+  * Can use experimental design principles
+  * Shouldn't only choose factors favorable to a method you developed
+  * $n_{sim}$ should be chosen to achieve acceptable precision
+
+---
+
+
+## Final Takeaways
+
+* **Principle 2**: Save everything often!
+  * Save the individual estimates in a file and then compute the mean, bias, SD, etc. later, as opposed to computing these summaries and saving only them
+  * This is especially critical if the simulation takes a long time to run
+  * Don’t wait until the simulation ends to save. Long tasks can often be interrupted.
+
+---
+
+## Final Takeaways
+
+- **Principle 3**: Keep $n_{sim}$ small at first
+  - Test and refine code until you are sure everything is working correctly before carrying out final production runs
+  - Get an idea of how long it takes to process one data set, i.e., one iteration
+  - Particularly important if production run will be submitted to the cluster to determine how many cores may be necessary to finish in an acceptable time frame.
+
+---
+
+
+## Final Takeaways
+
+
+- **Principle 4**: Keep everything as reproducible as possible
+  - Set and record the seed
+  - Document your code!! Should be readable to your peer or your future self
+  - Backup your code and results
+
+
+---
+
+
+## References
+
+
+
+![](refs.png){width=80%}
+
+
+## Extra
+
+---
+
+## Allowing for failures
+
+Anticipate and **allow for failures** in a given simulation run. These can be do to:
+
+- Rare events (e.g., assigned all subjects to a single treatment by
+chance, treatment perfectly confounded by a covariate in a
+permutation test)
+- Lack of convergence of an optimization routine (fairly common in logistic regression)
+
+Discard the failed iteration and repeat with the next random state but
+**record the number of failures** that occur to gauge how likely failure
+is in practice
+
+- Use the results to judge whether the statistical procedure can
+reliably be used in the situation(s) being investigated
+
+---
+
+
+## Allowing for failures
+
+To handle errors and other conditions in R
+
+- `try()`: execution will continue when an error occurs
+- `tryCatch()`: allows you to specify handler functions that
+give the computer directions about how to proceed when a
+condition is encountered
+
+---
+
+
+## Allowing for failures
+
+This will throw an error:
+
+```{r, eval = FALSE}
+f1 = function (x){
+  log(x)
+}
+
+f1("x")
+# Error in log(x) : non-numeric argument to 
+# mathematical function
+```
+
+---
+
+
+## Allowing for failures
+
+Using `try()` avoids failure:
+
+```{r}
+f1 = function (x){
+  try(log(x))
+}
+
+f1("x")
+
+```
+
+
+- Will print the error encountered during the `try()` statement, but doesn't break your code
+- Using option `silent=TRUE` will suppress the message
+
+---
+
+## Allowing for failures
+
+In addition to handling errors, `tryCatch()` allows you to specify
+how to proceed in the event of a warning, message, or **interrupt**
+
+- An interrupt is raised when the user terminates the program
+execution by pressing Ctrl+C (or similar).
+
+
+```{r}
+result <- tryCatch(
+  10 / "5",  # Code that might cause an error
+  error = function(e) {
+    message("Caught an error: ", e$message)
+    return(NA)
+  }
+)
+
+print(result)
+```
+
+
+
+
+
+

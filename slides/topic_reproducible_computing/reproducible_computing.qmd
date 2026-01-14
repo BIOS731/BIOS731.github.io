@@ -130,7 +130,7 @@ I may be flexible about the due dates since the course is new
 ## Grading
 
 - Homework (50%)
-  - 6-7 assignments
+  - 7 assignments
 - Discussion board posts (10%)
   - 4-5 posts
 - Participation (10%)
@@ -419,6 +419,9 @@ I use pothole case, which is also called `snake_case`.  Typing uppercase letters
 
 ---
 
+
+
+
 ## Self-documenting code
 
 Many of these recommendations are to \green{make code self-documenting}. 
@@ -433,11 +436,50 @@ This is really __hard to do__.
 
 ---
 
+
+## Self-documenting code
+
+- Functions as verbs, variables as nouns
+- Make names encode shape, type, and meaning (not implementation)
+
+```{r}
+clean_data <- function(raw_df) { ... }
+
+users_df  <- readr::read_csv("users.csv")
+is_valid  <- validate_users(users_df)
+```
+
+
+---
+
+## Self-documenting code
+
+Patterns that prevent bugs include
+
+- Singular vs. plural for "one vs. many"
+  - `user` vs. `users`, `model` vs. `models`
+- Type suffixes when it matters: `_df`, `_vec`, `_lst`, `_mat`
+- Units/scales in names: `_sec`, `_ms`, `_km`
+- Booleans start with `is_`, `has_`, `can_`, `should_`
+
+\fontsize{8pt}{9pt}\selectfont
+
+```{r}
+users_df     <- read_users()
+region_vec   <- unique(users_df$region)
+timeout_sec  <- 30
+revenue_usd  <- 125000
+has_dupes    <- anyDuplicated(users_df$id) > 0
+
+```
+
+---
+
 ## Self-documenting code
 
 
 
-\fontsize{8pt}{9pt}\selectfont
+\fontsize{9pt}{10pt}\selectfont
 
 Here's an example of \red{bad code}:
 
@@ -471,7 +513,7 @@ The second chunk is better; at least it is documented! But it's redundant and no
 ## Self-documenting code
 
 
-\fontsize{8pt}{9pt}\selectfont
+\fontsize{9pt}{10pt}\selectfont
 Here's \green{self-documenting code}:
 
 ```{r}
@@ -528,7 +570,7 @@ Why spend a lecture on coding style if everyone knows how to code?
 
 * dots (".") in variable names
 * upper case in variable names
-* Not putting a vertical line of white space after a section header in an `.Rmd` document 
+* Not putting a vertical line of white space after a section header in an `.Rmd` or Quarto document 
 * Unnecessarily short and unreadable variable names
 * Calling libraries, loading data, or sourcing files in the middle of a script
   * Always do it at the beginning!!
@@ -874,7 +916,7 @@ ls [a-e]_file.txt
 
 ## Reproducible project organization
 
-![](project_org.png){width=55%}
+![](project_org.png){width=65%}
 
 
 ::: notes
@@ -1018,11 +1060,12 @@ The `00`, `01`, ... number system is something that many people use because it h
 
 ## Example data analysis project, cont'd 
 
-I typically have other ancillary files in my root directory as well. These are files I don't (often) modify but are important for workflow or reproducibility:
+I typically have other ancillary files in my root directory as well. These files are important for workflow or reproducibility:
 
 ```text
 YYYY_MM_PI_topic/
 ├── YYYY_MM_PI_topic.Rproj
+├── sandbox/
 ├── .git/
 └── .gitignore
 ```
@@ -1248,6 +1291,7 @@ It's not only data you can access this way, but this is the most common use case
 
 ## Automated project initiation using `projectr`
 
+\fontsize{11pt}{12pt}\selectfont
 Hosted on my GitHub, heavily adapted from [Jeff Goldsmith](https://github.com/jeff-goldsmith/projectr)
 
 ```{r, eval = FALSE}

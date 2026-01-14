@@ -44,5 +44,11 @@
   },
   "homework/topic_reproducible_computing/HW_reproducibility.Rmd": {
     "HW_reproducibility.html": "0c10abee"
+  },
+  "slides/topic_simulations/s_simulations.qmd": {
+    "s_simulations.tex": "e7996167"
+  },
+  "slides/topic_simulations/s_bootstrap.qmd": {
+    "s_bootstrap.tex": "36295b6b"
   }
 }

@@ -88,7 +88,7 @@ Evaluation will be based on the following components:
 
 | Assessment                         | Percentage |
 |-----------------------------------|------------|
-| Homework (5 assignments)          | 50%        |
+| Homework (7 assignments)          | 50%        |
 | Final Project and Presentation    | 30%        |
 | Discussion Board (4 posts)        | 10%        |
 | Participation                     | 10%        |
@@ -202,10 +202,10 @@ Students are expected to uphold the Laney Graduate School Honor Code.
 | 3/25  | Cloud Computing          | Cluster project organization               |                         |
 | 3/26  | R Packages               | Package basics                             | HW5 due                 |
 | 4/1   | R Packages               | Rcpp                                       |                         |
-| 4/2   | Optimization II          | LP, quantile regression                    |                         |
+| 4/2   | Optimization II          | LP, quantile regression                    | HW6 due                 |
 | 4/8   | Optimization II          | QP, LASSO                                  |                         |
 | 4/9   | Optimization II          | HMM and ADMM                               |                         |
 | 4/15  | Optimization II          | Stochastic gradient descent                |                         |
-| 4/16  | Special Topics           | TBD                                        | HW6 due                 |
+| 4/16  | Special Topics           | TBD                                        | HW7 due                 |
 | 4/22  | Final Presentations      | First half                                 |                         |
 | 4/23  | Final Presentations      | Second half                                |                         |
