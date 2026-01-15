@@ -237,20 +237,6 @@ Warnings from modeling functions like `glmer` can be important to investigate, t
 
 ---
 
-## Basic GitHub workflow
-
-
-```bash
-git pull
-
-git status
-git add --all
-git commit -m "informative commit message!"
-git status
-
-git push
-```
----
 
 ## What is Git?
 
@@ -384,6 +370,14 @@ docx, .Rdata, .rds, .xlsx, etc…)
 
 ---
 
+
+## Example commit messages
+
+Let's see what I've committed for this course website.
+
+
+---
+
 ## .gitignore files
 
 - If there are files that you know for sure you do not want to
@@ -465,6 +459,12 @@ git push
 ```
 
 ---
+
+## GitHub
+
+I'll start a new project with `projectr`, including a symbolic link to data, and we can put that on GitHub.
+
+--
 
 ## Reproducible examples
 
