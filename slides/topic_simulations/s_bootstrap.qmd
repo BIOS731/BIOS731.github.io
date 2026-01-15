@@ -1,5 +1,5 @@
 ---
-title: "Best practices for using simulation studies to evaluate statistical methods"
+title: "Resampling methods: Bootstrap and Permutation tests"
 author: "Julia Wrobel"
 format:
   beamer:
@@ -9,7 +9,7 @@ format:
     slide-level: 2
 execute:
   echo: true
-  eval: false
+  eval: true
   warning: false
   message: false
 header-includes:
@@ -18,1094 +18,881 @@ header-includes:
   - \newcommand{\green}[1]{\textcolor{green}{#1}}
 ---
 
-
 ## Overview
+
 
 Today, we cover:
 
-- Simulation studies
-  - Design
-  - Implementation
-  - Presentation
-- Lab
+- Resampling methods
+  - Bootstrap
+  - Permutation tests
 
-Announcements
+**Announcements**:
 
-- HW2 posted and due 1/28 at 10:00AM
+- HW2 posted and due 2/4 at 10:00AM
+
+Readings:
+
+- [Tim Hesterburg: Bootstrap](https://wires.onlinelibrary.wiley.com/doi/abs/10.1002/wics.182)
+
+
+::: notes
+Start homework 1!! It's computationally intensive. After this lecture you will have everything you need to start implementing it expect parallelization. You should have at least one simulation scenario tested and ready to go.
+
+Question about homework 1?
+Extra stuff in the Hesterburg paper that I didn't cover and is useful
+:::
+
+---
+
+## Bootstrap: motivation
+
+What do you already know about the bootstrap?
+
+::: notes
+What is your prior experience with the bootstrap?  What do you know about it already?
+
+better confidence intervals when we can't get or don't trust ones based on CLT/ normal sampling theory
+
+Confidence intervals are for parameter estimates (like $\hat{\beta}$)
+:::
+
+---
+
+## Bootstrap: motivation
+
+- Basically, used to obtain better confidence intervals when we can't get or don't trust ones based on CLT
+  - idea: $\hat{\beta} = (x^Tx)^{-1}x^Ty$, $se(\hat{\beta}) = \sigma^2(x^Tx)^{-1}$
+    - What happens if we don't trust $se(\hat{\beta})$
+
+
+- Resample data with replacement, calculate a statistic of interest (e.g., $\bar{Y}$) for each sample, obtain empirical distribution of $\bar{Y}$
+  - Nonparametric bootstrap
+
+
+How would you then obtain confidence intervals?
+
+::: notes
+CI: we will learn 4 ways to do this
+Think about how you construct T statistic or Z-statistic.  CI and p-values are based on assumption that the statistic should be roughly $t$ or $N(0,1)$ distributed. If this is not true, the CI will not be good.  
+:::
+
+
+---
+
+
+
+## Bootstrap: motivation
+
+- Many subtle issues with the usual non-parametric bootstrap
+  - In small samples, bootstrap confidence intervals often preferred to avoid relying on CLT, but the common percentile bootstrap
+performs poorly in small samples!
+  - Other types of bootstrap intervals may work better in small samples.
+
+
+- Important to understand these issues of the bootstrap to avoid pitfalls
+when quantifying uncertainty
+
+
+
+---
+
+
+
+## Notation
+
+
+For some cumulative distribution function $F$, suppose we are
+interested in a parameter, $\theta \stackrel{\triangle}{=} T(F)$, written as a functional of $F$
+
+
+- Let $y$ represent a random variable associated with a sample from $F$
+- A **functional** is a function of a function
+  - Mean of $F$: $T(F) = \int y dF(y)$
+  - Median of $F$: $T(F) = inf\{y: F(y) \ge 0.5\}$
 
 
 
 ::: notes
-Just for today if you haven't done it I will let you do it later today and only take a couple of points off.
+Here  T(F) means some functional of f.  
 
-Lots of science/math funded my practical purposes- in this case the atom bomb
+inf is the infimum, which is the biggest number that is less than or equal to all elements of its set
+This is our mathematical definition of the median in terms of the CDF
+
+The idea here is that both the mean and the median (or other summary statistics we might be interested in) depend on the true underlying CDF of the data.
+:::
+
+---
+
+
+## Notation 
+
+\fontsize{10pt}{11pt}\selectfont
+- Usually $F$ is unknown, so we have to estimate it. 
+- Suppose we have a sample of data, $\mathcal{Y} = \{ y_1, y_2, \ldots, y_n\}$ drawn from $F$
+
+- Empirical CDF is an estimate of $F$
+  - places $1/n$ mass at each observed data point:
+
+$$\hat{F}_n(y) = \frac{1}{n}\sum_{i = 1}^n I_{y_i\le y}$$
+
+- To estimate a functional $T(F)$, we plug in the empirical distribution, $\hat{F}_n(y)$, for $F(y)$:
+
+$$T(\hat F_n) = \int g(y) d\hat F_n(y) = \frac 1n\sum_{i = 1}^n g(y_i)$$
+
+::: notes
+Idea here is that, even though we don't usually think of the mean or other statistics of interest as being dependent on the empirical CDF, conceptually they are.
+
+The notation here gets at the underlying theory of the bootstrap, which we won't go into too much and will just touch the surface of here.
+
+You test statistic of interest can be posed as a function of the empirical CDF
+:::
+
+---
+
+## Notation
+
+- Now, suppose we are interested in statistical **inference** for a statistic
+  - Denote this $W(\mathcal{Y, F})$
+
+- For example, if $Y_i \sim N(\mu, \sigma^2)$ we might be interested in the t-statistic
+
+$$W(\mathcal{Y, F}) = t = \frac{\bar{Y}-\mu}{s/\sqrt{n}}$$
+
+::: notes
+Inference for $W(\mathcal{Y, F})$ depends on the sampling distribution of W
+:::
+
+---
+
+
+## Notation
+
+\fontsize{10pt}{11pt}\selectfont
+- Now, suppose we are interested in statistical **inference** for a statistic
+  - Denote this $W(\mathcal{Y, F})$
+
+- For example, if $Y_i \sim N(\mu, \sigma^2)$ we might be interested in the t-statistic
+
+$$W(\mathcal{Y, F}) = t = \frac{\bar{Y}-\mu}{s/\sqrt{n}}$$
+
+- In many cases, the sampling distribution of $W(\mathcal{Y, F})$ may be very complicated, unknown, or could depend on an unknown $F$
+  - e.g., if $Y_i$ come from a skewed distribution, then $t$ does not have a t-distribution, **even in large samples**!
+
+::: notes
+Why is this last statement a problem?
+:::
+
+---
+
+
+## When t is not t 
+
+\fontsize{10pt}{11pt}\selectfont
+When $Y_i$ come from a skewed distribution, the sample mean and its SE are correlated and their correlation does not decrease as $n\to \infty$
+
+- $\implies$ t-statistic is not t-distributed
+
+![](tdist.png){width=60%}
+
+
+
+- If your test or CI assumes your statistic has a normal or t sampling distribution, **any deviation** from the diagonal implies your test/interval will perform poorly
+
+
+::: notes
+This is a Q-Q plot for a **sampling distribution** not raw data! The CLT already had its chance to work
+:::
+
+---
+
+
+## When t is not t 
+
+Idea: confidence intervals for parameter estimates provide no robustness against non-normality!
+- Coverage does not improve as $n \to \infty$!
+
+\vspace{5mm}
+Bootstrapping can be very useful for constructing better confidence
+intervals for these parameters.
+
+
+::: notes
+Tricky here because the non-normality refers to the sampling distribution of your test-statistic, not the underlying distribution of your data
+:::
+
+---
+
+## The Bootstrap Principle
+
+- Replace unknown $F$ with $\hat F_n$
+  - Produce a numerical approximation of the sampling distribution of $W(\mathcal{Y, F})$ by repeatedly sampling from $\hat F_n$
+
+
+
+**Idea**: Bootstrap principle is used to estimate the sampling distribution of a *statistic* without relying on strong parametric assumptions about the underlying population distribution
+
+::: notes
+Used to estimate the sampling distribution of a statistic without relying on strong parametric assumptions about the underlying population distribution
 :::
 
 ---
 
 
 
-- Named for Monte Carlo, Monaco
-  - Las Vegas of Europe
+## The Bootstrap Principle
+
+- Nonparametric bootstrap
+- Parametric bootstrap
+- Wild bootstrap
+
+
+- Smooth bootstrap
+- Bag of little bootstraps
 
 ::: notes
-Who has heard of Stan, the Bayesian computing language?
+Many different flavors!
 :::
 
 ---
 
 
-## Monte Carlo History
+## Nonparameteric bootstrap
 
-- Ulam was playing solitaire and wondered: what are the chances that a hand laid out with 52 cards will come out successfully?
-  - ~ $8 \times 10^{67}$ ways to sort a deck of cards
-    - Intractable analytically
+\fontsize{10pt}{11pt}\selectfont
+A **bootstrap sample** is a random sample of size drawn **with replacement** from $\hat F_n$
 
+- bootstrap sample denoted $y^* = (y^*_1, y^*_2, \ldots, y^*_n)$
+- $\hat{\theta}^* \stackrel{\triangle}{=} T(\hat F_n(y^*))$ is the corresponding bootstrap estimate using the sample $y^*$
+  - We'll call this $T(\hat F_n^*)$ to simplify notation
+  
 
+Draw $B$ bootstrap samples and calculate $\hat{\theta}^*_i, i = 1,\ldots,B$. 
 
+- Then, SE of $\hat{\theta}$ can be estimated using the standard deviation of the $B$ replications:
 
-- What if instead he could simply lay out the cards one hundred times and count the number of successful plays?
-
+$$\widehat{SE}(\hat{\theta}) = \sqrt{\frac{\sum_{i = 1}^B (\hat{\theta_i^*}-\bar{\theta}^*)^2}{B-1}}$$
 
 
 ::: notes
-This works under the assumption that each play started with randomized conditions.
-
-Also, he quickly thought in the new era of computing this would generalize well to mathematical physics problems
-Now this type of computing is ubiquitous, interesting to see how quickly the world has changed
+Then use this standard error or other aspects of the distribution of theta hat to estimate a confidence interval
 :::
 
 ---
 
 
+## Why does it work?
 
+- $\hat F_n \to F$ uniformly by Glivenko-Cantelli
 
-## Simulation studies in biostatistics
+  - $\implies$ when $n$ is large, iid sampling from $\hat F_n$ should be approximately the same as iid sampling from $F$
+  
+- Each bootstrap sample is considered an iid sample from $\hat F_n$
+  
 
-Many uses!
-
-- Check algebra (and code) to provide reassurance no error has been made when a new statistical method has been derived analytically
-- Assess relevance of large-sample theory in finite samples
-- For absolute evaluation of a new method
-  - Does it work well in the scenarios for which it was designed?
-- For comparative evaluation of two or more methods
-
-::: notes
-Some uses include the following.
-- An estimator or test statistic has a **true sampling distribution** under
-a particular set of conditions (e.g., finite sample size, true generative
-distribution)
-- Monte Carlo simulation can be used to *approximate* the sampling
-distribution under a particular set of *known* conditions
-- Useful when derivation of the true sampling distribution is not
-tractable
-- Also when true sampling distribution is known (e.g., asymptotically normal) but you want to check:
-     - If your derivations are correct
-     - If your method works in small sample sizes
-- Importantly, the **true value(s)** of the target parameter(s) are known and used to generate the data.
-:::
-
----
-
-
-## Simulation Study Design
-
-- Simulation studies are **empirical experiments**
-
-- As statisticians, we should apply principles of **experimental design** when conducting simulation studies
-- Burton, Altman, Royston, and Holder (2006): Before writing code, develop a **protocol** that provides details about how the study will be performed, analysed, and reported
-
----
-
-## Simulation Study Design
-
-- Morris, White, and Crowther (2019) advocate for **ADEMP**:
-  - Aims 
-  - Data-generating Mechanisms
-  - Estimands
-  - Methods
-  - Performance Measures
-
-::: notes
-Morris is a good paper! I recommend reading it. I learned a lot from reading it in preparation of this lecture.
-:::
-
----
-
-## ADEMP Structure
-
-
-![](table1.png){width=90%}
+- Potential sources of error:
+  - Original sample is chosen randomly from population
+  - Bootstrap distribution contains Monte Carlo error when exhaustive resampling is infeasible
+    - For fixed $n$, number of possible bootstrap samples is ${2n-1}\choose{n}$
 
 
 ::: notes
-This is part of Table 1 in the paper.  At a high level explain each of these concepts
+Data sample needs to be representative of the population for it to work
+Glivenko Cantelli establishes uniform convergence of the eCDF to the true CDF
+
+Idea behind the bootstrap is simple but the theory is hard! I can point you to some resources if you want more.
+
+if n = 10, choose(2n-1, n) = 92,378
+
+if n = 5, 126
 :::
 
 ---
 
 
 
+## Sources of error
 
-## Planning Stage (notation)
 
-
-![](table2.png){width=90%}
+![](booterror.png){width=60%}
 
 ::: notes
-Table 2 in paper
+One takeaway from this plot: bootstrap distribution is centered around $\bar{x}$, not $\mu$.  **Bootstrapping will not get you a better estimate of ** $\bar{x}$! Just a better estimate of the spread around it.
+
+Also, there is error both due to your original sample, and due to the randomness in your bootstrap samples. The larger nboot is, the more you will reduce the second source of error. You can't really do anything about the first.
+:::
+
+---
+
+## Example: nonparameteric bootstrap
+
+\fontsize{10pt}{11pt}\selectfont
+Using `mtcars` dataset, we will look at the mean `mpg` for different cars
+
+```{r}
+data(mtcars)
+str(mtcars)
+```
+
+
+---
+
+## Example: nonparameteric bootstrap
+
+
+```{r, echo = FALSE, fig.width= 6, fig.height = 4, fig.align='center'}
+hist(mtcars$mpg)
+```
+
+
+
+---
+
+## Example: nonparameteric bootstrap
+
+\fontsize{10pt}{11pt}\selectfont
+```{r}
+B = 10000
+mpg = mtcars$mpg
+boot_mean = rep(NA, B)
+set.seed(222)
+for(i in 1:B){
+  ystar = sample(mpg, size = length(mpg), replace = TRUE)
+  boot_mean[i] = mean(ystar)
+}
+
+paste0("mean: ", round(mean(mpg),3), 
+       "; bootstrapped mean: ", round(mean(boot_mean),3))
+```
+
+
+::: notes
+Formula for standard error of the mean is s/sqrt(n) where s is the sample standard deviation
+depends on large enough sample size and/or normal mpg variable
+
+Standard deviation of the bootstrapped estimates is an estimate of the standard error of theta hat
+:::
+
+---
+
+## Example: nonparameteric bootstrap
+
+\fontsize{10pt}{11pt}\selectfont
+
+```{r}
+se_mean = sd(mpg)/sqrt(length(mpg))
+paste0("sd: ", round(se_mean,3), 
+       "; bootstrapped sd: ", round(sd(boot_mean),3))
+```
+
+---
+
+
+## Example: nonparameteric bootstrap
+
+```{r, fig.width= 5, fig.height = 3, fig.align='center'}
+hist(boot_mean)
+```
+
+
+---
+
+
+
+
+
+## Bootstrap confidence intervals
+
+- When it works, the bootstrap can be very useful for constructing
+confidence intervals (CIs) for a parameter $\theta$
+
+
+- Multiple methods for constructing bootstrap CIs exist!
+  - Percentile intervals
+  - $t$ intervals with bootstrap SE (also called Wald-type)
+  - bootstrap $t$
+  - BCa intervals
+  
+
+- Quality of different approaches generally depends on $n$ and the skewness of the original data
+
+
+---
+
+## Order of accuracy
+
+- Recall "big-O" notation for non-negative functions $f,g$:
+  - $f(x) \in O(g(x)) \mbox{ iff } f(x) \le hg(x) \forall x\ge x_0$ and some $h > 0$
+  
+
+- A confidence interval is **first-order accurate** if the non-coverage probability differs from the nominal value by $O(n^{-1/2})$:
+  - $Pr(\theta < \theta_{lb}) + P(\theta > \theta_{ub}) = \alpha + O(n^{-1/2})$
+  
+  
+- A confidence interval is second-order accurate if the non-coverage probability differs from the nominal value by $O(n^{-1})$:
+  - $Pr(\theta < \theta_{lb}) + P(\theta > \theta_{ub}) = \alpha + O(n^{-1})$
+
+::: notes
+Basically, this just means that the second order accurate confidence intervals converge faster as n increases than the second order intervals.
 :::
 
 ---
 
 
-## Estimands 
+## Percentile method
 
-What is an estimand?
+The simplest approach to constructing a bootstrap CI is the **percentile method**.
+
+- Let $\hat{\theta}^*_1, \ldots, \hat{\theta}^*_B$ be a bootstrap sample of point estimators
+- Then, a two-sided $100 \times (1-\alpha)$% bootstrap percentile CI is 
+
+$$(\xi^*_{\alpha/2}, \xi^*_{1-\alpha/2})$$
+
+- where $\xi^*_p$ is the $p^{th}$ percentile of the bootstrap samples
+
+
+---
+
+## Percentile method
+
+**Pros**:
+
+- Simple to implement and easy to understand
+- It is **transformation invariant**: the percentile method confidence interval for a monotone transformation of $\theta$ can be obtained by transforming the endpoints of the interval for $\theta$
+- Works better than some other methods when data are skewed
+
+
+**Cons**:
+
+- Tends to be too narrow with small sample sizes
+- The percentile method is only first-order accurate
 
 
 ::: notes
-An estimand is the precise quantity or parameter of interest that a study aims to estimate to address its research question.
+Think about transformation invariant in terms of logistic regression: you might want a confidence interval for both beta and e^beta (the odds ratio)
 
-Especially in causal inference, but also more generally- define your estimand
+What does too narrow mean, practically? Poor coverage. False rejection of null hypothesis (type 1 error)
 ::: 
 
 ---
 
-## Estimands 
+## $t$ intervals with bootstrap SE
 
-What is an estimand?
+Recall that if $(\hat{\theta}-\theta)/\hat{se}(\hat{\theta}) \to N(0,1)$, then the (Wald) approximate CI for $\theta$ is 
 
-- An estimand is the precise quantity or parameter of interest that a study aims to estimate to address its research question.
+$$\hat{\theta} \pm Z_{1-\alpha/2}\times se(\hat{\theta)}$$
+
+- This interval will closely agree with the percentile bootstrap CI when $\hat{\theta}$ is approximately normal
+- What if we don't know $se(\hat{\theta)}$ or $se(\hat{\theta)}$ is difficult to calculate?
+
+---
+
+## $t$ intervals with bootstrap SE
+
+When $se(\hat{\theta)}$ is unknown or cumbersome, we can use a bootstrap estimate of the standard error of $\hat{\theta}$ instead:
+
+$$\hat{\theta} \pm Z_{1-\alpha/2}\times \hat{se}_b(\hat{\theta)}$$
+
+- For smaller samples, replace the $Z$ quantile by a $t$ quantile:
+
+$$\hat{\theta} \pm t_{1-\alpha/2, n-1}\times \hat{se}_b(\hat{\theta})$$
+
+- If you can estimate $se(\hat{\theta)}$ directly, there is no real benefit of using $\hat{se}_b(\hat{\theta})$
+
+---
+
+## $t$ intervals with bootstrap SE
+
+**Pros**:
+
+- Simple to implement and easy to understand
+- Can be applied to situations where $se(\hat{\theta)}$ is difficult to derive
+
+
+**Cons**:
+
+- **Biased**: comparable to using the MLE $\sqrt{\frac{1}{n}\sum_i (x_i-\bar{x})^2}$ instead of the unbiased estimate $\sqrt{\frac{1}{n-1}\sum_i (x_i-\bar{x})^2}$
+- Can perform poorly if distribution is skewed
+- Tends to be too narrow with small sample sizes
+- Only first-order accurate
 
 
 ---
 
-
-## Estimands 
-
-What is an estimand?
-
-- An estimand is the precise quantity or parameter of interest that a study aims to estimate to address its research question.
-
-**Example**: treatment effect in a clinical trial
-
-
-::: notes
-Say we have an RCT, and we want to know if treatment works better than placebo. Treatment effect might be the estimand of interest.  How can we estimate treatment effect?
-:::
-
----
-
-
-
-## Simple exam: linear regression
-
-$$Y_i = \beta_0 + \beta_{treatment}X_{i1} + \mathbf{Z_i}^T\boldsymbol{\gamma} + \epsilon_i$$
-
-- $Y_i$: continuous outcome
-- $X_{i1}$: treatment group indicator; $X_{i1}=1$ for treated 
-- $\mathbf{Z_i}$: vector of potental confounders
-
-
-
-
-- $\beta_{treatment}$: average treatment effect, adjusting for $\mathbf{Z_i}$
-- $\boldsymbol{\gamma}$: vector of regression coefficient values for confounders 
-- $\epsilon_i$: iid error, $\sim N(0, \sigma^2)$
-
-::: notes
-X_i is a binary treatment variable
-
-What is our estimand in this example?
-
-beta_treat, since we explicitly stated that before, but we could also have other quantities of interest
-:::
-
----
-
-
-
-## Planning Stage: Aims
-
-
-Desirable (asymptotic) properties of an estimator $\hat{\theta}$ from a frequentist perspective:
-
-1. $\hat{\theta}$ should be consistent: as $n\to \infty$, $\hat{\theta} \to \theta$
-  - Also desirable that $\hat{\theta}$ is unbiased: $E(\hat{\theta}) = \theta$
-2. The sample estimate $\widehat{Var(\hat{\theta})}$ consistent estimate of true sampling variance of $\hat{\theta}$, $Var(\hat{\theta})$
-3. Confidence intervals should have **good coverage**: at least $100(1-\alpha)$% of intervals contain $\theta$
-4. $\hat{\theta}$ should be efficient: $Var(\hat{\theta})$ should be as small as possible
-
-
-::: notes
-Aims is the A in ADEMP
-These properties are typically what you would evaluate in a simulation study
-:::
-
----
-
-
-## Planning Stage: Aims
-
-
-Desirable properties of an estimator $\hat{\theta}$ from a frequentist perspective:
-
-1. $\hat{\theta}$ should be consistent: as $n\to \infty$, $\hat{\theta} \to \theta$
-  - Also desirable that $\hat{\theta}$ is unbiased: $E(\hat{\theta}) = \theta$
-2. The sample estimate $\widehat{Var(\hat{\theta})}$ consistent estimate of true sampling variance of $\hat{\theta}$, $Var(\hat{\theta})$
-3. Confidence intervals should have **good coverage**: at least $100(1-\alpha)$% of intervals contain $\theta$
-4. $\hat{\theta}$ should be efficient: $Var(\hat{\theta})$ should be as small as possible
-
-
-
-
-* \green{Computational efficiency}
-
-::: notes
-Typically, in simulation studies we are assessing these things or a combination of these things
-:::
-
----
-
-
-## Planning Stage: Aims
-
-Proof-of-concept vs. stretching simulation studies
-
-
-* Proof-of-concept: aim to show that a method is viable in some settings 
-* Stretch/break objective:: identify settings where the method may fail
-
-
-Examples of each in the linear regression setting?
-
-::: notes
-1st might check that the treatment effect can be well captured when errors are normally distributed and sample size is large
-2nd might check how this works for binary outcome, or very small sample size, or highly correlated errors
-:::
-
----
-
-
-## Data-generating mechanisms
-
-Refers to how random numbers are used to generate a simulated dataset.
-
-
-
-1. Parametric draws from a known model 
-  - true data generating model is known
-  - more flexible but may be overly simplistic for real data
-2. Repeated resampling with replacement from a specific dataset
-  - true data generating model is unknown
-  - less flexible but relevant for at least the study at hand
-
-::: notes
-We are still in the planning stage
-This is the D of ADEMP
-1. is more common 
-2. Comes into play in bootstrapping next week
-:::
-
----
-
-
-## Data-generating mechanisms
-
-
-If using a parametric model, need to fully specify your generative model:
-
-- Functional form(s)
-- True values of the parameters
-- Error distributions and their parameters
-
-
-
-Without every detail of the data generation process, others will not be
-able to reproduce your simulation results!
-
----
-
-
-## Data-generating mechanisms
- 
-Suppose you want to calculate coverage for $\hat{\beta}_{treatment}$ under several conditions:
-
-- Sample sizes $n \in \{50, 100, 200\}$
-- Error variances $\sigma^2 \in \{1, 3\}$
-- True treatment effects $\beta_{treatment} \in \{0, 0.5, 2\}$
-
-
-- **Full factorial design**: evaluate all combinations of these conditions/factors
-  - $3 \times 2 \times 3 = 18$ simulation scenarios
-  - This is the preferred approach, but can be computationally demanding
-  
+## Bootstrap $t$ method
+
+The **bootstrap-t** method uses simulation to estimate the $t$ quantile for the interval.
+
+- For **each** bootstrap sample, calculate $t^*_b$, where:
+  - $t^*_b = \frac{\hat{\theta}^*_b-\hat{\theta}}{se(\hat{\theta}^*_b)}$
+  - $\hat{\theta}$ is estimated from the original sample
+  - $\hat{\theta}^*_b$ is estimated from the $b^{th}$ bootstrap sample
+  - $se(\hat{\theta}^*_b)$ is the SE of the $b^{th}$ estimate
   
 ::: notes
-Other approach us "base case" where you vary factors one at a time around a base case approach
+This is different from the previous approach, t intervals with bootstrap SE!!
+Notation here is key to understand, this one is going to show up in your homework
 :::
 
 ---
 
-
-## Estimands and other targets
-
-- Most simulation studies evaluate or compare methods for estimating one or more population quantities, which we term **estimands** and denote by $\theta$
-- Choice of estimand(s) depends on the aims of your study!
-    - If you are interested in how well treatment works: $\beta_{treatment}$
-    - If interested in the patient outcome value for a given set of characteristics: $E(Y_i|X_i, \beta)$
-
-
-- Not all simulation studies involve an estimand.  These other quantities we might want to focus on are referred to as **targets** of a simulation study
-
-::: notes
-This is the E of ADEMP
-:::
-
-
----
-
-
-## Estimands and other targets
-
-
-![](table3.png){width=75%}
-
-::: notes
-Table 3 of the paper
-Possible targets of a simulation study and relevant performance measures
-:::
-
----
-
-
-## Planning: Methods
-
-What method is being evaluated? Is it being compared to other methods?
-
-
-- When comparing across multiple methods, it is important to consider:
-  - Are all relevant methods in the literature being included in your study?
-     - If not, what is your justification?
-  - Do competing methods have open source implementations?
-    - Will you need to contact author(s) for code?
-  - What are the assumptions of each method?
-    - Will your simulation design favor one method over another?
-
-::: notes
-M of ADEMP
-Justifications include no code, method has already been shown to be poor for the same settings in another paper 
-Definitely you will encounter trying to compare a method you develop with another method, only to discover that they have no code. 
-When you email them about the code, and you get no response, what do you do?
-In bioinformatics, this is less of a problem
-:::
-
-
----
-
-## Planning: Performance measures
-
-A **performance measure** is a numerical quantity used to assess the performance of a method.  Examples of common measures:
-
-* bias: $E[\hat{\theta}]-\theta$
-  * used for estimands
-* coverage: $Pr(\hat{\theta}_{low}\le \theta \le \hat{\theta}_{high})$
-  * used for estimands
-* power and type 1 error
-  * used in evaluating a method that targets a hypothesis test
-
-::: notes
-P of ADEMP
-We will discuss this in more detail through examples
-:::
-
----
-
-
-
-
-## Implementing the simulation study
-
-
-![](table1_rest.png){width=95%}
-
-
-
----
-
-
-
-## Simulations for estimands
-
-Simple example: consider three estimators for mean $\mu$ of a distribution based on iid draws $Y_1\ldots Y_n$:
-- $\theta_1$: sample mean
-- $\theta_2$: sample 20% trimmed mean
-- $\theta_3$: sample median
-
-
-If the distribution is symmetric, all three estimators should estimate
-the mean
-- If the distribution is skewed, they will give different answers 
-
-
-
----
-
-
-## Simulations for estimands
-
-For a particular choice of $\mu$, $n$, and true underlying distribution:
-
-- Generate independent draws $Y_1\ldots Y_n$ from the distribution
-- Compute $\theta_1$, $\theta_2$, $\theta_3$ and repeat $n_{sim}$ times to get:
-  - $\theta_{1,1}, \ldots, \theta_{1,n_{sim}}$
-  - $\theta_{2,1}, \ldots, \theta_{2,n_{sim}}$
-  - $\theta_{3,1}, \ldots, \theta_{3,n_{sim}}$
-
-
-::: notes
-This is a super simple example. More details for best practices will be filled in later.
-:::
-
----
-
-
-
-## Simulations for estimands
-
-For $k = 1,2,3$, compute:
-
-- $\hat{E}[\hat{\theta}_k]$
-- $\widehat{bias}(\hat{\theta})$
-- $\widehat{Var}(\hat{\theta})$
-- $\widehat{coverage}(\hat{\theta})$
-
-
-1. What is the estimand(s)?
-2. What is the estimator(s)?
-3. What is the performance measure(s)?
-
-::: notes
-Estimand is the population mean. Estimators are theat1, theat2, theta3
-Performance measures are what we see on this screen
-:::
-
----
-
-
-## Simulations for hypothesis tests
-
-Consider a t-test for whether the mean is equal to a specified value:
-
-$$H_0: \mu = \mu_0 \mbox{ vs. } H_1: \mu \ne \mu_0$$
-
-Suppose we want to evaluate whether the size/level of test achieves
-the advertised $\alpha$. We would:
-
-- Generate data under the **null hypothesis** and calculate proportion of
-rejections of $H_0$.
-- This approximates Pr(reject $H_0$| $H_0$ true)
-  - Should be $\approx \alpha$ if the method works well
+## Bootstrap $t$ method
+
+The **bootstrap-t** method uses simulation to estimate the $t$ quantile for the interval.
+
+- For **each** bootstrap sample, calculate $t^*_b$, where:
+  - $t^*_b = \frac{\hat{\theta}^*_b-\hat{\theta}}{se(\hat{\theta}^*_b)}$
+  - $\hat{\theta}$ is estimated from the original sample
+  - $\hat{\theta}^*_b$ is estimated from the $b^{th}$ bootstrap sample
+  - $se(\hat{\theta}^*_b)$ is the SE of the $b^{th}$ estimate
   
 
+- Since $se(\hat{\theta}^*_b)$ is unknown, must estimate it...
+
+---
+
+## Bootstrap $t$ method
+
+\fontsize{10pt}{11pt}\selectfont
+Note that calculating $\hat{se}(\hat{\theta}^*_b)$ for each bootstrap estimate requires (nested) bootstrapping!
+
+- Obtain a bootstrap estimate of $se(\hat{\theta}^*_b)$ for **each** $b = 1, \ldots, B$
+  - For each bootstrap sample $b$, run $k = 1, \ldots, K$ bootstrap simulations to obtain $\hat{\theta}_{b,k}^*$ and use these to estimate  $se(\hat{\theta}^*_b)$ for calculating $t^*_b$
+- Calculate lower and upper quantiles of the *bootstrap t distribution*, $t^*_{1-\alpha/2}$ and $t^*\alpha/2$ and construct the CI:
+
+$$\left(\hat{\theta}-t^*_{1-\alpha/2}\times se(\hat{\theta)}, \hat{\theta}-t^*_{\alpha/2}\times se(\hat{\theta)}\right)$$
+
+- $se(\hat{\theta})$ is the SE of the estimate from the original sample, or can be estimated using the top-level bootstrap
+
+
+
+---
+
+
+## Bootstrap $t$ method
+
+\fontsize{10pt}{11pt}\selectfont
+**Pros**:
+
+- Second-order accurate
+- Usually outperforms the other methods discussed so far, especially for non-normal populations.
+- For skewed data, much more asymmetric than the percentile bootstrap interval which corrects for the possibility that we observed too few observations from the tail
+
+
+**Cons**:
+
+- Requires an iterated bootstrap
+- The bootstrap-t interval is not transformation invariant. Must reconstruct the CI for a function of the parameter $g(\theta)$
+
+
+---
+
+
+
+## BCa Bootstrap
+
+\fontsize{10pt}{11pt}\selectfont
+The bias-corrected accelerated (BCa) method is an improvement over the percentile method, though still does not work well in small sample sizes.
+
+- BCa intervals use percentiles of the bootstrap distribution, but not necessarily the $100 \times \alpha$-th and $100\times (1-\alpha)$-th percentiles
+- Adjusts for **bias** in the bootstrap distribution and variability in the precision of the estimate (aka **acceleration**)
+
+First, estimate a bias correction factor $\hat{z}_0$:
+
+$$\hat{z}_0 = \Phi^{-1}\left(\frac{\#\{\hat{\theta}^*<\hat{\theta}\}}{B}\right)$$
+
+
 ::: notes
-- This is an estimate of your **Type I error**
-- what do we mean when we say generate data under the null hypothesis?
+Bias correction. based on the proportion of bootstrap sample estimates that are less than the original sample estimate.
+:::
+
+---
+
+## BCa Bootstrap
+
+Next, estimate the acceleration parameter $\hat{a}$:
+
+$$\hat{a} = \frac{\sum_{i=1}^n(\hat{\theta}_{(.)}-\hat{\theta}_{(i)})^3}{6\left(\sum_{i=1}^n (\hat{\theta}_{(.)}-\hat{\theta}_{(i)})^2\right)^{3/2}}$$
+
+- $\hat{\theta}_{(i)}$ is the value of the statistic with the $i^{th}$ observation removed (i.e. the $i^{th}$ jackknife estimate)
+- $\hat{\theta}_{(.)}$ is the mean of the $n$ jackknife estimates
+
+- adjusts for the rate of change in the standard error as the estimate changes
+
+
+---
+
+## BCa Bootstrap
+
+\fontsize{10pt}{11pt}\selectfont
+After estimating the bias correction $\hat{z}_0$ and acceleration $\hat{a}$, compute:
+
+$$\alpha_1 = \Phi\left(\hat{z}_0 + \frac{\hat{z}_0 + z_{\alpha/2}}{1-\hat{a}(\hat{z}_0 + z_{\alpha/2})}\right)$$
+
+
+$$\alpha_2 = \Phi\left(\hat{z}_0 + \frac{\hat{z}_0 + z_{1-\alpha/2}}{1-\hat{a}(\hat{z}_0 + z_{1-\alpha/2})}\right)$$
+
+- $\Phi$ is the standard normal CDF (`pnorm`)
+- $z_a$ is the $100\times \alpha$-th percentile of the standard normal
+- Use these new percentiles to construct a CI
+  - The BCa interval is the same as the percentile interval when $\hat{a} = \hat{z}_0 = 0$
+
+---
+
+
+## BCa Bootstrap
+
+\fontsize{10pt}{11pt}\selectfont
+**Pros**:
+
+- Second-order accurate and transformation invariant
+- Works well for a variety parameters
+- For skewed data, the percentile bootstrap is not asymmetric
+enough and the BCa bootstrap addresses this limitation
+- Implemented in the `bcanon()` function in the `bootstrap` R library
+
+
+
+**Cons**:
+
+- Estimation of the acceleration parameter requires the jackknife
+- Less intuitive than other methods
+- Still doesn't work great for small sample sizes
+
+::: notes
+Considered the gold standard for nonparametric bootstrap methods
 :::
 
 ---
 
 
 
-## Simulations for hypothesis tests
+## Parametric bootstrap
 
-Suppose we want to evaluate **power**. We would:
 
-- Generate data under some value of the alternative hypothesis $\mu \ne \mu_0$ and calculate proportion of rejection of $H_0$
-- Approximates power, or Pr(reject $H_0$| $H_1$ true)
+If we have information about the population distribution, this can be
+used in resampling for bootstrap inference
 
+- If the assumption about the population distribution is correct then
+the parametric bootstrap will perform better than the
+nonparametric bootstrap
+
+- If the assumption not correct, then the nonparametric bootstrap should perform better.
 
 ---
 
+## Parametric bootstrap example
+
+\fontsize{10pt}{11pt}\selectfont
+Suppose we have data from a $N(\mu, \sigma^2)$ distribution, $Y = \{y_1, \ldots, y_n\}$
+
+- Interested in obtaining an estimate of the standard error of the
+trimmed mean with 10% trimmed from each tail
+- To employ the parametric bootstrap, we would start by generating $n$ values from a $N(\hat{\mu}, \hat{\sigma}^2)$
+  - $\hat{\mu}, \hat{\sigma}^2$ are the ML estimates
+- Then, compute trimmed mean using the simulated sample
+  - repeat B times
 
 
-## Simulations for hypothesis tests
 
-\fontsize{9pt}{10pt}\selectfont
-Size/level
-
-```{r}
-set.seed(125)
-nsim = 10000; n = 20; sigma = sqrt(5/3)
-mu0 = 1
-# Generate data from null distribution:
-dat = matrix (rnorm (n*nsim, mu0, sigma), ncol=nsim, byrow=T)
-opmean = apply (dat, 2, mean)
-ses = sqrt(apply(dat, 2, var)/n)
-tstats = (opmean - mu0)/ses
-t05 = qt (0.975, n-1)
-type1 = sum (abs (tstats) > t05)/nsim
-type1
-```
+Only difference between parametric and non-parametric bootstrap is the way to generate data!
 
 
 ::: notes
-What do nsim and n represent here?
+Note that no replacement is done here
+
+In parametric bootstrap: simulate from parametric distribution
+In non-parametric: sample with replacement from observed data
+Still can use same means of getting confidence intervals
 :::
 
-
 ---
 
+## Bootstrapping regression models
+
+Regression model:
+
+$$E(Y_i|\textbf{X}_i) = f(\mathbf{\beta}, \textbf{X}_i), i = 1,\ldots, n$$
 
 
-## Simulations for hypothesis tests
 
-\fontsize{9pt}{10pt}\selectfont
-Power
-
-```{r}
-set.seed(125)
-nsim = 10000; n = 20; sigma = sqrt(5/3)
-mu0 = 1
-mu = 1.85 ## Generate data from alternative
-dat = matrix (rnorm (n*nsim, mu, sigma), ncol=nsim, byrow=T)
-opmean = apply (dat, 2, mean)
-ses = sqrt(apply(dat, 2, var)/n)
-tstats = (opmean - mu0)/ses
-t05 = qt (0.975, n-1)
-power = sum (abs (tstats) > t05)/nsim
-power
-```
+- $f$ is a known function, $\textbf{X}_i$ a vector of parameters
+- Interested in estimating a SE or CI for a function of parameters
 
 
 ::: notes
-If we want higher power, what should we change?
+Generalizes to logistic regression, etc
 :::
 
 ---
 
 
-## Setting the seed
+## Bootstrapping regression models
 
-Simulations use pseudo-random numbers generated by a random number generating algorithm
+Three common methods:
 
+1. Bootstrap the pairs $(Y_i, \textbf{X}_i)$ and generate bootstrap
+parameter estimates that can be used to obtain bootstrap CIs
 
-Each random number is a deterministic function of the current *state* of the random number generator
+2. Bootstrap the **residuals** of the original model
 
-- After a random number is produced, the state changes, ready to produce next random number 
-- State is set using a **seed**
-  - After enough random draws, the state will eventually repeat (the path is circular)
+3. Estimate the residual variance and simulate residuals
 
-
-Setting the seed ensures **reproducibility** of the simulation results.
 
 ::: notes
-At least, reproducibility is ensured if you're using the same type of random number generator, and same computing language.
+Are these parametric or nonparametric bootstrap approaches?
+:::
+
+---
+
+## Bootstrapping regression models: residuals 
+
+\fontsize{10pt}{11pt}\selectfont
+Let's take linear regression as an example, 
+
+$$Y_i = \textbf{X}_i^T\mathbf{\beta} + \epsilon_i; \epsilon_i \sim N(0, \sigma^2)$$
+
+To fit a bootstrap on the residuals:
+
+- Fit a model on the original data to obtain residuals $\hat{\epsilon}_i$
+  - $\hat{\epsilon}_i = Y_i - \textbf{X}_i^T\hat{\mathbf{\beta}}$
+- Resample residuals $\hat{\epsilon}_i$ with replacement and repeat $B$ times:
+  - Compute $Y_i^b = \textbf{X}_i^T\hat{\mathbf{\beta}}+ \hat{\epsilon}_i^b$ for all $i$
+  - Refit model using $Y_i^b, i = 1,\ldots, n$ to estimate $\hat{\beta}^b$
+- This approach assumes errors are **identically distributed**
+
+
+
+::: notes
+This is the approach where we bootstrap the residuals of the original model
+Advantage: Y's and X's are fixed rather than random, which is sometimes consistent with assumptions
 :::
 
 ---
 
 
-## Setting the seed 
+## Bootstrapping regression models: residual variance 
 
-How do you typically set the seed?
-
-
-::: notes
-I typically set a different seed for each simulated dataset, and store that seed with the dataset so that I can regenerate the same dataset if I need to.
-
-Morris is different, and gets a little wonky.
-:::
-
----
-
-## Setting the seed 
-
-Morris et. al. recommends setting seed *once per simulation scenario*
-
-- All $n_{sim}$ simulated datasets will be generated with the same seed 
-- Avoids potential non-independence in simulated datasets
-
-A simple simulation study shows that using sequential seeds for each dataset is a problem in Stata:
+- Estimate residual variance from sample, $\hat{\sigma}^2$
+- Repeat $B$ times:
+  - Generate a residual $\epsilon^b_i \sim N(0, \hat{\sigma}^2)$ and associated outcome $Y_i^b = \textbf{X}_i^T\hat{\mathbf{\beta}} + \epsilon^b_i$ for $i = 1,\ldots, n$
+  - Refit model using $Y_i^b$, $i = 1, \ldots, n$ to estimate $\hat{\beta}^b$
 
 
-![](stata.png){width=50%}
+This approach assumes the residual errors are **normally distributed** 
 
 ::: notes
-4 datasets generated with nsim = nobs = 4, use seed 1:4 in stata
-obvious overlap in datasets
-
-Why might this be a problem?
-results for each simulation run will be highly correlated, you will get an underestimate of the standard error 
-:::
-
----
-    
-## Setting the seed 
-
-Using sequential seeds for each dataset appears to be less of a problem in R: 
-
-```{r}
-nobs = nsim = 4
-set.seed(2025) # Morris approach
-for(i in 1:nsim){
-  # set.seed(i) # common approach
-  print(runif(nobs))
-}
-```
-
-::: notes
-Very good to check though- if you are using a different language or a different random number generator, to make sure your values are trully random.
-:::
-
----
-
-
-## Setting the seed
-
-
-Morris et. al. recommends setting seed *once per simulation scenario*
-
-- In practice this is often unrealistic
-  - Simulation code is often run in parallel or on a cluster
-  - *Common approach is to set seed for each simulated dataset*
-
-```{r}
-nobs = nsim = 4
-# set.seed(2025) # Morris approach
-for(i in 1:nsim){
-  set.seed(i) # common approach
-  print(runif(nobs))
-}
-```
-
-
----
-
-
-## Setting the seed, best practices 
-
-- *Common approach is to set seed for each simulated dataset*
-   - Best practice for this approach is to draw a random seed
-       
-
-```{r}
-nobs = nsim = 3
-seeds = sample(1:10000, nsim)
-print(seeds)
-for(i in 1:nsim){
-  # set.seed(i) # common approach
-  set.seed(seeds[i]) # slightly better approach
-  print(runif(nobs))
-}
-```
-
-::: notes
-This approach is going to be more robust to the type of issue we see with the stat code
-:::
-
----
-
-
-## Setting the seed, best practices 
-
-
-- Do not set the seed again later in the program, even if the methods being used have a stochastic component
-- When writing functions and R packages, **do not hard code** a certain seed into the function/package
-  - In fact, don't set a seed in the function or package at all, leave that up to the user 
-
-
-::: notes
-This is different from what I have done in the past, but is what I will do in the future.
-:::
-
----
-
-## Monte Carlo standard errors
-
-Monte Carlo standard errors quantify simulation uncertainty: they provide an estimate of the SE of (estimated) performance due to using finite $n_{sim}$
-
-
-![](table6.png){width=50%}
-
-
-
-
-
-::: notes
-Assume normally distributed $\hat{\theta}$
-
-Monte Carlo SE targets the sampling distribution of repeatedly running the same simulation study (with nsim repetitions) under different random-number seeds
-
-who has used MC SE in any of their simulation studies or papers? amounts to error bars in your plots
-:::
-  
---- 
-
-## Number of simulations
-
-How many simulated datasets do you need to capture the true sampling distribution of your estimator?
-
-- Often this is chosen arbitrarily
-  - $n_{sim} = 50, 100$ chosen to evaluate bias
-  - $n_{sim} = 500, 1000$ chosen to evaluate coverage
-
-Are these values large enough?
-
----
-
-## Number of simulations
-
-How many simulated datasets do you need to capture the true sampling distribution of your estimator?
-
-- Often this is chosen arbitrarily
-  - $n_{sim} = 50, 100$ chosen to evaluate bias
-  - $n_{sim} = 500, 1000$ chosen to evaluate coverage
-
-Are these values large enough?
-
-- each simulated dataset yields a draw from the true sampling distribution of the estimator, so $n_{sim}$ is the "**sample size**" on which Monte Carlo estimates of the mean, bias, SD, etc are based
-- **result**: we can use Central Limit Theorem to choose $n_{sim}$ in a more principled way
-
-::: notes
-idea is to select a desired precision for your estimates than choose $n_{sim}$ that achieves this precision
-:::
-
----
-
-## Number of simulations (bias)
-
-Let's say we are interested in the **bias** of an estimator $\theta$ (whose true value is $\theta_0$.  )
-
-
----
-
-
-
-## Number of simulations (bias)
-
-
-Let's say we are interested in the **bias** of an estimator $\theta$ (whose true value is $\theta_0$.  )
-
-- True bias: $bias(\hat{\theta}) = E(\hat{\theta})-\theta_0$
-- Estimated bias: $\widehat{bias(\hat{\theta}})=\frac{1}{n_{sim}}\sum_{i = 1}^{n_{sim}}\hat{\theta}_i - \theta_0$
-
-
-- True variance: $Var(\hat{\theta}) = E\left[(\hat{\theta}-\theta_0)^2\right]$
-- Estimated variance: $\widehat{Var(\hat{\theta}})= \frac{1}{n_{sim}-1}\sum_i^{n_{sim}}(\hat{\theta}_i-\bar{\theta})^2$
-
-
-::: notes
-estimated bias uses sample mean
-estimated variance uses sample variance
-
-Let's talk a little bit about using precise notation here
+This is the third approach, where we estimate residual variance
 :::
 
 ---
 
 
 
-## Number of simulations (bias)
 
-\fontsize{9pt}{10pt}\selectfont
-Derive the Monte Carlo standard error of $\widehat{bias(\hat{\theta}})$
+## Wild bootstrap
+
+\fontsize{10pt}{11pt}\selectfont
+$$Y_i = \textbf{X}_i^T\mathbf{\beta} + \epsilon_i$$
+The models previously discussed fail if there is **heteroskedasticity**
+- i.e., if $\epsilon_i$ are not identically distributed
+
+The **wild bootstrap** is a modification of the residual bootstrap intended to handle heteroskedasticity.
+
+- Fit a model on the original data to obtain residuals $\hat{\epsilon}_i$
+- Repeat $B$ times:
+  - Multiply residuals by random weights to obtain $\hat{\epsilon}_i^b$
+  - Compute $Y_i^b = \textbf{X}_i^T\hat{\mathbf{\beta}}+ \hat{\epsilon}_i^b$ for all $i$
+  - Refit model using $Y_i^b, i = 1,\ldots, n$ to estimate $\hat{\beta}^b$
 
 
-$$SE\left(\widehat{bias(\hat{\theta}})\right) = \sqrt{Var\left(\widehat{bias(\hat{\theta}})\right)} = \sqrt{Var\left(\frac{1}{n_{sim}}\sum_{i = 1}^{n_{sim}}\hat{\theta}_i - \theta_0)\right)}$$ 
 
-<br>
-$$= \sqrt{\frac{1}{n_{sim}(n_{sim}-1)}\sum_{i=1}^{n_{sim}}(\hat{\theta}_i-\bar{\theta})^2}$$
-$$= \frac{\sqrt{\widehat{Var(\hat{\theta}})}}{\sqrt{n_{sim}}}$$
+---
+
+## Wild bootstrap
+
+Common options for weights:
+
+
+1. Multiply $\hat{\epsilon}_i$ by $-1$ or $1$ with equal probability
+
+
+2. Multiply $\hat{\epsilon}_i$ by a standard normal random variable
 
 ---
 
 
-## Number of simulations (bias)
 
-\fontsize{9pt}{10pt}\selectfont
-To ensure our estimate of the bias has an acceptable amount of Monte Carlo standard error $e$, we can set
+## When does the bootstrap fail?
 
-
-$$\frac{\sqrt{\widehat{Var(\hat{\theta}})}}{\sqrt{n_{sim}}} = e$$
-
-Solving for $n_{sim}$ gives:
+We must assume that the original sample is representative of the population so that $\hat{F}_n$ is a good estimate of $F$
 
 
-$$n_{sim} = \frac{\widehat{Var(\hat{\theta}})}{e^2}$$
+The bootstrap may fail when:
 
-Can guess $\widehat{Var(\hat{\theta}})$ from prior knowledge or preliminary runs.
+- The support of $F$ depends on the parameter of interest
+- The true parameter sits on the boundary of the parameter space
+- The parameter of interest is nonregular, i.e., there does not exist
+an estimator that converges to it uniformly in distribution over
+the parameter space
+
+
+---
+
+## Permutation tests
+
+\fontsize{10pt}{11pt}\selectfont
+Typically bootstrap is used for CI rather than hypothesis testing.  For hypothesis testing and p-values, we can use a **permutation test**.
+- Idea: use resampling to generate a **null distribution** for a test statistic, then compare it to the one you observe in the real data
+
+- **Null distribution**: the distribution of a quantity of interest (i.e. $\hat{\beta}$) if the null hypothesis $H_0$ is true
+
+- The null distribution is available theoretically in some cases. For example,
+assume $Y_i \sim N(\mu, \sigma^2), i = 1,\ldots,n$.  
+  - Under $H_0: \mu = 0$, we have $\bar{Y} \sim N(0, \sigma^2/n)$
+    - Test $H_0$ by comparing $\bar{Y}$ with $N(0, \sigma^2/n)$
+
+- Use **permutation test** when null distribution cannot be obtained theoretically 
+
+
 
 ::: notes
-Essentially, we are choosing the standard error of our estimator to be no larger than e
+This is a different resampling approach
+We can use bootstrap for p-values but this isn't as common
 :::
 
 ---
 
 
-## Number of simulations (coverage)
+## Permutation tests
 
-**Coverage** is the probability that a confidence interval contains $\theta$.
+The basic procedure of permutation test for $H_0$:
 
+- Permute data under $H_0$ $B$ times. Each time recompute the test
+statistics. The test statistics obtained from the permuted data form the null distribution.
+- Compare the observed test statistics with the null distribution to obtain statistical
+significance.
 
-- If $\alpha$ is set to $0.05$, estimated coverage should be about $0.95$ if a method is performing well
-- Common performance measure for an estimator for $\theta$
-
-The Monte Carlo standard errors for coverage are
-
-$$SE\left(\widehat{coverage(\hat{\theta}})\right) = \frac{\sqrt{\widehat{cover}(1-\widehat{cover})}}{\sqrt{n_{sim}}}$$
-
-::: notes
-in this equation, coverage hat is the coverage in your data
-coverage should be equal to 1-alpha
-:::
-
----
-
-
-## Number of simulations (coverage)
-
-Rearranging the previous equation, we get
-$$n_{sim} = \frac{\widehat{cover}(1-\widehat{cover})}{\left(SE(\widehat{coverage(\hat{\theta}}))\right)^2}$$
-
-Let's assume $\alpha = 0.05$ and we want the Monte Carlo SE to be no more than 0.5% (.005):
-
-$$n_{sim} = \frac{0.95(1-0.95)}{(0.005)^2} = 1900$$
-
----
-
-
-
-## Presenting your results
-
-- **Key principle**: your simulation is useless unless other people (and your future self) can clearly understand what you did, why you did it, and what it means
-
-::: notes
-I actually find the simulation section to be the easiest section of an academic paper to write, because you just explain what you did.
-:::
-
----
-
-## Presenting the results
-
-- **Key principle**: your simulation is useless unless other people can clearly understand what you did, why you did it, and what it means
-- Before giving results, you must give the reader enough information to appreciate them.
-  - State the objectives: Why do this simulation? What specific
-questions are you trying to answer?
-  - State the **rationale** for choice of factors studied, assumptions
-made
-  - Review all methods under study – be precise and detailed
-  - Describe exactly how you generated data for each choice of
-factors. Enough detail should be given so that a reader could
-write his/her own program to reproduce your results
-
----
-
-## Presenting the results
-
-- Results must be presented in a form that:
-  - Clearly answers the questions
-  - Makes it easy to appreciate the main conclusions
-- Some basic principles:
-  - Only present a subset of results ("Results were qualitatively
-similar for all other scenarios we tried.")
-  - Only present information that is interesting ("Relative biases for
-all estimators were less than 2% under all scenarios and hence
-are not shown in the table.")
-  - The mode of presentation should be friendly... 
-
----
-
-
-## Presenting the results
-
-- **Tables** are an obvious way to present results, however, some caveats:
-  - Would a figure be more clear/compelling?
-  - Place things to be compared adjacent to one another
-  
-<br>
-Simple example: consider three estimators for mean $\mu$ of a distribution based on iid draws $Y_1\ldots Y_n$:
-- $\theta_1$: sample mean
-- $\theta_2$: sample 20% trimmed mean
-- $\theta_3$: sample median
 
 
 ---
 
 
-## Presenting the results
+## Permutation test example
 
-What's bad about this table?
+\fontsize{10pt}{11pt}\selectfont
+Assume there are two sets of independent normal r.v.’s with the same known
+variance and different means:
 
+- $X_i \sim N(\mu_1,\sigma^2)$
+- $Y_i \sim N(\mu^2, \sigma^2)$
 
+Our goal is to test $H_0: \mu_1 = \mu_2$.  Define test statistic: $t = \bar{X}-\bar{Y}$. Permutation test steps:
 
-![](mean_table.png){width=80%}
-
----
-
-## Presenting the results
-
-Improved version
-
-
-![](mean_table2.png){width=80%}
-
----
-
-
-## Presenting the results
-
-\fontsize{9pt}{10pt}\selectfont
-- Graphs/figures are often more effective than tables
-- Example: Power of the t-test for $H_0: \mu = 1$ vs. $H_1: \mu \ne 1$ for
-normal data with $n_{sim} = 10000$, $n = 15$
-
-
-![](mean_power.png){width=70%}
-
----
-
-## Final Takeaways
-
-* **Principle 1**: A Monte Carlo simulation is just like any other experiment and requires planning
-  * Can use experimental design principles
-  * Shouldn't only choose factors favorable to a method you developed
-  * $n_{sim}$ should be chosen to achieve acceptable precision
-
----
-
-
-## Final Takeaways
-
-* **Principle 2**: Save everything often!
-  * Save the individual estimates in a file and then compute the mean, bias, SD, etc. later, as opposed to computing these summaries and saving only them
-  * This is especially critical if the simulation takes a long time to run
-  * Don’t wait until the simulation ends to save. Long tasks can often be interrupted.
-
----
-
-## Final Takeaways
-
-- **Principle 3**: Keep $n_{sim}$ small at first
-  - Test and refine code until you are sure everything is working correctly before carrying out final production runs
-  - Get an idea of how long it takes to process one data set, i.e., one iteration
-  - Particularly important if production run will be submitted to the cluster to determine how many cores may be necessary to finish in an acceptable time frame.
-
----
-
-
-## Final Takeaways
-
-
-- **Principle 4**: Keep everything as reproducible as possible
-  - Set and record the seed
-  - Document your code!! Should be readable to your peer or your future self
-  - Backup your code and results
-
-
----
-
-
-## References
-
-
-
-![](refs.png){width=80%}
-
-
-## Extra
-
----
-
-## Allowing for failures
-
-Anticipate and **allow for failures** in a given simulation run. These can be do to:
-
-- Rare events (e.g., assigned all subjects to a single treatment by
-chance, treatment perfectly confounded by a covariate in a
-permutation test)
-- Lack of convergence of an optimization routine (fairly common in logistic regression)
-
-Discard the failed iteration and repeat with the next random state but
-**record the number of failures** that occur to gauge how likely failure
-is in practice
-
-- Use the results to judge whether the statistical procedure can
-reliably be used in the situation(s) being investigated
-
----
-
-
-## Allowing for failures
-
-To handle errors and other conditions in R
-
-- `try()`: execution will continue when an error occurs
-- `tryCatch()`: allows you to specify handler functions that
-give the computer directions about how to proceed when a
-condition is encountered
-
----
-
-
-## Allowing for failures
-
-This will throw an error:
-
-```{r, eval = FALSE}
-f1 = function (x){
-  log(x)
-}
-
-f1("x")
-# Error in log(x) : non-numeric argument to 
-# mathematical function
-```
-
----
-
-
-## Allowing for failures
-
-Using `try()` avoids failure:
-
-```{r}
-f1 = function (x){
-  try(log(x))
-}
-
-f1("x")
-
-```
-
-
-- Will print the error encountered during the `try()` statement, but doesn't break your code
-- Using option `silent=TRUE` will suppress the message
-
----
-
-## Allowing for failures
-
-In addition to handling errors, `tryCatch()` allows you to specify
-how to proceed in the event of a warning, message, or **interrupt**
-
-- An interrupt is raised when the user terminates the program
-execution by pressing Ctrl+C (or similar).
-
-
-```{r}
-result <- tryCatch(
-  10 / "5",  # Code that might cause an error
-  error = function(e) {
-    message("Caught an error: ", e$message)
-    return(NA)
-  }
-)
-
-print(result)
-```
-
+1. Randomly shuffle labels of $X$ and $Y$
+2. Compute $t^* = \bar{X}^*-\bar{Y}^*$
+3. Repeat `nperm` times. Resulting $t^*$ values form the **empirical null distribution** of $t$.
+4. To compute p-values calculate $Pr(|t^*|> |t|)$
 
 
 
