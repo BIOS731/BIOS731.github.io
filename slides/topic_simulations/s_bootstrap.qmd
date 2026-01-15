@@ -21,9 +21,7 @@ header-includes:
 
 ## Overview
 
-
 Today, we cover:
-
 
 - Simulation studies
   - Design
