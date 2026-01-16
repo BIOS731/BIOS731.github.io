@@ -132,6 +132,41 @@ Aggregate simulation results.  Use informative tables and/or figures to summariz
 
 ### Lab: resampling methods
 
+#### Parametric vs. non-Parametric bootstrap
+
+Take the following problem from the slides:
+
+Suppose we have data from a $N(\mu, \sigma^2)$ distribution, $Y = \{y_1, \ldots, y_n\}$
+
+- Interested in obtaining an estimate of the standard error of the trimmed mean with 10% trimmed from each tail
+- To employ the parametric bootstrap, we would start by generating $n$ values from a $N(\hat{\mu}, \hat{\sigma}^2)$
+  - $\hat{\mu}, \hat{\sigma}^2$ are the ML estimates
+- Then, compute trimmed mean using the simulated sample
+  - repeat B = 10000 times
+
+
+##### Exercise 1
+
+Implement both the parametric and non-parametric bootstrap for the trimmed mean here. Compare standard error estimates. Which do you expect to perform better? How would you evaluate what is "better"?
+
+##### Exercise 2
+
+For the non-parametric bootstrap, construct bootstrap-t confidence intervals for the trimmed mean using B = 1000 for the first level bootstrap and Bt = 500 for the second level bootstrap.
+
+#### Permutation test example
+
+Assume there are two sets of independent normal random variables with the same known variance and different means:
+
+- $X_i \sim N(\mu_1,\sigma^2)$
+- $Y_i \sim N(\mu^2, \sigma^2)$
+
+Our goal is to test $H_0: \mu_1 = \mu_2$.  Define test statistic: $t = \bar{X}-\bar{Y}$. Permutation test steps:
+
+1. Randomly shuffle labels of $X$ and $Y$
+2. Compute $t^* = \bar{X}^*-\bar{Y}^*$
+3. Repeat `nperm` times. Resulting $t^*$ values form the **empirical null distribution** of $t$.
+4. To compute p-values calculate $Pr(|t^*|> |t|)$
+
 
 
 

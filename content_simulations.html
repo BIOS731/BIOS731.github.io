@@ -321,7 +321,46 @@ window.Quarto = {
 </section>
 </div>
 <div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<section id="parametric-vs.-non-parametric-bootstrap" class="level4">
+<h4 class="anchored" data-anchor-id="parametric-vs.-non-parametric-bootstrap">Parametric vs.&nbsp;non-Parametric bootstrap</h4>
+<p>Take the following problem from the slides:</p>
+<p>Suppose we have data from a <span class="math inline">\(N(\mu, \sigma^2)\)</span> distribution, <span class="math inline">\(Y = \{y_1, \ldots, y_n\}\)</span></p>
+<ul>
+<li>Interested in obtaining an estimate of the standard error of the trimmed mean with 10% trimmed from each tail</li>
+<li>To employ the parametric bootstrap, we would start by generating <span class="math inline">\(n\)</span> values from a <span class="math inline">\(N(\hat{\mu}, \hat{\sigma}^2)\)</span>
+<ul>
+<li><span class="math inline">\(\hat{\mu}, \hat{\sigma}^2\)</span> are the ML estimates</li>
+</ul></li>
+<li>Then, compute trimmed mean using the simulated sample
+<ul>
+<li>repeat B = 10000 times</li>
+</ul></li>
+</ul>
+<section id="exercise-1" class="level5">
+<h5 class="anchored" data-anchor-id="exercise-1">Exercise 1</h5>
+<p>Implement both the parametric and non-parametric bootstrap for the trimmed mean here. Compare standard error estimates. Which do you expect to perform better? How would you evaluate what is “better”?</p>
+</section>
+<section id="exercise-2" class="level5">
+<h5 class="anchored" data-anchor-id="exercise-2">Exercise 2</h5>
+<p>For the non-parametric bootstrap, construct bootstrap-t confidence intervals for the trimmed mean using B = 1000 for the first level bootstrap and Bt = 500 for the second level bootstrap.</p>
+</section>
+</section>
+<section id="permutation-test-example" class="level4">
+<h4 class="anchored" data-anchor-id="permutation-test-example">Permutation test example</h4>
+<p>Assume there are two sets of independent normal random variables with the same known variance and different means:</p>
+<ul>
+<li><span class="math inline">\(X_i \sim N(\mu_1,\sigma^2)\)</span></li>
+<li><span class="math inline">\(Y_i \sim N(\mu^2, \sigma^2)\)</span></li>
+</ul>
+<p>Our goal is to test <span class="math inline">\(H_0: \mu_1 = \mu_2\)</span>. Define test statistic: <span class="math inline">\(t = \bar{X}-\bar{Y}\)</span>. Permutation test steps:</p>
+<ol type="1">
+<li>Randomly shuffle labels of <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span></li>
+<li>Compute <span class="math inline">\(t^* = \bar{X}^*-\bar{Y}^*\)</span></li>
+<li>Repeat <code>nperm</code> times. Resulting <span class="math inline">\(t^*\)</span> values form the <strong>empirical null distribution</strong> of <span class="math inline">\(t\)</span>.</li>
+<li>To compute p-values calculate <span class="math inline">\(Pr(|t^*|&gt; |t|)\)</span></li>
+</ol>
 <hr>
+</section>
 </div>
 </div>
 </div>
