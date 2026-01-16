@@ -6,9 +6,8 @@ sidebar: false
 
 Covers best practices for simulation studies in the first lecture, then bootstrap and permutation tests in the second lecture
 
-- [Simulation studies](what_is_ds_i.qmd)
-- [Resampling methods for statistical inference](what_is_ds_ii.qmd)
-- [Parallelization, parametric reports](what_is_ds_ii.qmd)
+- [Simulation studies/Resampling methods](content_simulations.qmd)
+- [Parallelization and other speedup tricks](what_is_ds_ii.qmd)
 
 
 A couple of papers I highly recommend reading on these topics are:

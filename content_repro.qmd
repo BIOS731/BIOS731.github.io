@@ -11,9 +11,12 @@ execute:
   out-width: "90%"
 ---
 
-In this, we will cover basic topics in reproducible computing, including coding style, project organization, and git/GitHub.
+
 
 ## Overview
+
+In this, we will cover basic topics in reproducible computing, including coding style, project organization, and git/GitHub.
+
 ::: {.panel-tabset .panel-pills}
 
 ### Slide Deck: project organization

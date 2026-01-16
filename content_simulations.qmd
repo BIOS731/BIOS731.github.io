@@ -1,0 +1,52 @@
+---
+title: "Simulations and resampling methods"
+format:
+  html:
+    toc: true
+    toc-location: right
+execute:
+  echo: false
+  fig-width: 6
+  fig-asp: 0.6
+  out-width: "90%"
+---
+
+
+
+## Overview
+
+In this, we will cover basic simulations, bootstrapping, permutation tests, and speeding up code through vectorization and parallelization.
+
+
+::: {.panel-tabset .panel-pills}
+
+### Slide Deck: simulations
+
+[![](./slides/topic_simulations/preview_simulation.png){width=70%}](./slides/topic_simulations/s_simulations.pdf)
+
+**Simulation studies**  
+[Download slides (PDF)](./slides/topic_simulations/s_simulations.pdf)
+
+
+***
+
+### Slide Deck: Bootstrap
+
+[![](./slides/topic_simulations/preview_bootstrap.png){width=70%}](./slides/topic_reproducible_computing/s_bootstrap.pdf)
+
+**Resampling Methods**  
+[Download slides (PDF)](./slides/topic_simulations/s_bootstrap.pdf)
+
+
+***
+### Lab: simulations
+
+
+
+### Lab: resampling methods
+
+
+
+
+***
+:::
