@@ -209,3 +209,4 @@ Students are expected to uphold the Laney Graduate School Honor Code.
 | 4/16  | Special Topics           | TBD                                        | HW7 due                 |
 | 4/22  | Final Presentations      | First half                                 |                         |
 | 4/23  | Final Presentations      | Second half                                |                         |
+| 5/1   | Final Project Due        |                                            |                         |
