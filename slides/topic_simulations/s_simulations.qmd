@@ -56,10 +56,7 @@ derive **exact analytic expressions**:
 hypothesis?
   - How does my method compare to a competing method?
 
-- Exact or approximate analytic results may require assumptions 
-  - e.g. normality
-  - Simulations can be used to study behavior when these
-assumptions are violated
+
 
 
 ::: notes
@@ -67,6 +64,16 @@ When I was a PhD student, I would use simulation to help me intuitively understa
 
 What have you all used simulations for in the past?
 :::
+
+---
+
+
+## Motivation
+
+- Exact or approximate analytic results may require assumptions 
+  - e.g. normality
+  - Simulations can be used to study behavior when these
+assumptions are violated
 
 ---
 
@@ -173,6 +180,8 @@ tractable
   - Estimands
   - Methods
   - Performance Measures
+
+They also look at 100 papers published in Statistics in Medicine and critique the design of the simulation studies.
 
 ::: notes
 Morris is a good paper! I recommend reading it. I learned a lot from reading it in preparation of this lecture.
@@ -296,7 +305,7 @@ These properties are typically what you would evaluate in a simulation study
 
 ## Planning Stage: Aims
 
-
+\fontsize{9pt}{10pt}\selectfont
 Desirable properties of an estimator $\hat{\theta}$ from a frequentist perspective:
 
 1. $\hat{\theta}$ should be consistent: as $n\to \infty$, $\hat{\theta} \to \theta$
@@ -323,7 +332,7 @@ Proof-of-concept vs. stretching simulation studies
 
 
 * Proof-of-concept: aim to show that a method is viable in some settings 
-* Stretch/break objective:: identify settings where the method may fail
+* Stretch/break objective: identify settings where the method may fail
 
 
 Examples of each in the linear regression setting?
@@ -446,7 +455,6 @@ M of ADEMP
 Justifications include no code, method has already been shown to be poor for the same settings in another paper 
 Definitely you will encounter trying to compare a method you develop with another method, only to discover that they have no code. 
 When you email them about the code, and you get no response, what do you do?
-In bioinformatics, this is less of a problem
 :::
 
 
@@ -487,6 +495,7 @@ We will discuss this in more detail through examples
 ## Simulations for estimands
 
 Simple example: consider three estimators for mean $\mu$ of a distribution based on iid draws $Y_1\ldots Y_n$:
+
 - $\theta_1$: sample mean
 - $\theta_2$: sample 20% trimmed mean
 - $\theta_3$: sample median
@@ -494,6 +503,7 @@ Simple example: consider three estimators for mean $\mu$ of a distribution based
 
 If the distribution is symmetric, all three estimators should estimate
 the mean
+
 - If the distribution is skewed, they will give different answers 
 
 
@@ -583,17 +593,23 @@ Suppose we want to evaluate **power**. We would:
 \fontsize{9pt}{10pt}\selectfont
 Size/level
 
-```{r}
+```{r, eval = TRUE}
 set.seed(125)
-nsim = 10000; n = 20; sigma = sqrt(5/3)
+
+nsim = 10000 
+n = 20
+sigma = sqrt(5/3)
 mu0 = 1
+
 # Generate data from null distribution:
-dat = matrix (rnorm (n*nsim, mu0, sigma), ncol=nsim, byrow=T)
-opmean = apply (dat, 2, mean)
+dat = matrix(rnorm(n*nsim, mu0, sigma), ncol=nsim, byrow=TRUE)
+
+opmean = apply(dat, 2, mean)
 ses = sqrt(apply(dat, 2, var)/n)
 tstats = (opmean - mu0)/ses
-t05 = qt (0.975, n-1)
+t05 = qt(0.975, n-1)
 type1 = sum (abs (tstats) > t05)/nsim
+
 type1
 ```
 
@@ -612,17 +628,20 @@ What do nsim and n represent here?
 \fontsize{9pt}{10pt}\selectfont
 Power
 
-```{r}
+```{r, eval = TRUE}
 set.seed(125)
 nsim = 10000; n = 20; sigma = sqrt(5/3)
 mu0 = 1
 mu = 1.85 ## Generate data from alternative
-dat = matrix (rnorm (n*nsim, mu, sigma), ncol=nsim, byrow=T)
+
+dat = matrix(rnorm(n*nsim, mu, sigma), ncol=nsim, byrow=T)
 opmean = apply (dat, 2, mean)
 ses = sqrt(apply(dat, 2, var)/n)
 tstats = (opmean - mu0)/ses
-t05 = qt (0.975, n-1)
-power = sum (abs (tstats) > t05)/nsim
+t05 = qt(0.975, n-1)
+
+power = sum(abs (tstats) > t05)/nsim
+
 power
 ```
 
@@ -675,8 +694,14 @@ Morris et. al. recommends setting seed *once per simulation scenario*
 - All $n_{sim}$ simulated datasets will be generated with the same seed 
 - Avoids potential non-independence in simulated datasets
 
+---
+
+## Setting the seed 
+
+\fontsize{11pt}{12pt}\selectfont
 A simple simulation study shows that using sequential seeds for each dataset is a problem in Stata:
 
+- 4 datasets generated with nsim = nobs = 4, use seed 1:4 in stata
 
 ![](stata.png){width=50%}
 
@@ -770,26 +795,11 @@ This is different from what I have done in the past, but is what I will do in th
 
 ---
 
-## Monte Carlo standard errors
+## Number of simulations
 
-Monte Carlo standard errors quantify simulation uncertainty: they provide an estimate of the SE of (estimated) performance due to using finite $n_{sim}$
+How many simulated datasets do you need to capture the true sampling distribution of your estimator?
 
-
-![](table6.png){width=50%}
-
-
-
-
-
-::: notes
-Assume normally distributed $\hat{\theta}$
-
-Monte Carlo SE targets the sampling distribution of repeatedly running the same simulation study (with nsim repetitions) under different random-number seeds
-
-who has used MC SE in any of their simulation studies or papers? amounts to error bars in your plots
-:::
-  
---- 
+---
 
 ## Number of simulations
 
@@ -821,6 +831,27 @@ idea is to select a desired precision for your estimates than choose $n_{sim}$ t
 :::
 
 ---
+
+## Monte Carlo standard errors
+
+Monte Carlo standard errors quantify simulation uncertainty: they provide an estimate of the SE of (estimated) performance due to using finite $n_{sim}$
+
+
+![](table6.png){width=50%}
+
+
+
+
+
+::: notes
+Assume normally distributed $\hat{\theta}$
+
+Monte Carlo SE targets the sampling distribution of repeatedly running the same simulation study (with nsim repetitions) under different random-number seeds
+
+who has used MC SE in any of their simulation studies or papers? amounts to error bars in your plots
+:::
+  
+--- 
 
 ## Number of simulations (bias)
 
@@ -937,7 +968,7 @@ I actually find the simulation section to be the easiest section of an academic 
 
 ## Presenting the results
 
-- **Key principle**: your simulation is useless unless other people can clearly understand what you did, why you did it, and what it means
+
 - Before giving results, you must give the reader enough information to appreciate them.
   - State the objectives: Why do this simulation? What specific
 questions are you trying to answer?
@@ -972,8 +1003,9 @@ are not shown in the table.")
   - Would a figure be more clear/compelling?
   - Place things to be compared adjacent to one another
   
-<br>
+
 Simple example: consider three estimators for mean $\mu$ of a distribution based on iid draws $Y_1\ldots Y_n$:
+
 - $\theta_1$: sample mean
 - $\theta_2$: sample 20% trimmed mean
 - $\theta_3$: sample median
@@ -1011,6 +1043,12 @@ normal data with $n_{sim} = 10000$, $n = 15$
 
 
 ![](mean_power.png){width=70%}
+
+---
+
+## Presenting the results
+
+![](https://cdn.ncbi.nlm.nih.gov/pmc/blobs/dc55/10585654/ac51675a99d6/nihms-1935117-f0004.jpg){width=80%}
 
 ---
 
@@ -1068,6 +1106,7 @@ normal data with $n_{sim} = 10000$, $n = 15$
 
 ## Allowing for failures
 
+\fontsize{9pt}{10pt}\selectfont
 Anticipate and **allow for failures** in a given simulation run. These can be do to:
 
 - Rare events (e.g., assigned all subjects to a single treatment by
@@ -1099,6 +1138,7 @@ condition is encountered
 
 ## Allowing for failures
 
+\fontsize{9pt}{10pt}\selectfont
 This will throw an error:
 
 ```{r, eval = FALSE}
@@ -1116,6 +1156,7 @@ f1("x")
 
 ## Allowing for failures
 
+\fontsize{9pt}{10pt}\selectfont
 Using `try()` avoids failure:
 
 ```{r}
@@ -1135,6 +1176,7 @@ f1("x")
 
 ## Allowing for failures
 
+\fontsize{9pt}{10pt}\selectfont
 In addition to handling errors, `tryCatch()` allows you to specify
 how to proceed in the event of a warning, message, or **interrupt**
 
