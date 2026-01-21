@@ -20,7 +20,7 @@ In this, we will cover basic simulations, bootstrapping, permutation tests, and 
 
 ::: {.panel-tabset .panel-pills}
 
-### Slide Deck: simulations
+### Slide Deck: Simulations
 
 [![](./slides/topic_simulations/preview_simulation.png){width=70%}](./slides/topic_simulations/s_simulations.pdf)
 
