@@ -20,6 +20,9 @@ header-includes:
 
 ## Overview
 
+```{r}
+library(tidyverse)
+```
 
 Today, we cover:
 
@@ -29,12 +32,9 @@ Today, we cover:
 
 **Announcements**:
 
-- HW2 posted and due 2/4 at 10:00AM
+- HW2 posted and due 2/11 at 10:00AM
 - Final project due 5/1 at midnight
 
-Readings:
-
-- [Tim Hesterburg: Bootstrap](https://wires.onlinelibrary.wiley.com/doi/abs/10.1002/wics.182)
 
 
 ::: notes
@@ -59,7 +59,7 @@ Extra stuff in the Hesterburg paper that I didn't cover and is useful
   - Deriving standard errors is difficult or impossible
 
 ::: notes
-Bootstrap is a resam[l]
+Bootstrap is a resample
 
 better confidence intervals when we can't get or don't trust ones based on CLT/ normal sampling theory
 
@@ -68,6 +68,161 @@ Confidence intervals are for parameter estimates (like $\hat{\beta}$)
 
 ---
 
+## Rivers t-test example
+
+- `rivers` data: length (in miles) of 141 major North American Rivers
+
+```{r, echo = FALSE, fig.height = 2, fig.width = 5}
+data(rivers)
+
+
+df <- data.frame(rivers = rivers)
+
+mu  <- mean(rivers)
+med <- median(rivers)
+sdx <- sd(rivers)
+
+ggplot(df, aes(x = rivers)) +
+  geom_histogram(
+    bins = 40,
+    color = "black",
+    fill = "grey80"
+  ) +
+  geom_vline(aes(xintercept = mu),
+             color = "red", linewidth = 1) +
+  geom_vline(aes(xintercept = med),
+             color = "blue", linewidth = 1) +
+  geom_vline(aes(xintercept = mu + sdx),
+             linetype = "dashed", color = "red") +
+  geom_vline(aes(xintercept = mu - sdx),
+             linetype = "dashed", color = "red") +
+  labs(
+    title = "Red = mean ± 1 SD, Blue = median",
+    x = "River length (miles)",
+    y = "Count"
+  ) +
+  theme_minimal()
+```
+
+
+---
+
+## Rivers t-test example
+
+\fontsize{10pt}{11pt}\selectfont
+Is the mean length of rivers in North America equal to 1000 miles?
+
+- $H_0: \mu = 1000$ 
+
+```{r, echo = FALSE}
+t.test(rivers, mu = 1000)
+```
+
+---
+
+## Rivers t-test example
+
+\fontsize{10pt}{11pt}\selectfont
+T-test assumptions
+
+- Observations are independent
+- CLT holds: sampling distribution of $\bar{Y}$ will be approximately normal even if the population isn't
+- $\bar{Y}$ and $s$ are approximately independent
+
+$$t = \frac{\bar{Y}-\mu}{s/\sqrt{n}}$$ 
+
+- $t\sim t_{n-1} \mbox{ or } t\approx N(0,1)$
+
+
+Highly skewed data violates these assumptions
+
+- Mean and variance are correlated 
+- Skewness is a property of the underlying distribution, not $n$, so increasing sample size won't necessarily fix the problem
+  - Poor t-test coverage
+
+
+
+::: notes
+Popular rule of thumb is go to standard normal when n > 30
+
+when data are skewed, SD and mean aren't independent- deleting a point from one of the extreme outliers changes the mean and variance
+
+THis is a probem because basically everything we do in parameteric modeling is a t test
+:::
+
+----
+
+##  Rivers t-test sampling distribution
+
+
+```{r, echo = FALSE, fig.height = 3, fig.width = 5}
+library(ggplot2)
+library(patchwork)   # for side-by-side layout
+
+data(rivers)
+x <- rivers
+n <- length(x)
+
+# Point estimate and t-based SE
+xbar <- mean(x)
+s <- sd(x)
+se <- s / sqrt(n)
+df <- n - 1
+
+# Bootstrap sampling distribution of the mean
+set.seed(2026)
+B <- 50000
+boot_means <- replicate(B, mean(sample(x, replace = TRUE)))
+
+boot_df <- data.frame(boot_mean = boot_means)
+
+# t-based density for the mean
+# If (Xbar - mu)/SE ~ t_df, then density of Xbar is:
+t_density <- function(m) dt((m - xbar) / se, df = df) / se
+
+# Plot limits based on bulk of bootstrap distribution
+xlim <- quantile(boot_means, c(0.001, 0.999))
+
+# ---- Left panel: histogram + t overlay ----
+p_hist <- ggplot(boot_df, aes(x = boot_mean)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 bins = 60, fill = "grey80", color = "black") +
+  stat_function(fun = t_density, linewidth = 1) +
+  geom_vline(xintercept = xbar, linewidth = 1) +
+  coord_cartesian(xlim = xlim) +
+  labs(
+    title = "Sampling distribution",
+    x = "Bootstrap means (miles)",
+    y = "Density"
+  ) +
+  theme_minimal()
+
+# ---- Right panel: Q–Q plot ----
+# Standardize bootstrap means to t-scale
+z_boot <- (boot_means - xbar) / se
+
+probs <- ppoints(B)
+emp_q <- quantile(z_boot, probs)
+theo_q <- qt(probs, df = df)
+
+qq_df <- data.frame(theo = theo_q, emp = emp_q)
+
+p_qq <- ggplot(qq_df, aes(x = theo, y = emp)) +
+  geom_point(size = 1, alpha = 0.6) +
+  geom_abline(slope = 1, intercept = 0, linewidth = 1) +
+  labs(
+    title = "Q–Q plot",
+    x = "Theoretical t quantiles",
+    y = "Bootstrap quantiles"
+  ) +
+  theme_minimal()
+
+# ---- Combine side by side ----
+p_hist + p_qq
+
+```
+
+---
 
 ## Bootstrap: motivation
 
@@ -94,6 +249,8 @@ CLT-based inference assumes approximate normality of the test statistic. This ca
 - For nonlinear or non-smooth statistics (i.e. sample median vs. sample mean)
 
 When these assumptions fail, asymptotics-based confidence intervals can have poor coverage.
+
+- Also great for more complicated statistics where asymptotics can be hard to calculate
 
 ---
 
@@ -571,6 +728,7 @@ The bias-corrected accelerated (BCa) method is an improvement over the percentil
 First, estimate a bias correction factor $\hat{z}_0$:
 
 $$\hat{z}_0 = \Phi^{-1}\left(\frac{\#\{\hat{\theta}^*<\hat{\theta}\}}{B}\right)$$
+
 - The acceleration parameter measures how the estimator’s variability changes with the true parameter
 
 ::: notes
