@@ -30,6 +30,7 @@ Today, we cover:
 **Announcements**:
 
 - HW2 posted and due 2/4 at 10:00AM
+- Final project due 5/1 at midnight
 
 Readings:
 
@@ -45,12 +46,20 @@ Extra stuff in the Hesterburg paper that I didn't cover and is useful
 
 ---
 
-## Bootstrap: motivation
+## Why do we need resampling methods?
 
-What do you already know about the bootstrap?
+
+- Inference requires understanding the **sampling distribution** of a statistic
+- Classical tools rely on:
+  - Known parametric models
+  - Large sample (CLT-based) approximations
+- In many modern settings: 
+  - Sampling distributions are unknown
+  - Asymptotics may be inaccurate or hard to obtain
+  - Deriving standard errors is difficult or impossible
 
 ::: notes
-What is your prior experience with the bootstrap?  What do you know about it already?
+Bootstrap is a resam[l]
 
 better confidence intervals when we can't get or don't trust ones based on CLT/ normal sampling theory
 
@@ -59,131 +68,35 @@ Confidence intervals are for parameter estimates (like $\hat{\beta}$)
 
 ---
 
-## Bootstrap: motivation
-
-- Basically, used to obtain better confidence intervals when we can't get or don't trust ones based on CLT
-  - idea: $\hat{\beta} = (x^Tx)^{-1}x^Ty$, $se(\hat{\beta}) = \sigma^2(x^Tx)^{-1}$
-    - What happens if we don't trust $se(\hat{\beta})$
-
-
-- Resample data with replacement, calculate a statistic of interest (e.g., $\bar{Y}$) for each sample, obtain empirical distribution of $\bar{Y}$
-  - Nonparametric bootstrap
-
-
-How would you then obtain confidence intervals?
-
-::: notes
-CI: we will learn 4 ways to do this
-Think about how you construct T statistic or Z-statistic.  CI and p-values are based on assumption that the statistic should be roughly $t$ or $N(0,1)$ distributed. If this is not true, the CI will not be good.  
-:::
-
-
----
-
-
 
 ## Bootstrap: motivation
 
-- Many subtle issues with the usual non-parametric bootstrap
-  - In small samples, bootstrap confidence intervals often preferred to avoid relying on CLT, but the common percentile bootstrap
-performs poorly in small samples!
-  - Other types of bootstrap intervals may work better in small samples.
+Suppose we observe data $Y_1\ldots Y_n \sim F$ and we want to compute a statistic $T(Y_1,\ldots Y_n)$.
 
+We want:
 
-- Important to understand these issues of the bootstrap to avoid pitfalls
-when quantifying uncertainty
+- Standard errors
+- Confidence intervals
 
+- But $F$ is unknown
+- The distribution of $T$ depends on $F$
 
-
----
-
-
-
-## Notation
-
-
-For some cumulative distribution function $F$, suppose we are
-interested in a parameter, $\theta \stackrel{\triangle}{=} T(F)$, written as a functional of $F$
-
-
-- Let $y$ represent a random variable associated with a sample from $F$
-- A **functional** is a function of a function
-  - Mean of $F$: $T(F) = \int y dF(y)$
-  - Median of $F$: $T(F) = inf\{y: F(y) \ge 0.5\}$
-
-
-
-::: notes
-Here  T(F) means some functional of f.  
-
-inf is the infimum, which is the biggest number that is less than or equal to all elements of its set
-This is our mathematical definition of the median in terms of the CDF
-
-The idea here is that both the mean and the median (or other summary statistics we might be interested in) depend on the true underlying CDF of the data.
-:::
+**How can we approximate the sampling distribution of $T$ without knowing $F$?**
 
 ---
 
 
-## Notation 
+## Why classical asymptotics can fail
 
-\fontsize{10pt}{11pt}\selectfont
-- Usually $F$ is unknown, so we have to estimate it. 
-- Suppose we have a sample of data, $\mathcal{Y} = \{ y_1, y_2, \ldots, y_n\}$ drawn from $F$
+CLT-based inference assumes approximate normality of the test statistic. This can fail, even as $n \to \infty$ when:
 
-- Empirical CDF is an estimate of $F$
-  - places $1/n$ mass at each observed data point:
+- Data is skewed or heavy-tailed
+- For nonlinear or non-smooth statistics (i.e. sample median vs. sample mean)
 
-$$\hat{F}_n(y) = \frac{1}{n}\sum_{i = 1}^n I_{y_i\le y}$$
-
-- To estimate a functional $T(F)$, we plug in the empirical distribution, $\hat{F}_n(y)$, for $F(y)$:
-
-$$T(\hat F_n) = \int g(y) d\hat F_n(y) = \frac 1n\sum_{i = 1}^n g(y_i)$$
-
-::: notes
-Idea here is that, even though we don't usually think of the mean or other statistics of interest as being dependent on the empirical CDF, conceptually they are.
-
-The notation here gets at the underlying theory of the bootstrap, which we won't go into too much and will just touch the surface of here.
-
-You test statistic of interest can be posed as a function of the empirical CDF
-:::
+When these assumptions fail, asymptotics-based confidence intervals can have poor coverage.
 
 ---
 
-## Notation
-
-- Now, suppose we are interested in statistical **inference** for a statistic
-  - Denote this $W(\mathcal{Y, F})$
-
-- For example, if $Y_i \sim N(\mu, \sigma^2)$ we might be interested in the t-statistic
-
-$$W(\mathcal{Y, F}) = t = \frac{\bar{Y}-\mu}{s/\sqrt{n}}$$
-
-::: notes
-Inference for $W(\mathcal{Y, F})$ depends on the sampling distribution of W
-:::
-
----
-
-
-## Notation
-
-\fontsize{10pt}{11pt}\selectfont
-- Now, suppose we are interested in statistical **inference** for a statistic
-  - Denote this $W(\mathcal{Y, F})$
-
-- For example, if $Y_i \sim N(\mu, \sigma^2)$ we might be interested in the t-statistic
-
-$$W(\mathcal{Y, F}) = t = \frac{\bar{Y}-\mu}{s/\sqrt{n}}$$
-
-- In many cases, the sampling distribution of $W(\mathcal{Y, F})$ may be very complicated, unknown, or could depend on an unknown $F$
-  - e.g., if $Y_i$ come from a skewed distribution, then $t$ does not have a t-distribution, **even in large samples**!
-
-::: notes
-Why is this last statement a problem?
-:::
-
----
 
 
 ## When t is not t 
@@ -194,7 +107,6 @@ When $Y_i$ come from a skewed distribution, the sample mean and its SE are corre
 - $\implies$ t-statistic is not t-distributed
 
 ![](tdist.png){width=60%}
-
 
 
 - If your test or CI assumes your statistic has a normal or t sampling distribution, **any deviation** from the diagonal implies your test/interval will perform poorly
@@ -210,9 +122,10 @@ This is a Q-Q plot for a **sampling distribution** not raw data! The CLT already
 ## When t is not t 
 
 Idea: confidence intervals for parameter estimates provide no robustness against non-normality!
+
 - Coverage does not improve as $n \to \infty$!
 
-\vspace{5mm}
+
 Bootstrapping can be very useful for constructing better confidence
 intervals for these parameters.
 
@@ -223,10 +136,62 @@ Tricky here because the non-normality refers to the sampling distribution of you
 
 ---
 
+
+## A computational workaround
+
+- We cannot repeatedly sample from the true population distribution $F$
+- But, we *do* have data sampled from $F$
+
+**Idea**: use the observed data to approximate $F$ through simulation
+
+---
+
+## Parameters as functionals
+
+
+For some cumulative distribution function $F$, suppose we are
+interested in a parameter, $\theta \stackrel{\triangle}{=} T(F)$, written as a functional of $F$
+
+
+- A **functional** is a function of a function
+  - Mean of $F$: $T(F) = \int y dF(y)$
+  - Median of $F$: $T(F) = inf\{y: F(y) \ge 0.5\}$
+- The statistic $T(Y_1,\ldots, Y_n)$ is an estimate of $T(F)$
+
+Inference about a statistic is inference about a **functional of an unknown distribution.**
+
+
+::: notes
+Here  T(F) means some functional of f.  
+
+inf is the infimum, which is the biggest number that is less than or equal to all elements of its set
+This is our mathematical definition of the median in terms of the CDF
+
+The idea here is that both the mean and the median (or other summary statistics we might be interested in) depend on the true underlying CDF of the data.
+:::
+
+---
+
+
+## Estimating the data-generating distribution 
+
+
+- The true distribution of $F$ is unknown, so we have to estimate it
+- A natural estimator is the **empirical distribution**:
+
+$$\hat{F}_n(y) = \frac{1}{n}\sum_{i = 1}^n I\{Y_i\le y\}$$
+
+- $\hat{F}_n$ places $1/n$ mass at each observed data point
+- To estimate a functional $T(F)$, we plug in the empirical distribution, $\hat{F}_n(y)$, for $F(y)$:
+
+---
+
 ## The Bootstrap Principle
 
-- Replace unknown $F$ with $\hat F_n$
-  - Produce a numerical approximation of the sampling distribution of $W(\mathcal{Y, F})$ by repeatedly sampling from $\hat F_n$
+- Replace the unknown distribution $F$ with its estimate $\hat{F}_n$
+- Approximate the sampling distribution of $T(Y_n,\ldots, Y_n)$ by:
+  - Repeatedly sampling from $\hat{F}_n$
+  - Recomputing the statistic
 
 
 
@@ -238,7 +203,14 @@ Used to estimate the sampling distribution of a statistic without relying on str
 
 ---
 
+## What the bootstrap gives us
 
+
+- Approximate sampling distribution
+- Standard error estimates
+- Confidence intervals
+
+---
 
 ## The Bootstrap Principle
 
@@ -257,12 +229,14 @@ Many different flavors!
 ---
 
 
+
+
 ## Nonparameteric bootstrap
 
 \fontsize{10pt}{11pt}\selectfont
 A **bootstrap sample** is a random sample of size drawn **with replacement** from $\hat F_n$
 
-- bootstrap sample denoted $y^* = (y^*_1, y^*_2, \ldots, y^*_n)$
+- Bootstrap sample denoted $y^* = (y^*_1, y^*_2, \ldots, y^*_n)$
 - $\hat{\theta}^* \stackrel{\triangle}{=} T(\hat F_n(y^*))$ is the corresponding bootstrap estimate using the sample $y^*$
   - We'll call this $T(\hat F_n^*)$ to simplify notation
   
@@ -284,14 +258,11 @@ Then use this standard error or other aspects of the distribution of theta hat t
 ## Why does it work?
 
 - $\hat F_n \to F$ uniformly by Glivenko-Cantelli
-
-  - $\implies$ when $n$ is large, iid sampling from $\hat F_n$ should be approximately the same as iid sampling from $F$
+- $\implies$ when $n$ is large, sampling from $\hat F_n$ resembles sampling from $F$
   
-- Each bootstrap sample is considered an iid sample from $\hat F_n$
   
-
 - Potential sources of error:
-  - Original sample is chosen randomly from population
+  - Finite sample bias
   - Bootstrap distribution contains Monte Carlo error when exhaustive resampling is infeasible
     - For fixed $n$, number of possible bootstrap samples is ${2n-1}\choose{n}$
 
@@ -600,7 +571,7 @@ The bias-corrected accelerated (BCa) method is an improvement over the percentil
 First, estimate a bias correction factor $\hat{z}_0$:
 
 $$\hat{z}_0 = \Phi^{-1}\left(\frac{\#\{\hat{\theta}^*<\hat{\theta}\}}{B}\right)$$
-
+- The acceleration parameter measures how the estimator’s variability changes with the true parameter
 
 ::: notes
 Bias correction. based on the proportion of bootstrap sample estimates that are less than the original sample estimate.
