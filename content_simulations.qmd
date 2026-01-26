@@ -39,6 +39,18 @@ In this, we will cover basic simulations, bootstrapping, permutation tests, and 
 
 
 ***
+
+### Slide Deck: Benchmarking and parallelization
+
+[![](./slides/topic_simulations/preview_parallel.png){width=70%}](./slides/topic_reproducible_computing/s_parallelization.pdf)
+
+**Speeding up your code in R**  
+[Download slides (PDF)](./slides/topic_simulations/s_parallelization.pdf)
+
+
+***
+
+
 ### Lab: simulations
 
 
