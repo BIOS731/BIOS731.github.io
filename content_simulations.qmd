@@ -179,7 +179,30 @@ Our goal is to test $H_0: \mu_1 = \mu_2$.  Define test statistic: $t = \bar{X}-\
 3. Repeat `nperm` times. Resulting $t^*$ values form the **empirical null distribution** of $t$.
 4. To compute p-values calculate $Pr(|t^*|> |t|)$
 
+***
 
+
+
+### Lab: Benchmarking and parallelization
+
+#### Vectorization
+
+1. Create a function __square_for(x)__ that takes as an argument vector __x__ (of any length), and uses the **for loop** to return vector __y__ such that $$y_i = x_i^2$$ 
+2. Create a function __square_sapply(x)__ that does the same thing using **sapply** function. 
+3. Create a function __square_vec(x)__ that does the same thing using **\^** operator applied directly to vector __x__. 
+4. Create a function __square_vec2(x)__ that does the same thing using * operator applied directly to vector __x__. 
+5. Create a vector **x** of $p=100,000$ normal random variables
+
+
+
+Next, use **microbenchmark** package to compare the performance of the four functions above using **x**
+
+
+**What's your conclusion?**
+
+#### Parallelization
+
+Go back to the lab on simulations. You can start with the solutions file, listed as `partial_solution` on the canvas site.  Parallelize this code.
 
 
 ***

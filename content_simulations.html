@@ -229,7 +229,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
 <p>In this, we will cover basic simulations, bootstrapping, permutation tests, and speeding up code through vectorization and parallelization.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset panel-pills">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Slide Deck: Simulations</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Slide Deck: Bootstrap</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Slide Deck: Benchmarking and parallelization</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false" href="">Lab: simulations</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false" href="">Lab: resampling methods</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Slide Deck: Simulations</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Slide Deck: Bootstrap</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Slide Deck: Benchmarking and parallelization</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false" href="">Lab: simulations</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false" href="">Lab: resampling methods</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-6" role="tab" aria-controls="tabset-1-6" aria-selected="false" href="">Lab: Benchmarking and parallelization</a></li></ul>
 <div class="tab-content panel-pills">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <p><a href="./slides/topic_simulations/s_simulations.pdf"><img src="./slides/topic_simulations/preview_simulation.png" class="img-fluid" style="width:70.0%"></a></p>
@@ -365,6 +365,25 @@ window.Quarto = {
 <li>Repeat <code>nperm</code> times. Resulting <span class="math inline">\(t^*\)</span> values form the <strong>empirical null distribution</strong> of <span class="math inline">\(t\)</span>.</li>
 <li>To compute p-values calculate <span class="math inline">\(Pr(|t^*|&gt; |t|)\)</span></li>
 </ol>
+<hr>
+</section>
+</div>
+<div id="tabset-1-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-6-tab">
+<section id="vectorization" class="level4">
+<h4 class="anchored" data-anchor-id="vectorization">Vectorization</h4>
+<ol type="1">
+<li>Create a function <strong>square_for(x)</strong> that takes as an argument vector <strong>x</strong> (of any length), and uses the <strong>for loop</strong> to return vector <strong>y</strong> such that <span class="math display">\[y_i = x_i^2\]</span></li>
+<li>Create a function <strong>square_sapply(x)</strong> that does the same thing using <strong>sapply</strong> function.</li>
+<li>Create a function <strong>square_vec(x)</strong> that does the same thing using <strong>^</strong> operator applied directly to vector <strong>x</strong>.</li>
+<li>Create a function <strong>square_vec2(x)</strong> that does the same thing using * operator applied directly to vector <strong>x</strong>.</li>
+<li>Create a vector <strong>x</strong> of <span class="math inline">\(p=100,000\)</span> normal random variables</li>
+</ol>
+<p>Next, use <strong>microbenchmark</strong> package to compare the performance of the four functions above using <strong>x</strong></p>
+<p><strong>What’s your conclusion?</strong></p>
+</section>
+<section id="parallelization" class="level4">
+<h4 class="anchored" data-anchor-id="parallelization">Parallelization</h4>
+<p>Go back to the lab on simulations. You can start with the solutions file, listed as <code>partial_solution</code> on the canvas site. Parallelize this code.</p>
 <hr>
 </section>
 </div>

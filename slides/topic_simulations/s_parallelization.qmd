@@ -36,6 +36,7 @@ Today, we cover:
 
 **Announcements**:
 
+- HW1 grades are up
 - HW2 posted and due 2/11 at 10:00AM
 - No class tomorrow (Thursday, January 29) but still have Office Hours
 
@@ -107,6 +108,13 @@ Our goal is to test $H_0: \mu_1 = \mu_2$.  Define test statistic: $t = \bar{X}-\
 4. To compute p-values calculate $Pr(|t^*|> |t|)$
 
 
+
+## Lab: resampling methods
+
+We will spend the next 20-30 minutes going through this lab.
+
+---
+
 ## Improving speed
 
 Two ways to find bottlenecks in code:
@@ -172,7 +180,7 @@ microbenchmark(
 
 ## Comparing R codes for speed
 
-\fontsize{11pt}{12pt}\selectfont
+\fontsize{10pt}{11pt}\selectfont
 - Take advantage of __crossprod__ and __tcrossprod__ functions. Suppose we want to calculate $x^{T}Ax$
 
 ```{r}
@@ -191,52 +199,12 @@ Certain linear algebra operations have faster or slower ways of writing them dow
 }
 :::
 
----
-
-## Comparing R codes for speed
-
-\fontsize{10pt}{11pt}\selectfont
-- **Hack** for calculating $\|x\|_2^2$ for large $p$
-
-
-```r
-p <- 100000
-x <- rnorm(p)
-as.numeric(crossprod(x))
-```
-
-```
-[1] 100031.9
-```
-
-```r
-sum(x^2)
-```
-
-```
-[1] 100031.9
-```
-
----
-
-## Comparing R codes for speed
-
-
-- **Hack** for calculating $\|x\|_2^2$ for large $p$
-
-```{r}
-microbenchmark(
-    as.numeric(crossprod(x)),
-    sum(x^2)
-)
-```
-
-
 
 ---
 
 ## Example: R Loops
 
+\fontsize{9pt}{10pt}\selectfont
 R is very bad at resizing objects since it copies to resize
 
 - Do not grow an object inside of a loop! 
@@ -250,7 +218,6 @@ bad = function (x){
     }
   return(obj)
 }
-
 
 better = function (x){
   obj = rep(NA, x)
@@ -266,15 +233,16 @@ better = function (x){
 
 ## Example: R Loops
 
+\fontsize{11pt}{12pt}\selectfont
 ```{r}
 microbenchmark(bad (100), better (100))
-
 ```
 
 ---
 
 ## Measuring speed in simulations
 
+\fontsize{10pt}{11pt}\selectfont
 If you are interested in measuring computation time in a simulation study, say, to compare how fast different methods are, I **would not** recommend `microbenchmark`.  Instead, do the following:
 
 
@@ -285,29 +253,30 @@ tic()
 ## do some stuff
 large_vector <- rnorm(1e7)  # Create a vector of 10 million random numbers
 sum_large_vector <- sum(large_vector)
+time_stamp = toc(quiet = TRUE) # stop the timer and print the time elapsed
 
-# stop the timer and print the time elapsed
-time_stamp = toc(quiet = TRUE)
-
-# human time in seconds for the operation to complete
-time_stamp$toc - time_stamp$tic
+time_stamp$toc - time_stamp$tic # human time in seconds
 ```
 
 ---
 
 
+
+
 ## Vectorization
 
----
-
-## Why vectorization?
 
 R is **vectorized**, meaning it efficiently performs operations on entire vectors or arrays in a single step, avoiding explicit loops and leveraging optimized low-level code for speed and simplicity.
+
 - Often, there is more than one way to do something in R
 - Take advantage of vectorization!
   - Often it is more concise and significantly faster
+
+---
+
+## Vectorization
   
-  
+\fontsize{11pt}{12pt}\selectfont
 ```{r}
 # non vectorized squaring operation
 x <- c(1, 2, 3, 4, 5)
@@ -325,6 +294,7 @@ result <- x^2
 
 ## Why vectorization?
 
+\fontsize{11pt}{12pt}\selectfont
 Another example- which is the vectorized version?
 
 
@@ -348,6 +318,7 @@ Base R has many built in functions that take advantage of this vectorization
 
 ## Why vectorization?
 
+\fontsize{11pt}{12pt}\selectfont
 - __colSums__, __colMeans__ and corresponding row functions are vectorized
 
 ```{r}
@@ -364,11 +335,11 @@ microbenchmark(
 
 ## Break
 
-Let's stop and try vectorization Examples 1 and 2 in the lab.
+Let's stop and try vectorization examples in the lab.
 
 
 <br>
-Next up will be profiling and parallelization.
+Next up will be parallelization.
 
 
 ---
@@ -376,12 +347,12 @@ Next up will be profiling and parallelization.
 
 ## Parallel computing
 
-A modern CPU (Central Processing Unit) is at the heart of every computer. While traditional computers had a single CPU, modern computers can ship with mutliple processors, which in turn can each contain multiple cores. These processors and cores are available to perform computations.
 
-A computer with one processor may still have 4 cores (quad-core), allowing 4 computations to be executed at the same time.
+\fontsize{12pt}{13pt}\selectfont
+A modern CPU (Central Processing Unit) is at the heart of every computer. While traditional computers had a single CPU, modern computers can ship with multiple processors, which in turn can each contain multiple cores. These processors and cores are available to perform computations.
 
-
-**Parallel computing** is the simultaneous use of multiple processors or computers to solve a problem by dividing it into smaller, independent tasks, i.e. operating **in parallel**.
+- A computer with one processor may still have 4 cores (quad-core), allowing 4 computations to be executed at the same time.
+- **Parallel computing** is the simultaneous use of multiple processors or computers to solve a problem by dividing it into smaller, independent tasks, i.e. operating **in parallel**.
 
 
 ---
@@ -422,16 +393,11 @@ It’s not as simple as it may seem. While in theory each added processor would 
 
 ---
 
-## Example : foreach and doParallel
-
-
----
-
 
 ## Example : foreach and doParallel
 
 
-
+\fontsize{10pt}{11pt}\selectfont
 ```{r, echo = TRUE, eval = FALSE}
 library(doParallel)
 library(foreach)
@@ -449,7 +415,22 @@ monte_carlo_pi <- function(n) {
 
 nsim = 100
 
-pi_estimates = foreach(i = 1:100, .combine = c) %dopar% {
+```
+
+::: notes
+Note that this is stored in a vector. You may need other options for storage-what if you want to store it as a list?
+combine argument- default is to return a list, this concatenates things into a vector. You could also supply your own function here
+:::
+
+---
+
+
+### Example : foreach and doParallel
+
+
+\fontsize{12pt}{13pt}\selectfont
+```{r, echo = TRUE, eval = FALSE}
+pi_estimates = foreach(i = 1:nsim, .combine = c) %dopar% {
   n = 1000
   monte_carlo_pi(n)
 }
@@ -467,10 +448,8 @@ combine argument- default is to return a list, this concatenates things into a v
 
 ## Example : foreach and doParallel
 
-- Useful arguments:
-  - multiple iterators
-  - error catching
-  - combine
+\fontsize{10pt}{11pt}\selectfont
+Useful arguments include multiple iterators, error catching, combine
   
 ```{r, eval = FALSE}
 foreach(
