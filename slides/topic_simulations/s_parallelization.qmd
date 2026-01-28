@@ -24,6 +24,7 @@ header-includes:
 library(tidyverse)
 ```
 
+\fontsize{10pt}{11pt}\selectfont
 Today, we cover:
 
 - Resampling methods
@@ -56,6 +57,7 @@ Extra stuff in the Hesterburg paper that I didn't cover and is useful
 
 \fontsize{10pt}{11pt}\selectfont
 Typically bootstrap is used for CI rather than hypothesis testing.  For hypothesis testing and p-values, we can use a **permutation test**.
+
 - Idea: use resampling to generate a **null distribution** for a test statistic, then compare it to the one you observe in the real data
 
 - **Null distribution**: the distribution of a quantity of interest (i.e. $\hat{\beta}$) if the null hypothesis $H_0$ is true
@@ -91,7 +93,7 @@ significance.
 ---
 
 
-## Permutation test example
+## Permutation test example: difference in means
 
 \fontsize{10pt}{11pt}\selectfont
 Assume there are two sets of independent normal r.v.’s with the same known
@@ -107,7 +109,92 @@ Our goal is to test $H_0: \mu_1 = \mu_2$.  Define test statistic: $t = \bar{X}-\
 3. Repeat `nperm` times. Resulting $t^*$ values form the **empirical null distribution** of $t$.
 4. To compute p-values calculate $Pr(|t^*|> |t|)$
 
+---
 
+
+## Permutation test example: difference in means
+
+\fontsize{8pt}{9pt}\selectfont
+```{r}
+set.seed(111)
+x = rnorm(30, 2, 2)
+y = rnorm(30, 0.5, 1.5)
+mean_diff = mean(x) - mean(y)
+
+nperm = 10000
+perm_mean_diff = rep(NA, nperm)
+for(perm in 1:nperm){
+  combined_data = c(x, y)
+  x_index = sample(1:length(combined_data), size = length(x), replace = FALSE) 
+  x_perm = combined_data[x_index]
+  y_perm = combined_data[-x_index]
+  
+  perm_mean_diff[perm] = mean(x_perm) - mean(y_perm)
+}
+
+p = sum(abs(perm_mean_diff) >= abs(mean_diff))/nperm
+p
+
+```
+
+
+
+---
+
+## Permutation test example: regression coefficient 
+
+$$Y_i = \beta_0 + \beta_{treatment}X_{i1} + \mathbf{Z_i}^T\boldsymbol{\gamma} + \epsilon_i$$
+
+- Our goal is to test $H_0: \beta_{treatment} = 0$ and we observe $\hat{\beta}_{treatment} = 1.2$.
+
+<br>
+**How will we perform the permutations?**
+
+::: notes
+Randomly shuffle Y nperm times. Refit regression, record beta at each one.
+:::
+
+---
+
+
+## Permutation test example: classification accuracy
+
+We used a random forest model to build a binary classifier for disease detection and achieved accuracy of 78%.  
+
+- Goal is to test if this is significantly different than random guessing (50%)    
+
+<br>
+**How will we perform the permutations?**
+
+::: notes
+Keep features (X values) fixed. Shuffle labels (Y). Retrain model, measure accuracy. Repeat 1000 times.
+:::
+
+---
+
+
+## Choosing the number of permutations
+
+- Monte Carlo error: If the true p-value is $p$, then 
+
+$$\hat{p}\sim Binomial(nperm, p)/nperm$$
+and
+
+$$SE(\hat{p}) = \sqrt{\frac{p(1-p)}{nperm}}$$
+
+---
+
+## Choosing the number of permutations
+
+```{r}
+p_true = 0.05
+nperm = c(10, 100, 10000)
+
+# standard error
+sqrt(p_true*(1-p_true)/nperm)
+```
+
+---
 
 ## Lab: resampling methods
 
@@ -124,7 +211,7 @@ Two ways to find bottlenecks in code:
 
 ---
 
-## Comparing R codes for speed
+## Comparing R code for speed
 
 \fontsize{11pt}{12pt}\selectfont
 - R package `microbenchmark` is well-suited for comparing small chunks of code
@@ -148,7 +235,7 @@ expressions is randomized
 
 ---
 
-## Comparing R codes for speed
+## Comparing R code for speed
 
 \fontsize{11pt}{12pt}\selectfont
 ```{r}
@@ -163,7 +250,7 @@ microbenchmark(
 ---
 
 
-## Comparing R codes for speed
+## Comparing R code for speed
 
 \fontsize{11pt}{12pt}\selectfont
 ```{r}
@@ -178,7 +265,7 @@ microbenchmark(
 
 ---
 
-## Comparing R codes for speed
+## Comparing R code for speed
 
 \fontsize{10pt}{11pt}\selectfont
 - Take advantage of __crossprod__ and __tcrossprod__ functions. Suppose we want to calculate $x^{T}Ax$
@@ -333,16 +420,7 @@ microbenchmark(
 
 ---
 
-## Break
 
-Let's stop and try vectorization examples in the lab.
-
-
-<br>
-Next up will be parallelization.
-
-
----
 
 
 ## Parallel computing
