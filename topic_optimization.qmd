@@ -4,16 +4,10 @@ toc: true
 sidebar: false
 ---
 
-In progress.
+Is this module we will first cover convex optimization and gradient descent. In the second week of this module we will move to the EM and MM algorithms.
 
-```{r, echo = FALSE, eval = FALSE}
-First part of optimization
 
--   [Introduction to optimization](what_is_ds_i.qmd)
--   [Gradient methods and GLMs](what_is_ds_ii.qmd)
+-   [Introduction to optimization and gradient descent](content_optimization.qmd)
 -   [EM 1: Applications](what_is_ds_ii.qmd)
 -   [EM 2: Theory and Inference](what_is_ds_ii.qmd)
 -   [MM Algorithm](what_is_ds_ii.qmd)
-
-```
-

@@ -3,9 +3,11 @@
 *.RData
 *.rdb
 *.rdx
+*json
 
 .DS_Store
 /.quarto/
 **/*.quarto_ipynb
 homework*
 
+*/solution*

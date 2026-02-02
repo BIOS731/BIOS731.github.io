@@ -1,0 +1,850 @@
+---
+title: "Introduction to optimization"
+author: "Julia Wrobel"
+format:
+  beamer:
+    theme: metropolis
+    aspectratio: 169
+    fontsize: 14pt
+    slide-level: 2
+execute:
+  echo: true
+  eval: false
+  warning: false
+  message: false
+header-includes:
+  - \usepackage{xcolor}
+  - \newcommand{\red}[1]{\textcolor{red}{#1}}
+  - \newcommand{\green}[1]{\textcolor{green}{#1}}
+---
+
+
+## Overview
+
+```{r, eval = TRUE, echo = FALSE}
+library(tidyverse)
+```
+
+\fontsize{10pt}{11pt}\selectfont
+Today, we cover:
+
+- Intro to optimization
+- Rates of convergence
+- Beginning of gradient methods
+  - Steepest descent
+  - Newton's Method
+  
+Announcements
+
+- HW2 posted and due 2/4 at 10:00AM
+
+Readings:
+
+- Peng Chapter 2 (rates of convergence)
+- Peng Chapter 3 (general optimization)
+
+
+::: notes
+Just for today if you haven't done it I will let you do it later today and only take a couple of points off.
+
+Lots of science/math funded my practical purposes- in this case the atom bomb
+:::
+
+---
+
+
+## Optimization terminology
+
+
+\fontsize{9pt}{10pt}\selectfont
+We will consider the following general optimization problem: 
+
+\begin{equation*}
+\begin{split}
+	\text{minimize}_x \quad&f({\bf{x}}) \\
+	\text{subject to}\quad & g_j({\bf{x}})\leq0,\quad j = 1, 2, ..., m; \\& h_k({\bf{x}})=0,\quad  k = 1, 2,...,l.
+\end{split} 
+\end{equation*}
+
+- $\bf{x}\in R^p$: **optimization variable** (in this class, could be a scalar, vector or a matrix)
+- $f(\bf{x}): R^p \rightarrow R$: **objective function**
+- $g_j:R^{p}\rightarrow R$ and $g_j({\bf{x}})\leq0$: **inequality constraints**
+- $h_k:R^{p}\rightarrow R$ and $h_k({\bf{x}})=0$: **equality constraints**
+- If no constraints: **unconstrained problem**
+
+
+::: notes
+Sometimes we wish to maximize instead! This is just -1 times the objective function
+Most of this unit will focus on unconstrained optimization, next unit we will do some constrained optimization
+:::
+
+---
+
+## Optimization terminology
+
+We will consider the following general optimization problem:  
+
+\begin{equation*}
+\begin{split}
+	\text{minimize}_x \quad&f({\bf{x}}) \\
+	\text{subject to}\quad & g_j({\bf{x}})\leq0,\quad j = 1, 2, ..., m; \\& h_k({\bf{x}})=0,\quad  k = 1, 2,...,l.
+\end{split} 
+\end{equation*}
+
+
+
+## Least squares linear regression
+
+Given data $X\in R^{n \times p}$ and $Y \in R^n$ with $rank(X) = p$
+
+\begin{equation*}
+\text{minimize}_{\beta}\|Y-X\beta\|_2^2
+\end{equation*}
+
+- **unconstrained** optimization problem
+- any $\beta \in R^p$ is **feasible**
+- the optimal value $f^* = \|Y - X(X^TX)^{-1}X^TY\|_2^2$
+- the globally optimal $\beta^* =  (X^TX)^{-1}X^TY$ 
+  - also locally optimal, the only locally optimal point
+
+---
+
+
+
+## Unconstrained optimization problem
+
+\fontsize{10pt}{11pt}\selectfont
+Consider minimizing differentiable function $f$
+
+$$
+\text{minimize}_x f(x)
+$$
+
+A point $x^*$ is called **stationary** if 
+$$\nabla f(x^*) = 0.$$
+All local optimal points are **stationary** points.
+
+Globally optimal $x^*$ satisfies $f(x^*) = 0$, but locally optimal and stationary points also satisfy it.
+
+For **convex** f, any solution to $f(x^*) = 0$ is globally optimal.
+
+
+::: notes
+This is why its nice for problems to be convex!
+:::
+
+---
+
+## Convex sets
+
+![](convex_set.png){width=80%}
+
+
+
+
+::: notes
+A convex set is defined as a set of points in which the line AB connecting any two points A, B in the set lies completely within that set.
+:::
+
+---
+
+
+
+## Convex optimization problems
+
+\fontsize{10pt}{11pt}\selectfont
+- Very common in statistics, *easier* to solve, genereally have nice algorithms
+ 
+
+**Definition:** A function $f: R^p \to R$ is $\textbf{convex}$ if for all $x_1, x_2 \in R^p$ and all $\alpha \in [0,1]$,
+ $$
+ f(\alpha x_1 + (1-\alpha)x_2)\leq \alpha f(x_1) + (1-\alpha) f(x_2)
+ $$
+ and is $\textbf{strictly convex}$ if for all $x_1, x_2 \in R^p$, $x_1\neq x_2$, and all $\alpha \in (0,1)$
+ 
+ $$
+ f(\alpha x_1 + (1-\alpha)x_2)< \alpha f(x_1) + (1-\alpha) f(x_2)
+ $$
+
+
+- **Interpretation**: The chord between two points is always above the function
+ 
+::: notes
+Why are convex problems nice?
+What is a more intuitive explanation for these 
+:::
+
+---
+
+
+
+## Convex optimization problems
+
+![Convex function, basic definition](convex.png){width=80%}
+
+
+::: notes
+Right out the math definition on this slide
+Convex function, basic definition
+:::
+
+---
+
+
+
+
+## Convex optimization problems
+
+**Theorem**
+
+*First order conditions (for differentiable $f$)*
+- $f$ is convex $\iff$ $f(y)\geq f(x)+\nabla f(x)^\top(y-x)$, $\forall x,y\in\mathbb{R}^p$. 
+- $f$ is strictly convex $\iff$ $f(y)> f(x)+\nabla f(x)^\top(y-x)$, $\forall x,y\in\mathbb{R}^p$ and $x\neq y$.
+
+
+- **Interpretation**: function lies above its tangent
+
+---
+
+
+## Convex optimization problems
+
+![Convex function, first order condition](FirstOrderConvex.png)
+
+
+::: notes
+These two conditions are called the duality of convex problems.
+Essentially this supporting hyperplane provides a lower bound for the solution.
+:::
+
+---
+
+
+## Convex optimization problems
+
+\fontsize{10pt}{11pt}\selectfont
+**Theorem**
+
+*Second order conditions (for twice differentiable $f$)*
+
+- $f$ is convex $\iff$ Hessian $\nabla^2 f(x)\succeq 0$, $\forall x\in\mathbb{R}^p$. (pos.semi-def)
+- $f$ is strictly convex $\iff$ Hessian $\nabla^2 f(x)\succ0$, $\forall x\in\mathbb{R}^p$  (strictly pos.semi-def)
+
+
+
+- Often easiest to check in practice, i.e. 
+   $$f(x) = x^2, \quad \nabla^2 f(x) = 2 >0.$$
+   $$
+   f(x) = \|x\|_2^2, \quad \nabla f(x) = 2x, \quad \nabla^2 f(x) = 2I \succ 0.
+   $$
+
+
+::: notes
+This is just a single $x$ vs. a vector $x$
+:::
+
+---
+
+
+## Examples of convex functions
+
+- $-\log(x)$
+- $e^x$
+- $|x|^p$, $p\geq 1$
+- Any norm on $\mathbb{R}^p$
+- $-\log(\text{det}(\Sigma))$, where $\Sigma$ is positive definite
+
+
+::: notes
+What is the definition of a norm
+norm" is a function that assigns a non-negative real number to each vector in a vector space, essentially representing the "size" or "length" of that vector, and satisfying specific properties like being zero only for the zero vector, scaling proportionally with scalar multiplication, and obeying the triangle inequality; it acts like a generalized concept of distance from the origin within the vector space
+:::
+
+---
+
+## Operations that preserve convexity
+
+
+- Non-negative weighted sum: $\sum_{i=1}^k w_if_i$, where $w_i\geq0$ and  $f_i,i=1,...,k$ are convex functions.
+- If $f$ is convex, and $g(x)=f(Ax+b)$, then $g$ is convex.
+- If $f_1,...,f_k$ are convex functions, then $\max(f_1,...,f_k)$ is also convex.
+- ... not exhaustive list
+  
+---
+
+
+## Example
+
+Least squares loss function is convex
+
+$$f(\beta) = \|Y-X\beta\|_2^2$$
+
+Why?
+
+- The hessian is $\nabla^2f(\beta) = 2X^TX\succeq 0$ (semi positive definite)
+- $f(\beta)=g(Y-X\beta)$, where $g(x) = \|x\|_2^2$ is convex as a norm squared
+
+
+---
+
+
+- A point $\bf{x}\in R^p$ is **feasible** if it satisfies all the constraints. Otherwise, it's **infeasible**.
+- The **optimal value** $f^*$ is the minimal value of $f$ over the set of feasible points
+
+
+
+---
+
+
+
+## Optimization terminology
+
+\fontsize{10pt}{11pt}\selectfont
+We will consider the following general optimization problem:  
+
+\begin{equation*}
+\begin{split}
+	\text{minimize}_x \quad&f({\bf{x}}) \\
+	\text{subject to}\quad & g_j({\bf{x}})\leq0,\quad j = 1, 2, ..., m; \\& h_k({\bf{x}})=0,\quad  k = 1, 2,...,l.
+\end{split} 
+\end{equation*}
+
+  - The **optimal value** $f^*$ is the minimal value of $f$ over the set of feasible points
+  - $x^*$ is **globally optimal** if $x$ is *feasible* and $f(x^*) = f^*$
+  - $x^*$ is **locally optimal** if $x$ is *feasible* and for each feasible $x$ in the neighborhood $\|x - x^*\|_2\leq R$ for some $R>0$, $f(x^*)\leq f(x)$.
+
+
+
+::: notes
+Def need to revisit this locally optimal definition. Basically, a locally optimal solution is the best within a specific neighborhood of feasible solutions.  Draw a plot of a function that has both local and global optima
+:::
+
+---
+
+
+## Recall unconstrained optimization problem
+
+\fontsize{10pt}{11pt}\selectfont
+Consider minimizing differentiable function $f$
+
+$$
+\text{minimize}_x f(x)
+$$
+
+A point $x^*$ is called **stationary** if 
+
+$$\nabla f(x^*) = 0.$$
+
+All local optimal points are **stationary** points.
+
+
+Globally optimal $x^*$ satisfies $f(x^*) = 0$, but locally optimal and stationary points also satisfy it.
+
+
+---
+
+
+## Unconstrained convex optimization problem
+
+\fontsize{10pt}{11pt}\selectfont
+Consider
+
+$$\text{minimize}_x f(x)$$
+
+This is a **convex** optimization problem if $f(x)$ is **convex**
+
+**Important property 1**: any locally optimal point of a convex problem is globally optimal
+
+**Important property 2**: If $f$ is differentiable, $x^*$ is optimal if and only if
+
+$$
+\nabla f(x)|_{x=x^*} = 0.
+$$
+
+
+---
+
+## Example: Least Squares
+
+\fontsize{10pt}{11pt}\selectfont
+Least squares solves
+
+$$
+\text{minimize}_{\beta}\|Y-X\beta\|_2^2
+$$
+
+This is a convex unconstrained optimization problem, so the solution must satisfy
+
+\begin{align*}
+\nabla\|Y-X\beta\|_2^2 &= \nabla(\|Y\|_2^2 - 2Y^TX\beta + \beta^TX^TX\beta)\\
+&= -2X^TY + 2X^TX\beta = 0
+\end{align*}
+
+This is equivalent to
+
+$$
+X^TX\beta = X^TY
+$$
+
+If $X^TX$ is **invertible**, global solution is $\beta^* = (X^TX)^{-1}X^TY$.
+
+---
+
+
+
+## Example: Least Squares
+
+Least squares solves
+
+$$\text{minimize}_{\beta}\|Y-X\beta\|_2^2$$
+This is a convex unconstrained optimization problem, so the solution must satisfy
+
+
+\begin{align*}
+\nabla\|Y-X\beta\|_2^2 &= \nabla(\|Y\|_2^2 - 2Y^TX\beta + \beta^TX^TX\beta)\\
+&= -2X^TY + 2X^TX\beta = 0
+\end{align*}
+
+This is equivalent to
+
+$$X^TX\beta = X^TY$$
+
+If $X^TX$ is **not invertible**, **multiple** global solutions (give same $f^*$)
+
+---
+
+## Example: Maximum Likelihood Estimation
+
+\fontsize{10pt}{11pt}\selectfont
+Observations $x_i$, $i=1,\dots, n$, independent samples from distribution with density $f(x;\theta)$ with some parameter $\theta\in \mathbb{R}^d$
+
+**Maximum Likelihood Estimator (MLE)**
+
+$$\widehat \theta = \arg\max_{\theta} \prod_{i=1}^nf(x_i; \theta)$$
+
+Typically, we maximize **log-likelihood** which is equivalent to
+
+$$\widehat \theta = \arg\min_{\theta}\left\{-\sum_{i=1}^n\log f(x_i; \theta)\right\}$$
+
+This is **convex optimization** if $-\log(f)$ is convex.
+
+---
+
+
+## MLE example
+
+\fontsize{10pt}{11pt}\selectfont
+Normal likelihood with known variance $\sigma^2$
+
+$$f(x; \theta) = \frac1{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x-\theta)^2}{2\sigma^2}\right)$$
+
+Here $\theta$ is the unknown mean.
+
+Log-likelihood
+
+$$
+\log f(x; \theta) = -\frac12\log(2\pi\sigma^2) - \frac1{2\sigma^2}(x-\theta)^2 = C -\frac1{2\sigma^2}(x-\theta)^2
+$$
+
+**MLE** optimization problem
+
+$$\widehat{\theta} = \arg\min_{\theta}\left\{-\sum_{i=1}^n-\frac1{2\sigma^2}(x_i-\theta)^2\right\} = \arg\min_{\theta}\sum_{i=1}^n(x_i-\theta)^2$$
+
+---
+
+
+
+## MLE example
+
+\fontsize{10pt}{11pt}\selectfont
+**MLE** optimization problem
+
+$$\widehat \theta = \arg\min_{\theta}\left\{-\sum_{i=1}^n-\frac1{2\sigma^2}(x_i-\theta)^2\right\} = \arg\min_{\theta}\sum_{i=1}^n(x_i-\theta)^2$$
+
+This is **convex optimization problem**. Why?
+
+The optimality conditions
+
+$$-2\sum_{i=1}^nx_i + 2n\theta = 0.$$
+The optimal $\widehat \theta = n^{-1}\sum_{i=1}^nx_i = \bar x$ - sample mean.
+
+
+---
+
+
+## Summary
+
+\fontsize{10pt}{11pt}\selectfont
+Unconstrained optimization problem with differentiable $f$:
+
+$$\text{minimize}_x f(x).$$
+
+To find global optimum, need to solve optimality conditions
+
+$$\nabla f(x) = 0.$$
+
+For **convex** $f$ - any solution to above is **globally optimal**.
+
+Least squares problem has closed form solution.
+
+What if exact solution is not tractable? Need **numerical methods**
+
+---
+
+## Example 1
+
+$$f(x) = (x-50)^2 + e^x/50$$
+
+```{r, echo = F}
+ f = function(x){
+    (x - 50)^2 + exp(x)/50
+  }
+plot(seq(-10,12, length = 100), f(seq(-10,12, length = 100)), type = "l", xlab = "x", ylab = "f(x)") #plot function on an interval
+```
+
+We will come back to this example shortly.
+
+
+::: notes
+Can't solve the derivative for x analytically to get optimal value, but plot is clearly convex. Still need numeric methods.
+:::
+
+
+---
+
+## Rates of convergence 
+
+\fontsize{10pt}{11pt}\selectfont
+One of the ways algorithms can be compared is via their rates of convergence to some limiting value.
+
+- Typically we have an iterative algorithm that is trying to find the max/min of an objective function $f$
+  - Want to estimate how long it will take to reach that optimal value
+  
+- Three rates of convergence we will focus on:
+  - **linear** (slowest)
+  - **superlinear** (faster)
+  - **quadratic** (fastest)
+  
+Algorithms that require more information about $f$ (such as its derivative) tend to converge more quickly.
+
+
+::: notes
+Faster rate here means fewer iterations, not necessarily faster computation time.
+:::
+
+---
+
+## Linear convergence 
+
+Suppose we have a sequence $\{x_n\}$ such that $x_n\to x_{\infty} \in \mathcal{R}^k$. Convergence is **linear** if there exists $r\in (0,1)$ such that:
+
+$$\frac{\|x_{n+1} -  x_{\infty}\|}{ \|x_n - x_{\infty}\|} \leq r$$
+for all sufficiently large $n$.
+
+
+::: notes
+Use example from Peng textbook for this and other convergence types
+These definitions are good to have in case you are ever asked to define the convergence rate of your algorithm (i've been asked) but I'm not going to go into the details.  In practice, typically simulations tell you a lot about the convergence of your algorithm.
+:::
+
+---
+
+
+## Superlinear convergence
+
+We say a sequence $\{x_n\}$ converges to $x_{\infty}$ **superlinearly** if we have
+
+$$\lim_{n\to\infty}\frac{\|x_{n+1} -  x_{\infty}\|}{ \|x_n - x_{\infty}\|} = 0$$
+for all sufficiently large $n$.
+
+---
+
+
+## Quadratic convergence
+
+Quadratic convergence is the fastest form of convergence discussed here. 
+We say a sequence $\{x_n\}$ converges to $x_{\infty}$ at a **quadratic** rate if there exists some constant $0<M<\infty$ such that
+
+$$\frac{\|x_{n+1} -  x_{\infty}\|}{ \|x_n - x_{\infty}\|^2} \le M$$
+for all sufficiently large $n$.
+
+---
+
+
+
+## Gradient methods: steepest (gradient) descent
+
+- Choose a step size $\alpha > 0$ 
+  - Sometimes called **learning rate** or **learning step**
+
+- Start with an initial guess $x_0$
+
+- At each iteration $t$, compute $x_{t+1} = x_t - \alpha \nabla f(x_t)$
+
+- Continue until some **convergence criterion** is met i.e. $f(x_{t+1}) \approx f(x_t)$
+
+
+**Idea**: Move $\alpha$ units in the direction of *steepest descent*, which is the direction that is orthogonal to the contours of $f$ at the point $x_n$
+- This attempts to find solution to $\nabla f(x) = 0$
+  
+
+::: notes
+Hence, this is where $f$ is changing most rapidly at $x_n$
+:::
+
+
+---
+
+## Steepest descent
+
+In practice, can require many steps (iterations) to reach the minimum when parameters are highly correlated.
+
+**Example**: Bivariate Normal.
+- Can use steepest descent to estimate the MLE of the mean
+- True $\mu = (1, 2)$
+- True $\Sigma  = \begin{pmatrix}1 & 0.9 \\0.9 & 1\end{pmatrix}$
+
+
+<br>
+Parameters are highly correlated!
+
+- Try starting value $\mu_0 = (-5, -2)$
+
+
+::: notes
+Let's look at a contour plot of the negative log likelihood for this example
+:::
+
+---
+
+## Steepest descent
+
+```{r, echo = FALSE, eval = TRUE, fig.width = 11, fig.height=5.5}
+set.seed(731)
+
+mu = c(1, 2)
+S = rbind(c(1, .9), c(.9, 1))
+x = MASS::mvrnorm(500, mu, S)
+nloglike = function(mu1, mu2) {
+  dmv = mvtnorm::dmvnorm(x, c(mu1, mu2), S, log = TRUE)
+  -sum(dmv)
+}
+  
+  
+nloglike = Vectorize(nloglike, c("mu1", "mu2"))
+nx = 40
+ny = 40
+xg = seq(-5, 5, len = nx)
+yg = seq(-5, 6, len = ny)
+g = expand.grid(xg, yg)
+nLL = nloglike(g[, 1], g[, 2])
+z = matrix(nLL, nx, ny)
+par(mar = c(4.5, 4.5, 1, 1))
+contour(xg, yg, z, nlevels = 40, xlab = expression(mu[1]),
+ylab = expression(mu[2]))
+abline(h = 0, v = 0, lty = 2)
+```
+
+::: notes
+Truth is (1, 2)
+
+starting value is (-5, -2)
+:::
+
+---
+
+## Steepest descent
+
+```{r, echo = FALSE, eval = TRUE, fig.width = 11, fig.height=5.5}
+norm = function(x){
+  x / sqrt(sum(x^2))
+} 
+
+Sinv = solve(S) 
+step1 = function(mu, alpha = 1){
+  D = sweep(x, 2, mu, "-")
+  score = colSums(D) %>% norm
+  mu + alpha * drop(Sinv %*% score)
+
+}
+
+
+steep = function(mu, n = 10, ...) {
+  results = vector("list", length = n)
+  for(i in seq_len(n)) {
+    results[[i]] = step1(mu, ...)
+    mu = results[[i]]
+    }
+  results
+}
+
+u0 = c(-5, -2)
+m = do.call("rbind", steep(u0, 8))
+m = rbind(u0, m)
+
+par(mar = c(4.5, 4.5, 1, 1))
+contour(xg, yg, z, nlevels = 40, xlab = expression(mu[1]),
+ylab = expression(mu[2]))
+abline(h = 0, v = 0, lty = 2)
+points(m, pch = 20, type = "b")
+```
+
+::: notes
+Algorithm is winding as it traverses the narrow valley.  Step length is fixed, which is probably not optimal. Has difficulty navigating the surface because the direction of steepest descent does not take one directly towards the minimum ever.
+:::
+
+---
+
+
+## Steepest descent - example
+
+- For simplicity, focus on one-dimensional case first
+
+
+$$
+f(x) = (x-50)^2 + e^x/50, \quad \nabla f(x) = 2x - 100 + e^x/50 = 0
+$$
+
+The choice of step size is very important!!
+
+- **Too small $\alpha$** - very small difference between updates, larger number of iterations
+- **Too large $\alpha$** - oscillations, may not converge
+
+
+
+---
+
+## Lab exercise
+
+Use **Exercise 1** in lab to check different values of $\alpha$ on the given function. 
+
+
+
+How did we monitor convergence in this code? Why?
+
+
+
+::: notes
+Let's talk about what we learned from this exercise
+:::
+
+---
+
+## Steepest descent in practice
+
+- Very simple
+- Only requires the first derivative
+- Used in many machine learning methods, i.e. in neural nets (with additional stochastic updates)
+
+
+::: notes
+There are ways to optimize step size in steepest descent, see additional resources
+:::
+
+---
+
+## Newton's method
+
+
+Goal is to find solution $x^*$ to
+$$\nabla f(x) = 0$$
+By Taylor expansion, can approximate $\nabla f(x^*)$ around a given point $x$: 
+
+$$\nabla f(x^*) = \nabla f(x) + \nabla^2 f(x)(x^* - x) + \mbox{higher order terms.}$$
+
+
+::: notes
+Do algebra here, since $\nabla f(x^*) = 0$ we get  $x* \approx x = [\nabla f'(x)]^{-1}\nabla f(x)$
+:::
+
+---
+
+## Newton's method
+
+\fontsize{10pt}{11pt}\selectfont
+Since $\nabla f(x^*)=0$, must have $\nabla f(x) + \nabla^2 f(x)(x^* - x) \approx 0$, leading to
+
+$$x^* \approx x - \{\nabla^2 f(x) \}^{-1}\nabla f(x).$$
+
+
+
+One dimensional case update, Newton's method
+
+$$
+x_{t+1} = x_t - \frac{f'(x_t)}{f''(x_t)}
+$$
+
+
+
+Steepest descent (one dimensional)
+$$x_{t+1} = x_t - \alpha  f'(x_t)$$
+
+
+::: notes
+This is basically steepest descent, with a better step size update that changes with each iteration
+:::
+
+---
+
+
+
+## Newton's method - illustration
+
+- The closer is $x_0$ to the optimal value $x^*$, the faster is the convergence
+
+
+![](rootfindingnewton.jpg){width=70%}
+
+
+[Illustration of Newton's method, taken from Ardian Umam blog](https://ardianumam.wordpress.com/2017/09/27/newtons-method-optimization-derivation-and-how-it-works/)
+
+
+
+::: notes
+Basically, Newtons method makes a quadratic approximation to the target function $f$ at each step
+:::
+
+---
+
+## Newton's method - example
+
+$$f(x) = (x-50)^2 + e^x/50, \quad \nabla f(x) = 2x - 100 + e^x/50 = 0$$
+$$\nabla f'(x) =  2 + e^x/50$$
+
+
+
+See **Exercise 2** in lab to implement this example. 
+
+- How does it compare to the steepest descent approach in number of iterations? 
+- Computation time?
+
+
+---
+
+## Recall
+
+\fontsize{10pt}{11pt}\selectfont
+Convex optimization problem:
+
+$$\text{minimize}_x f(x), \quad f - \text{convex function.}$$
+
+To find global optimum, need to solve optimality conditions
+$$\nabla f(x) = 0.$$
+
+
+Steepest descent algorithm and Newton's method aim to find any solution to the above, so may be applied with nonconvex problems as well **but**
+- only guaranteed to converge to a **global** optimum if convex
+- solution may be a local min, local max, or saddle point
+
+
+---
+
+
+
+
+## Resources
+
+- [old paper on convexity in GLMs](https://www.jstor.org/stable/2335080)
+
+
+

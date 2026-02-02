@@ -271,7 +271,7 @@ microbenchmark(
 - Take advantage of __crossprod__ and __tcrossprod__ functions. Suppose we want to calculate $x^{T}Ax$
 
 ```{r}
-p <- 3000
+p <- 30000
 x <- rnorm(p)
 A <- matrix(rnorm(p^2), p, p)
 microbenchmark(
