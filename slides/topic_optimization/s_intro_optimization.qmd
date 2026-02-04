@@ -180,7 +180,7 @@ What is a more intuitive explanation for these
 
 ## Convex optimization problems
 
-![Convex function, basic definition](convex.png){width=80%}
+![Convex function, basic definition](convex.png){width=70%}
 
 
 ::: notes
@@ -198,6 +198,7 @@ Convex function, basic definition
 **Theorem**
 
 *First order conditions (for differentiable $f$)*
+
 - $f$ is convex $\iff$ $f(y)\geq f(x)+\nabla f(x)^\top(y-x)$, $\forall x,y\in\mathbb{R}^p$. 
 - $f$ is strictly convex $\iff$ $f(y)> f(x)+\nabla f(x)^\top(y-x)$, $\forall x,y\in\mathbb{R}^p$ and $x\neq y$.
 
@@ -366,7 +367,7 @@ $$
 
 ## Example: Least Squares
 
-\fontsize{10pt}{11pt}\selectfont
+
 Least squares solves
 
 $$
@@ -380,6 +381,10 @@ This is a convex unconstrained optimization problem, so the solution must satisf
 &= -2X^TY + 2X^TX\beta = 0
 \end{align*}
 
+---
+
+## Example: Least Squares
+
 This is equivalent to
 
 $$
@@ -388,30 +393,12 @@ $$
 
 If $X^TX$ is **invertible**, global solution is $\beta^* = (X^TX)^{-1}X^TY$.
 
+- If $X^TX$ is **not invertible**, **multiple** global solutions (give same $f^*$)
 ---
 
 
 
-## Example: Least Squares
 
-Least squares solves
-
-$$\text{minimize}_{\beta}\|Y-X\beta\|_2^2$$
-This is a convex unconstrained optimization problem, so the solution must satisfy
-
-
-\begin{align*}
-\nabla\|Y-X\beta\|_2^2 &= \nabla(\|Y\|_2^2 - 2Y^TX\beta + \beta^TX^TX\beta)\\
-&= -2X^TY + 2X^TX\beta = 0
-\end{align*}
-
-This is equivalent to
-
-$$X^TX\beta = X^TY$$
-
-If $X^TX$ is **not invertible**, **multiple** global solutions (give same $f^*$)
-
----
 
 ## Example: Maximum Likelihood Estimation
 
@@ -585,6 +572,7 @@ for all sufficiently large $n$.
 
 
 **Idea**: Move $\alpha$ units in the direction of *steepest descent*, which is the direction that is orthogonal to the contours of $f$ at the point $x_n$
+
 - This attempts to find solution to $\nabla f(x) = 0$
   
 
@@ -600,12 +588,13 @@ Hence, this is where $f$ is changing most rapidly at $x_n$
 In practice, can require many steps (iterations) to reach the minimum when parameters are highly correlated.
 
 **Example**: Bivariate Normal.
+
 - Can use steepest descent to estimate the MLE of the mean
 - True $\mu = (1, 2)$
 - True $\Sigma  = \begin{pmatrix}1 & 0.9 \\0.9 & 1\end{pmatrix}$
 
 
-<br>
+
 Parameters are highly correlated!
 
 - Try starting value $\mu_0 = (-5, -2)$
@@ -845,6 +834,6 @@ Steepest descent algorithm and Newton's method aim to find any solution to the a
 ## Resources
 
 - [old paper on convexity in GLMs](https://www.jstor.org/stable/2335080)
-
+- [Peng, Advanced Statistical Computing, chapters 2 and 3](https://bookdown.org/rdpeng/advstatcomp/)
 
 
