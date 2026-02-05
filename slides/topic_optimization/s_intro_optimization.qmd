@@ -537,6 +537,12 @@ These definitions are good to have in case you are ever asked to define the conv
 ---
 
 
+## Linear convergence 
+
+Example: the sequence $x_n = 1 + \frac{1}{2}^n$ converges linearly to $x_{\infty} = 1$.
+
+---
+
 ## Superlinear convergence
 
 We say a sequence $\{x_n\}$ converges to $x_{\infty}$ **superlinearly** if we have
@@ -546,6 +552,12 @@ for all sufficiently large $n$.
 
 ---
 
+
+## Superlinear convergence
+
+Example: $x_n = 1 + (\frac{1}{n})^n$ converges superlinearly to 1.
+
+---
 
 ## Quadratic convergence
 
@@ -558,6 +570,11 @@ for all sufficiently large $n$.
 ---
 
 
+## Quadratic convergence
+
+Example: $x_n = 1 + (\frac{1}{n})^{2n}$ converges quadratically to 1.
+
+---
 
 ## Gradient methods: steepest (gradient) descent
 
