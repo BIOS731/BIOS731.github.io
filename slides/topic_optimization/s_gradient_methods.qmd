@@ -37,7 +37,7 @@ Today, we cover:
   
 Announcements
 
-- HW2 posted and due 2/4 at 10:00AM
+- HW3 posted and due 3/4 at 10:00AM
 
 Readings:
 
@@ -143,6 +143,7 @@ Yes,you can check second derivative
 ## Poisson regression log-likelihood
 
 Can solve using steepest descent or Newton
+
 - Need gradient and Hessian 
 
 <br>
@@ -357,6 +358,7 @@ IRLS algorithm:
 
 ::: notes
 IRLS comes up in gams too, but we're not going to cover that this eyar
+Newton is same as Newton-Raphson
 :::
 
 ---
@@ -393,7 +395,7 @@ Plan to write out univariate version
 ## Quasi-Newton
 
 \fontsize{10pt}{11pt}\selectfont
-Quasi-Newton methods arise from desire to use something like Newton's method without having to compute the Hessian each time.
+Quasi-Newton methods use Newton-like updates while avoiding repeated Hessian at each step.
 
 - **Motivation**: 
   - Computing $H$ scales as $O(n^2)$, inverting it scales as $O(n^3)$
@@ -473,7 +475,7 @@ Add inference to your Newton's method for Poisson function. Compare with results
 ## Homework 3
 
 
-Lab Exercise 3: Begin to implement Newton's method with inference for logistic regression (part 1 of homework).
+Lab Exercise 3: Begin to implement Newton's method with inference for logistic regression (part 1 of Homework 3).
 
 
 ::: notes

@@ -10,4 +10,6 @@
 **/*.quarto_ipynb
 homework*
 
-*/solution*
+*solution*
+*flat*
+search.json

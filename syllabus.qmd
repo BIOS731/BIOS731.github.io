@@ -186,15 +186,15 @@ Students are expected to uphold the Laney Graduate School Honor Code.
 | 1/22  | Simulation & Resampling  | Bootstrap & permutation tests              |                         |
 | 1/28  | Reproducible Computing   | Parallelization, parametric reports        |                         |
 | 1/29  | —                        | No class                                   |                         |
-| 2/4   | Optimization I           | Introduction to optimization               | HW2 due                 |
+| 2/4   | Optimization I           | Introduction to optimization               |                         |
 | 2/5   | Optimization I           | Gradient methods, GLMs                     |                         |
-| 2/11  | Optimization I           | EM I: applications                         |                         |
+| 2/11  | Optimization I           | EM I: applications                         | HW2 due                 |
 | 2/18  | Optimization I           | EM II: theory                              |                         |
 | 2/19  | Optimization I           | MM algorithm                               |                         |
-| 2/25  | Bayesian Computing       | Numerical integration & sampling           | HW3 due                 |
+| 2/25  | Bayesian Computing       | Numerical integration & sampling           |                         |
 | 2/26  | Bayesian Computing       | Introduction to MCMC                       |                         |
-| 3/4   | Bayesian Computing       | MCMC II                                    |                         |
-| 3/5   | Bayesian Computing       | Variational Bayes                          | Project proposals due  |
+| 3/4   | Bayesian Computing       | MCMC II                                    | HW3 due                 |
+| 3/5   | Bayesian Computing       | Variational Bayes                          | Project proposals due   |
 | 3/11  | Spring Break             | No class                                   |                         |
 | 3/12  | Spring Break             | No class                                   |                         |
 | 3/18  | ENAR                     | No class                                   |                         |
