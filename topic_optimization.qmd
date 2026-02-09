@@ -8,6 +8,6 @@ Is this module we will first cover convex optimization and gradient descent. In 
 
 
 -   [Introduction to optimization and gradient descent](content_optimization.qmd)
--   [EM 1: Applications](what_is_ds_ii.qmd)
--   [EM 2: Theory and Inference](what_is_ds_ii.qmd)
--   [MM Algorithm](what_is_ds_ii.qmd)
+-   [EM 1: Applications](content_EM.qmd)
+-   [EM 2: Theory and Inference](content_EM.qmd)
+-   [MM Algorithm](content_EM.qmd)

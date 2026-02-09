@@ -1,5 +1,5 @@
 ---
-title: "Convex optimization"
+title: "Optimization: EM and MM Algorithms"
 format:
   html:
     toc: true
@@ -15,7 +15,7 @@ execute:
 
 ## Overview
 
-In this, we will introduce optimization and methods for gradient descent.
+In this, we will introduce to convex optimization and gradient descent.
 
 
 ::: {.panel-tabset .panel-pills}
