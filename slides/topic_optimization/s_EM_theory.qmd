@@ -1,0 +1,677 @@
+---
+title: "The EM algorithm II: theory and inference"
+author: "Julia Wrobel"
+format:
+  beamer:
+    theme: metropolis
+    aspectratio: 169
+    fontsize: 14pt
+    slide-level: 2
+execute:
+  echo: true
+  eval: false
+  warning: false
+  message: false
+header-includes:
+  - \usepackage{xcolor}
+  - \newcommand{\red}[1]{\textcolor{red}{#1}}
+  - \newcommand{\green}[1]{\textcolor{green}{#1}}
+---
+
+
+## Overview
+
+```{r, eval = TRUE, echo = FALSE}
+library(tidyverse)
+```
+
+\fontsize{10pt}{11pt}\selectfont
+Today, we cover:
+
+- EM theory: why does it work?
+- Inference for EM estimates
+
+  
+Announcements
+
+- HW3 posted and due 3/4 at 10:00AM
+
+Readings:
+
+- Chapter 4: The EM Algorithm, in Peng
+- Givens and Hoeting Chapter 4
+
+
+
+---
+
+## EM: review
+
+\fontsize{10pt}{11pt}\selectfont
+(1) **E-Step**: Let $\theta_0$ be the current estimate of $\theta$. Define
+
+$$Q(\theta |\theta_0)= E_z\left[\log p(y, z |\theta)|y, \theta_0\right]$$
+
+
+(2) **M-Step**: Maximize $Q(\theta |\theta_0)$ with respect to $\theta$ to get next value of $\theta$
+
+(3) Iterate between E and M steps until convergence.
+
+
+**Note**: E-step expectation taken WRT missing data density,
+
+$$p(z|y, \theta) = \frac{p(y, z|\theta)}{p(y|\theta)}$$
+
+
+
+::: notes
+We will come back to this Q function to talk about where it comes from and what it is doing.  Idea is that we get an estimate of the joint likelihood, which is easier to maximize than the observed data likelihood.
+
+Try to explain intuitively, in words, what the E-step is doing and why you are taking expectation WRT marginal likelihood of Z
+:::
+
+---
+
+
+## EM Issues
+
+1. Local vs. global max: may be multiple modes, EM may converge to a saddle point
+  - **Solution**: try multiple starting values
+  
+2. Bad initialization can be a problem
+  - Use information from the context
+  - Use a crude method to find initial values (such as method of moments, grid search)
+
+
+---
+
+## EM: intuition
+
+\fontsize{10pt}{11pt}\selectfont
+**Idea**: In order to estimate $\theta$ via MLE *using only the observed data*, need to be able to maximize $l(\theta |y) = \log f(y|\theta) = \int_z p(y,z|\theta)dz$
+
+ - BUT $l(\theta |y)$ difficult to maximize because of the integral
+ - INSTEAD: assuming $p(y, z |\theta)$ has some nice form (like EF)
+   - If we have estimate of missing data $Z$, can easily evaluate $p(y, z |\theta)$
+
+<br>
+To do this, we construct surrogate function (called $Q$ function)
+
+- $Q$ is expected value of log likelihood for $p(y, z |\theta)$ *with respect to conditional distribution of missing given observed data*, $p(z|y, \theta)$, for current estimate of parameters, $\theta_0$
+- **M-Step** maximizes this surrogate function
+  - Akin to filling in the missing data then taking the MLE for $\theta$
+
+::: notes
+We observe data Y, but some data Z are missing
+For $p(y|\theta)$ z gets marginalized out
+:::
+
+---
+
+
+## EM: proof of ascent property
+
+First, some definitions
+
+- **Bayes rule**: $P(A|B) = \frac{P(B|A)P(A)}{P(B)}$
+
+
+- **Kullback-Leibler divergence** (aka "relative entropy"):
+
+$$\int\log \frac{p(x)}{q(x)}p(x)dx \ge 0 \mbox{ for densities } p(x), q(x)$$
+
+  - KL divergence is non-negative
+  - Attains its minimum 0 when $p(x)$ and $q(x)$ are equal
+
+
+::: notes
+KL divergence is non-negative, and basically a measure of similarity of two probability distributions
+:::
+
+---
+
+
+
+## EM: proof of ascent property
+
+\fontsize{10pt}{11pt}\selectfont
+**Theorem**: at each iteration of the EM algoirthm,
+
+$$\log p(y|\theta^{t+ 1}) \ge \log p(y|\theta^t),$$
+and equality holds if and only if $\theta^{t+1} = \theta^t.$
+
+
+**Proof**: The definition of $\theta^{t+1}$ gives
+
+
+$$Q(\theta^{t+1}|\theta^t) \ge Q(\theta^t|\theta^t) \implies$$
+
+
+$$E_z\left[\log p(y, z |\theta^{t+1})|y, \theta^t\right] \ge E_z\left[\log p(y, z |\theta^t)|y, \theta^t\right]$$
+
+Using Bayes rule and the law of conditional probability, this can be expanded to...
+
+::: notes
+This theorem is the ascent property of EM
+:::
+
+---
+
+
+
+## EM: proof of ascent property
+
+$$E\left[\log p(z|y,\theta^{t+1})|y, \theta^t\right] + \log p(y|\theta^{t+1}) \ge E\left[\log p(z|y,\theta^{t})|y, \theta^t\right] + \log p(y|\theta^{t})\tag{1}$$
+
+
+Also, by non-negativity of KL divergence,
+
+$$\int_z \log\frac{p(z|y,\theta^t)}{p(z|y,\theta^{t+1})}p(z|y,\theta^t)dz = E\left[\log\frac{p(z|y,\theta^t)}{p(z|y,\theta^{t+1})}|y,\theta^t\right] \ge 0\tag{2}$$
+<br>
+Combining (1) and (2) yields 
+
+$$\log p(y|\theta^{t+1}) \ge \log p(y|\theta^t)$$
+
+::: notes
+Show why combining (1) and (2) yields this.
+
+Good, but we aren't done yet! Only proved part of the theorem. Still need to prove the if and only if part
+:::
+
+---
+
+## EM: proof of ascent property
+---
+
+## EM: proof of ascent property
+
+Combining (3) and (4), we have 
+$$\log p(y,z|\theta^{t+1}) = \log p(y, z|\theta^t).$$
+
+The uniqueness of $\theta$ leads to $\theta^{t+1} = \theta^t$
+
+
+---
+
+
+
+## EM: Why does it work?
+
+\fontsize{10pt}{11pt}\selectfont
+$Q(\theta |\theta_0)$ function serves as a lower bound to the observed data density $p(y|\theta)$. 
+
+
+The EM is a **minorization** approach. Instead of directly maximizing. the log-likelihood, which is hard, the algorithm constructs a minorizing function and optimizes that function instead.
+
+A function $g$ *minorizes* $f$ over $\mathcal{X}$ at $y$ if:
+
+
+1. $g(x) \le f(x) \mbox{ for all } x \in \mathcal{X}$
+2. $g(y) = f(y)$
+
+::: notes
+Minorizing function is less than or equal to target function everywhere and equal somewhere 
+We will discuss MM next lecture
+
+Write out your own notation here; Q on lHS, l(theta) on RHS
+Draw picture of minorizing function here
+:::
+
+---
+
+## EM: Why does it work?
+
+Because $Q(\theta |\theta_0)$ minorizes $l(\theta |y)$, maximizing it is guaranteed to increase (or at least not decrease) $l(\theta |y)$. 
+
+- This is because if $\theta_n$ is our current estimate of $\theta$ and $Q(\theta |\theta_n)$ minorizes $l(\theta |y)$ at $\theta_n$, then we have
+
+
+$$l(\theta_{n+1}|y) \ge Q(\theta_{n+1}|\theta_n) \ge Q(\theta_n|\theta_n) = l(\theta_n|y)$$
+
+::: notes
+Pause and let this sink in. Helps to look at the picture.
+:::
+
+---
+
+
+## Example: minorization in Two-part Gaussian mixture model
+
+\fontsize{9pt}{10pt}\selectfont
+Suppose we have data $y_1,\ldots, y_n$ that are sampled independently from a two-part mixture of Normals with density
+
+$$p(y|\theta) = \lambda \mathcal{N}(y|\mu_1,\sigma_1^2) + (1-\lambda)\mathcal{N}(y|\mu_2, \sigma^2_2).$$
+
+We can simulate some data from this model:
+
+```{r, eval = TRUE}
+mu1 = 1; mu2 = 4
+s1 = 2; s2 = 1
+lambda0 = 0.4
+n = 100
+set.seed(2017-09-12)
+z = rbinom(n, 1, lambda0) ## "Missing" data
+x = rnorm(n, mu1 * z + mu2 * (1-z), s1 * z + (1-z) * s2)
+```
+
+::: notes
+Here we will revisit the two-part Normal mixture model from before. 
+:::
+
+---
+
+
+## Two-part Gaussian mixture model
+
+
+```{r, eval = TRUE, out.width="60%", fig.align = "center", echo = FALSE}
+hist(x)
+rug(x)
+```
+
+::: notes
+For the purposes of this example, let's assume that $\mu1$, $\mu2$, $\sigma^2_1$, $\sigma^2_2$ are known, and $\lambda$ is the only unknown parameter.
+:::
+
+---
+
+
+## Two-part Gaussian mixture model
+
+```{r, eval = TRUE, echo = FALSE, out.width="70%", fig.align = "center"}
+
+# define the mixture density (observed data density)
+f <- function(x, lambda) {
+  lambda * dnorm(x, mu1, s1) + (1-lambda) * dnorm(x, mu2, s2)
+}
+
+# define log likelihood
+loglike <- function(lambda) {
+sum(log(f(x, lambda)))
+}
+
+loglike <- Vectorize(loglike, "lambda") ## Vectorize for plotting
+
+par(mar = c(5,4, 1, 1))
+curve(loglike, 0.01, 0.95, n = 200,xlab = expression(lambda))
+```
+
+::: notes
+Code from Peng- just show pictures and talk them through what it is doing
+
+Draw true value on plot
+:::
+
+---
+
+
+## Two-part Gaussian mixture model
+
+```{r, eval = TRUE, echo = FALSE, out.width="70%", fig.align = "center"}
+lam0 <- 0.8
+minor <- function(lambda){
+  p1 <- sum(log(f(x, lam0)))
+  pi <- lam0 * dnorm(x, mu1, s1) / (lam0 * dnorm(x, mu1, s1) + (1 - lam0) * dnorm(x, mu2, s2))
+  p2 <- sum(pi * dnorm(x, mu1, s1, log = TRUE)
+            + (1-pi) * dnorm(x, mu2, s2, log = TRUE) + pi * log(lambda) + (1-pi) * log(1-lambda))
+  p3 <- sum(pi * dnorm(x, mu1, s1, log = TRUE) + (1-pi) * dnorm(x, mu2, s2, log = TRUE) + pi * log(lam0)
+            + (1-pi) * log(1-lam0))
+  p1 + p2 - p3
+}
+minor <- Vectorize(minor, "lambda")
+
+par(mar = c(5,4, 1, 1))
+curve(loglike, 0.01, 0.95, ylab = "Log-likelihood",
+xlab = expression(lambda))
+curve(minor, 0.01, 0.95, add = TRUE, col = "red")
+legend("topright", c("obs. log-likelihood", "minorizing function"),
+col = 1:2, lty = 1, bty = "n")
+```
+
+---
+
+
+## Two-part Gaussian mixture model
+
+```{r,  eval = TRUE, echo = FALSE, out.width="70%", fig.align = "center"}
+par(mar = c(5,4, 2, 1))
+curve(loglike, 0.01, 0.95, ylab = "Log-likelihood",
+xlab = expression(lambda), xlim = c(-0.5, 1),
+ylim = c())
+abline(v = lam0, lty = 2)
+mtext(expression(lambda[0]), at = lam0, side = 3)
+curve(minor, 0.01, 0.95, add = TRUE, col = "red", lwd = 2)
+op <- optimize(minor, c(0.1, 0.9), maximum = TRUE)
+abline(v = op$maximum, lty = 2)
+lam0 <- op$maximum
+curve(minor, 0.01, 0.95, add = TRUE, col = "blue", lwd = 2)
+abline(v = lam0, lty = 2)
+mtext(expression(lambda[1]), at = lam0, side = 3)
+op <- optimize(minor, c(0.1, 0.9), maximum = TRUE)
+abline(v = op$maximum, lty = 2)
+mtext(expression(lambda[2]), at = op$maximum, side = 3)
+legend("topleft",
+c("obs. log-likelihood", "1st minorizing function", "2nd minorizing function"),
+col = c(1, 2, 4), lty = 1, bty = "n")
+```
+
+---
+
+
+
+
+## EM Inference
+
+Original EM paper did not discuss how to obtain any measures of uncertainty, such as standard errors.
+
+
+- *Observed information matrix* would provide inference
+  - Like observed data log-likelihood, often difficult to compute because of the missing data
+  
+
+- Louis' method
+- Supplemented EM (SEM)
+- Bootstrap
+
+---
+
+
+## EM Inference
+
+\begin{align*}
+p(y|\theta) &= \frac{p(y, z|\theta)}{p(z|y, \theta)}\\[3mm]
+-\log p(y|\theta) &= -\log p(y, z|\theta) - [-\log p(z|y, \theta)]\\[3mm]
+E\left[ -\nabla^2 \log p(y|\theta)\right] &= E\left[-\nabla^2\log p(y, z|\theta)\right] - E\left[-\nabla^2\log p(z|y, \theta)\right]\\[5mm]
+I_Y(\theta) &= I_{Y,Z}(\theta) - I_{Z|Y}(\theta)
+\end{align*}
+
+::: notes
+These are some useful identifies. The first comes from the definition of the missing data density from the previous lecture.
+Here we have observed information, complete information, missing information
+::: 
+
+---
+
+
+## Louis's method
+
+$$I_Y(\theta) = I_{Y,Z}(\theta) - I_{Z|Y}(\theta)$$
+
+
+- Presumably, $I_{Y,Z}(\theta)$ is reasonable to compute because based on complete data
+- What is $I_{Z|Y}(\theta)$?
+
+
+- $S(y|\theta) = \nabla\log p(y|\theta)$: observed score function
+- $S(y,z|\theta) = \nabla\log p(y,z|\theta)$: complete data score function
+
+
+---
+
+## Louis's method
+
+$$I_Y(\theta) = I_{Y,Z}(\theta) - I_{Z|Y}(\theta)$$
+
+- $S(y|\theta) = \nabla\log p(y|\theta)$: observed score function
+- $S(y,z|\theta) = \nabla\log p(y,z|\theta)$: complete data score function
+
+
+Louis (1982) showed that 
+
+$$I_{Z|Y}(\theta) = E\left[S(y,z|\theta)S(y,z|\theta)^T \right] - S(y|\theta)S(y|\theta)^T$$
+
+
+Where expectation is taken WRT missing data density $p(z|y,\theta)$.
+
+---
+
+
+## Louis's method
+
+$$I_Y(\theta) = I_{Y,Z}(\theta) - I_{Z|Y}(\theta)$$
+
+
+- $I_{Z|Y}(\theta) = E\!\left[S(y,z|\theta)S(y,z|\theta)^T\right] - S(y|\theta)S(y|\theta)^T$
+  - At MLE $\hat{\theta}$, $S(y|\hat{\theta}) = 0$
+
+
+$$I_Y(\hat{\theta}) = I_{Y,Z}(\hat{\theta}) - E\left[S(y,z|\theta)S(y,z|\theta)^T \right]$$
+
+::: notes
+Now, all computations are done on the complete data, which should be easier
+- second line here CHATGPT recognized and error- see if this is still true
+:::
+
+---
+
+
+## Louis's method
+
+\begin{align}
+I_Y(\hat{\theta}) &= I_{Y,Z}(\hat{\theta}) - E\left[S(y,z|\theta)S(y,z|\theta)^T \right]\\[3mm]
+&= -E\left[\nabla^2 \log p(y,z|\theta)|\hat{\theta}, y\right] - E\left[S(y,z|\theta)S(y,z|\theta)^T \right]\\[3mm]
+&= -Q''(\hat{\theta}|\hat{\theta}) - E\left[S(y,z|\theta)S(y,z|\theta)^T \right]
+\end{align}
+
+
+Louis's estimator should be evaluated at last iteration of EM algorithm.
+
+::: notes
+Can evaluate second derivative of Q at theta hat.
+
+Do we need to do anything else with the last part of this (value on the right)?
+Example with censored exponential data is shon in Givens book- add that in next year
+:::
+
+---
+
+## Supplemented EM (SEM)
+
+Meng & Rubin, 1991: *Using EM to obtain asymptotic variance-covariance matrices: The SEM algorithm*.
+
+
+**Background:** EM defines a mapping $\Psi: \theta^{t+1} = \Psi(\theta^t)$
+
+- $\Psi(\theta) = \left(\Psi_1(\theta), \ldots, \Psi_p(\theta) \right)$ and $\theta = (\theta_1,\ldots,\theta_p)$
+- When EM converges, it converges to a fixed point of this mapping, so $\hat{\theta} = \Psi(\hat{\theta})$
+
+- $\Psi'(\theta)$ is the Jacobian matrix where $[\Psi'(\theta)]_{i,j} = \frac{\partial\Psi_i(\theta)}{\partial\theta_j}$
+
+
+::: notes
+Uses expected information rather than observed information
+A mapping is just another word for a function. In our case it is a vector valued function becuase $\theta$ is a vector.
+Jacobian: is a matrix of all first-order partial derivatives of a vector-valued function. It describes how a vector-valued function changes as its input variables change
+:::
+
+---
+
+## Supplemented EM (SEM)
+
+Dempster et al showed that
+
+$$\Psi'(\hat{\theta})^T = I_{Z |Y}(\hat{\theta}) I_{Y,Z}(\hat{\theta})^{-1}\tag{1}$$ 
+
+The missing information principle says that 
+
+\begin{align*}
+I_Y(\hat{\theta}) &= I_{Y,Z}(\hat{\theta}) - I_{Z | Y}(\hat{\theta})\\[2mm]
+ &= \left[\mathcal{I}- I_{Z | Y}(\hat{\theta})I_{Y,Z}(\hat{\theta})^{-1}\right]I_{Y,Z}(\hat{\theta})
+\end{align*}
+
+Then, substituting (1) and inverting gives
+
+$$\widehat{Var}(\hat{\theta}) = I_Y(\hat{\theta})^{-1} = I_{Y,Z}(\hat{\theta})^{-1}\left[\mathcal{I}- \Psi'(\hat{\theta}^T)\right]^{-1}\tag{2}.$$
+
+::: notes
+Dempster is original EM paper
+
+(2) means that the observed-data asymptotic variance can be obtained by inflating the
+complete-data asymptotic variance by the factor $\left[\mathcal{I}- \Psi'(\hat{\theta}^T)\right]^{-1}$
+:::
+  
+
+---
+
+
+
+
+## Supplemented EM (SEM)
+
+$$\widehat{Var}(\hat{\theta}) = I_Y(\hat{\theta})^{-1} = I_{Y,Z}(\hat{\theta})^{-1}\left[\mathcal{I}- \Psi'(\hat{\theta}^T)\right]^{-1}\tag{2}$$
+
+- (2) means that the observed-data asymptotic variance can be obtained by inflating the
+complete-data asymptotic variance by the factor $\left[\mathcal{I}- \Psi'(\hat{\theta}^T)\right]^{-1}$
+
+- Smaller missingness $\implies$ smaller $\Psi'$ $\implies$ less variance inflation and faster
+convergence.
+
+
+::: notes
+Result is appealing because it expresses desired covariance matrix as the complete data covariance matrix plus an incremental matrix that takes account of uncertainty attributable to the missing data.
+
+Next we talk about how to actually implement this
+:::
+
+---
+
+## SEM Algorithm
+
+SEM consists of three steps:
+
+1. The evaluation of $I_{Y,Z}(\hat{\theta})$
+2. The evaluation of $\Psi'(\hat{\theta})$
+3. The evaluation of $\widehat{Var}(\hat{\theta})$
+
+
+**Evaluation of $I_{Y,Z}(\hat{\theta})$**
+
+- For exponential family, $I_{Y,Z}(\hat{\theta}) = -E\left[\nabla^2 \log p(y,z|\theta)|\hat{\theta}, y\right]$ should be easy to obtain.
+- This is the second derivative of the $Q$ function evaluated at $\hat{\theta}$
+
+::: notes
+Basically if the complete data likelihood is easy to work with (1) should be easy as well.
+:::
+
+---
+
+
+## SEM Algorithm
+
+**Estimation of $\Psi'(\hat{\theta})$**
+
+1. Run EM algorithm to convergence to obtain MLE $\hat{\theta}$.
+2. Pick a new starting point, $\theta^0$. $\theta^0$ should be some small distance from $\hat{\theta}$ but not equal to $\hat{\theta}$ in any component.
+
+::: notes
+Step 2 is the initialization of SEM
+:::
+
+---
+
+
+## SEM Algorithm
+
+**Estimation of $\Psi'(\hat{\theta})$**
+
+1. Run EM algorithm to convergence to obtain MLE $\hat{\theta}$.
+2. Pick a new starting point, $\theta^0$. 
+3. Repeat the following until $r_{ij}^k$ is stable:
+
+- Calculate $\theta^k = \Psi(\theta^{k-1})$ using one step of EM
+- For each $i = 1,\ldots,p$:
+  - Let $\theta^k(i) = (\hat{\theta}_1, \ldots, \hat{\theta}_{i-1}, \hat{\theta}^k_i, \hat{\theta}_{i+1}, \ldots, \hat{\theta}_p)$., i.e., replace $i^{th}$ element of $\hat{\theta}$ with the $i^{th}$ element of $\theta^k$.
+  - Perform one step of EM on $\theta^k(i)$ to obtain $\Psi[\theta^k(i)]$
+  - Obtain $r_{ij}^k = \left\{ \Psi[\theta^k(i)] - \hat{\theta}\right\}/\left\{\theta_i^k - \hat{\theta}_i\right\}$ for $j = 1, \ldots, p$
+
+::: notes
+Step 2 is the initialization of SEM
+:::
+
+---
+
+## SEM Algorithm
+
+- The MLE $\hat{\theta}$ should be obtained at a very low tolerance (e.g. $\epsilon = 10^{-12}$)
+
+
+The final $r_{ij}$ is taken to be the first value of $r^k_{ij}$ satisfying $|r_{ij}^k-r_{ij}^{k-1}|\le \epsilon$, where $k$ can be different for different $(i,j)$.
+
+---
+
+
+## Bootstrapping
+
+Goal is to obtain estimate of covariance matrix for EM parameters. To do a simple nonparametric bootstrap given an *iid* sample of observed data $y_1,\ldots, y_n$, do the following: 
+
+1. Calculate $\hat{\theta}_{EM}$
+2. Sample data $y_1,\ldots, y_n$ with replacement, and for each sample $\boldsymbol{y}_b^*$, calculate a bootstrap estimate $\hat{\theta}^*_b$
+3. Repeat step 2 *B* times to obtain $\theta^*_1, \ldots, \theta^*_B$ bootstrap parameter estimates.
+4. Sample covariance matrix of $\boldsymbol{\theta}^*$ can be used as covariance of $\hat{\theta}_{EM}$.
+
+Other principles of bootstrap learned previously still apply.
+
+::: notes
+Note here that $\theta$ is usually a vector.
+I would probably use bootstrap percentile intervals for each parameters in theta
+:::
+
+---
+
+
+## Comparing EM inference approaches
+
+- Louis's Method
+  - Requires calculation of the conditional expectation of the square of the complete-data score function, which is specific to each problem
+
+- SEM
+  - Obtains covariance matrix by using only the code for computing the complete-data covariance matrix, the code for EM itself, and code for standard matrix operations.
+
+- Bootstrapping
+  - Conceptually simple
+  - May be prohibitively slow if your EM algorithm is slow to converge
+
+::: notes
+Givens book recommends SEM or bootstrapping since Louis requires a lot of algebra. I'm guessing Louis's method is probably fastest computationally once you have the derivation.
+:::
+
+---
+
+
+
+## Speeding up EM
+
+Sometimes convergence of EM can be very slow.  Some methods to help with this:
+
+- Louis's Acceleration
+
+
+- SQUAREM
+
+::: notes
+Not gonna go into details of how these work, just want you to know that they exist in case you need them
+:::
+
+---
+
+
+
+## References
+
+- Louis's method original paper
+  - [Finding observed information using the EM algorithm, JRSSB 1982](https://www.jstor.org/stable/2345828)
+- SEM original paper (Meng & Rubin)
+  - [Using EM to obtain asymptotic variance-covariance matrices: The SEM algorithm, JASA 1991](https://www.jstor.org/stable/2290503)
+
+---
+
+## Exercise
+
+Start to implement SEM method for the two-part GMM.
+
+
+
+
+
+
+

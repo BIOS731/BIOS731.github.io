@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Optimization, Part 1 – BIOS731</title>
+<title>Optimization: EM and MM Algorithms – BIOS731</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -69,6 +69,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -165,15 +194,21 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Optimization, Part 1</h1>
+<h1 class="title">Optimization: EM and MM Algorithms</h1>
 </div>
 
 
@@ -190,15 +225,193 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Is this module we will first cover convex optimization and gradient descent. In the second week of this module we will move to the EM and MM algorithms.</p>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>In this, we will focus on the EM and MM algorithms.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset panel-pills">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Slide Deck: Introduction to the Expectation-Maximization (EM) Algorithm</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Slide Deck: EM Theory</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Slide Deck: MM</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false" href="">Lab: Introduction to optimization</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false" href="">Lab: Gradient descent</a></li></ul>
+<div class="tab-content panel-pills">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p><a href="./slides/topic_optimization/s_EM.pdf"><img src="./slides/topic_optimization/preview_EM.png" class="img-fluid" style="width:70.0%"></a></p>
+<p><strong>Intro EM</strong><br>
+<a href="./slides/topic_optimization/s_EM.pdf">Download slides (PDF)</a></p>
+<hr>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p><a href="./slides/topic_optimization/s_gradient_methods.pdf"><img src="./slides/topic_optimization/preview_gradientDescent.png" class="img-fluid" style="width:70.0%"></a></p>
+<p><strong>Gradient Methods</strong><br>
+<a href="./slides/topic_optimization/s_gradient_methods.pdf">Download slides (PDF)</a></p>
+<hr>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<hr>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<section id="steepest-descent" class="level4">
+<h4 class="anchored" data-anchor-id="steepest-descent">Steepest descent</h4>
+<p>For simplicity, we’ll focus on a one-dimensional example.</p>
+<p><span class="math display">\[
+f(x) = (x-50)^2 + e^x/50, \quad f'(x) = 2x - 100 + e^x/50 = 0
+\]</span></p>
+<p>The R function below, <code>steepest_descent()</code>, implements this algorithm for <span class="math inline">\(f(x)\)</span>.</p>
+<section id="exercise-1" class="level5">
+<h5 class="anchored" data-anchor-id="exercise-1"><strong>Exercise 1</strong></h5>
 <ul>
-<li><a href="./content_optimization.html">Introduction to optimization and gradient descent</a></li>
-<li><a href="./content_EM.html">EM 1: Applications</a></li>
-<li><a href="./content_EM.html">EM 2: Theory and Inference</a></li>
-<li><a href="./content_EM.html">MM Algorithm</a></li>
+<li>Try out the steepest descent algorithm with different <code>x0</code> and <code>alpha</code> values
+<ul>
+<li>For each <code>x0</code> and <code>alpha</code> value, plot the evolution of <span class="math inline">\(x\)</span> with each iteration</li>
+<li>For each <code>x0</code> and <code>alpha</code> value, plot the evolution of <span class="math inline">\(f'(x)\)</span> with each iteration</li>
+</ul></li>
+<li>What is the solution?</li>
 </ul>
+<p><strong>Newton’s method</strong></p>
+<p>We’ll use the same example as from the steepest descent algorithm.</p>
+<p><span class="math display">\[f(x) = (x-50)^2 + e^x/50, \quad f'(x) = 2x - 100 + e^x/50 = 0\]</span></p>
+<ul>
+<li><span class="math inline">\(f''(x) = 2 + e^x/50\)</span></li>
+</ul>
+</section>
+<section id="exercise-2" class="level5">
+<h5 class="anchored" data-anchor-id="exercise-2"><strong>Exercise 2</strong></h5>
+<p>Modify the <code>steepest_descent()</code> function above to use Newtons method for adjusting step size and call this new function <code>newton()</code>.</p>
+<ul>
+<li>How does <code>newton()</code> compare with <code>steepest_descent()</code> in terms of number of iterations?</li>
+<li>How does <code>newton()</code> compare with <code>steepest_descent()</code> in terms of computation time?</li>
+</ul>
+<hr>
+</section>
+</section>
+</div>
+<div id="tabset-1-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-5-tab">
+<section id="poisson-regression" class="level4">
+<h4 class="anchored" data-anchor-id="poisson-regression">Poisson regression</h4>
+<p><span class="math display">\[\log(E[Y_i|X_i]) = X_i^T\beta \]</span></p>
+<ul>
+<li><span class="math inline">\(Y_i \sim Poisson(\mu_i)\)</span></li>
+<li><span class="math inline">\(Var(\mu_i) = \mu_i\)</span></li>
+<li><span class="math inline">\(g'(\mu_i) = \frac{1}{\mu_i}\)</span></li>
+</ul>
+<p><span class="math display">\[l(\beta) = \sum_i \left( y_iX_i^T\beta-e^{X_i^T\beta}-\log y_i!\right)\]</span></p>
+<ul>
+<li><p><strong>gradient</strong>: <span class="math inline">\(\frac{\partial l(\beta)}{\partial \beta} = \sum_i(Y_i - e^{X_i^T\beta})X_i\)</span></p></li>
+<li><p><strong>Hessian</strong>: <span class="math inline">\(\frac{\partial^2 l(\beta)}{\partial \beta^2} = -\sum_i e^{X_i^T\beta} X_i^TX_i\)</span></p></li>
+</ul>
+<section id="exercise-1-1" class="level5">
+<h5 class="anchored" data-anchor-id="exercise-1-1"><strong>Exercise 1</strong></h5>
+<p>The function <code>newton()</code> below performs Newton’s method for the lab example from earlier. Make a new function, <code>newton_poisson()</code>, to find MLE estimates for <span class="math inline">\(\beta\)</span> in Poisson regression. Use a simulated dataset with the following parameters:</p>
+<p>Simulation study specification:</p>
+<ul>
+<li>simulate from the model <span class="math inline">\(log(E(Y_i = 1|X_i)) = \beta_0 + \beta_1X_i\)</span>
+<ul>
+<li><span class="math inline">\(\beta_0 = 1\)</span></li>
+<li><span class="math inline">\(\beta_1 = 0.3\)</span></li>
+<li><span class="math inline">\(X_i \sim N(0, 1)\)</span></li>
+<li><span class="math inline">\(n = 100\)</span></li>
+<li><span class="math inline">\(nsim = 1\)</span></li>
+</ul></li>
+</ul>
+<p>Try a couple starting parameters for beta, including both good (close to the ground truth) and bad values.</p>
+<ul>
+<li>simulate from the model <span class="math inline">\(log(E(Y_i = 1|X_i)) = \beta_0 + \beta_1X_i\)</span>
+<ul>
+<li><span class="math inline">\(\beta_0 = 1\)</span></li>
+<li><span class="math inline">\(\beta_1 = 0.3\)</span></li>
+<li><span class="math inline">\(X_i \sim N(0, 1)\)</span></li>
+<li><span class="math inline">\(n = 100\)</span></li>
+<li><span class="math inline">\(nsim = 1\)</span></li>
+</ul></li>
+</ul>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>Converged in 21 iterations.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           [,1]
+[1,]  1.3664363
+[2,] -0.0286162</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.05113433 0.04826915</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = y ~ x, family = poisson)
+
+Coefficients:
+            Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)  1.36644    0.05113  26.723   &lt;2e-16 ***
+x           -0.02862    0.04827  -0.593    0.553    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 93.889  on 99  degrees of freedom
+Residual deviance: 93.538  on 98  degrees of freedom
+AIC: 408.25
+
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+</div>
+</section>
+<section id="exercise-2-1" class="level5">
+<h5 class="anchored" data-anchor-id="exercise-2-1"><strong>Exercise 2</strong></h5>
+<p>Modify your <code>newton_poisson()</code> function to return a 95% confidence interval for <span class="math inline">\(\beta\)</span>. How do your results compare to <code>glm()</code>?</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>function (x, y = NULL, na.rm = FALSE, use) 
+{
+    if (missing(use)) 
+        use &lt;- if (na.rm) 
+            "na.or.complete"
+        else "everything"
+    na.method &lt;- pmatch(use, c("all.obs", "complete.obs", "pairwise.complete.obs", 
+        "everything", "na.or.complete"))
+    if (is.na(na.method)) 
+        stop("invalid 'use' argument")
+    if (is.data.frame(x)) 
+        x &lt;- as.matrix(x)
+    else if (!is.null(x)) 
+        stopifnot(is.atomic(x))
+    if (is.data.frame(y)) 
+        y &lt;- as.matrix(y)
+    else if (!is.null(y)) 
+        stopifnot(is.atomic(y))
+    .Call(C_cov, x, y, na.method, FALSE)
+}
+&lt;bytecode: 0x118f371a8&gt;
+&lt;environment: namespace:stats&gt;</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="logistic-regression" class="level4">
+<h4 class="anchored" data-anchor-id="logistic-regression">Logistic regression</h4>
+<p>This is the beginning of HW 2.</p>
+<p>For a given subject in a study, we are interested in modeling <span class="math inline">\(\pi_i = P(Y_i = 1|X_i = x_i)\)</span>, where <span class="math inline">\(Y_i \in \{0, 1\}\)</span>. The logistic regression model takes the form</p>
+<p><br></p>
+<p><span class="math display">\[\text{logit}(\pi_i) = \log \left(\frac{\pi_i}{1-\pi_i}\right) = \log\left({\frac{P(Y_i = 1|X_i)}{1-P(Y_i = 1|X_i)}}\right) = \beta_0 + \beta_1X_{1i} + \beta_2X_{2i} + \ldots + \beta_pX_{pi}\]</span></p>
+<ul>
+<li><span class="math inline">\(Y_1, Y_2,\ldots, Y_n \sim Bernoulli(\pi)\)</span></li>
+<li>PDF is <span class="math inline">\(f(y_i; \pi) = \pi^{y_i}(1-\pi)^{1-y_i}\)</span></li>
+</ul>
+<section id="exercise-3" class="level5">
+<h5 class="anchored" data-anchor-id="exercise-3"><strong>Exercise 3</strong></h5>
+<ul>
+<li><p>Derive likelihood, gradient, and Hessian for logistic regression for an arbitrary number of predictors <span class="math inline">\(p\)</span></p></li>
+<li><p>What is the Newton’s method update for <span class="math inline">\(\beta\)</span> for logistic regression?</p></li>
+<li><p>Is logistic regression a convex optimization problem? Why or why not?</p></li>
+</ul>
+<hr>
+</section>
+</section>
+</div>
+</div>
+</div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
