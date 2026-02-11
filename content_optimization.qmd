@@ -254,7 +254,7 @@ newton_poisson = function(beta0 = c(0,0),
 
 
 
-```{r, eval = TRUE}
+```{r, eval = TRUE, echo = TRUE}
 set.seed(343243)
 n = 100
 beta0 = 1
