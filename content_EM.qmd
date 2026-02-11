@@ -32,10 +32,10 @@ In this, we will focus on the EM and MM algorithms.
 
 ### Slide Deck: EM Theory
 
-[![](./slides/topic_optimization/preview_gradientDescent.png){width=70%}](./slides/topic_optimization/s_gradient_methods.pdf)
+[![](./slides/topic_optimization/preview_EM_theory.png){width=70%}](./slides/topic_optimization/s_EM_theory.pdf)
 
-**Gradient Methods**  
-[Download slides (PDF)](./slides/topic_optimization/s_gradient_methods.pdf)
+**EM Theory**  
+[Download slides (PDF)](./slides/topic_optimization/s_EM_theory.pdf)
 
 
 ***

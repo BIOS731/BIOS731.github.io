@@ -37,7 +37,8 @@ Today, we cover:
   
 Announcements
 
-- HW3 posted and due 3/4 at 10:00AM
+- HW3 posted later today and due 3/4 at 10:00AM
+- No class tomorrow, 2/12
 
 Readings:
 
@@ -50,6 +51,79 @@ Just for today if you haven't done it I will let you do it later today and only 
 
 Lots of science/math funded my practical purposes- in this case the atom bomb
 :::
+
+---
+
+
+
+## Rates of convergence 
+
+\fontsize{10pt}{11pt}\selectfont
+One of the ways algorithms can be compared is via their rates of convergence to some limiting value.
+
+- Typically we have an iterative algorithm that is trying to find the max/min of an objective function $f$
+  - Want to estimate how long it will take to reach that optimal value
+  
+- Three rates of convergence we will focus on:
+  - **linear** (slowest)
+  - **superlinear** (faster)
+  - **quadratic** (fastest)
+  
+Algorithms that require more information about $f$ (such as its derivative) tend to converge more quickly.
+
+
+::: notes
+Faster rate here means fewer iterations, not necessarily faster computation time.
+
+- important caveat is that these describe local convergence i.e. what happens when you're already near the solution
+- cost per iteration matters and sometimes cost is larger per iteration for quadratic methods
+:::
+
+---
+
+## Rates of convergence 
+
+```{r, echo = FALSE, eval = TRUE, fig.height = 5}
+# Load ggplot2 for a professional look
+library(ggplot2)
+library(tidyr)
+
+# 1. Define the iterations
+iterations <- 0:10
+
+# 2. Simulate the Error decay for each type
+# Starting error is 0.5 (50cm away from the wall)
+linear_error      <- 0.5^(iterations + 1)
+superlinear_error <- 0.5^(iterations^1.5) # Grows faster than linear
+quadratic_error   <- 0.5^(2^iterations)    # Error is squared each time
+
+# 3. Create a Data Frame
+df <- data.frame(
+  Iteration = iterations,
+  Linear = linear_error,
+  Superlinear = superlinear_error,
+  Quadratic = quadratic_error
+)
+
+# Reshape for plotting
+df_long <- pivot_longer(df, cols = -Iteration, names_to = "Type", values_to = "Error")
+
+# 4. Generate the Plot
+ggplot(df_long, aes(x = Iteration, y = Error, color = Type, group = Type)) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 3) +
+  scale_y_log10(limits = c(1e-15, 1)) + # Log scale is key for convergence!
+  theme_minimal() +
+  labs(
+    title = "Comparison of Convergence Rates",
+    x = "Iteration Step",
+    y = "Error (Log Scale)",
+    color = "Convergence Type"
+  ) +
+  scale_color_manual(values = c("Linear" = "#56B4E9", "Superlinear" = "#E69F00", "Quadratic" = "#D55E00")) +
+  theme(legend.position = "none")
+```
+
 
 ---
 
