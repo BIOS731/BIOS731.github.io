@@ -201,7 +201,9 @@ newton = function(x0, tol = 1e-6, max_iter = 100) {
 
 
 
-```{r, echo = FALSE, eval = FALSE}
+```{r, echo = TRUE, eval = TRUE}
+# x is a matric of the covariate values
+# beta0 is a vector of the initial values for beta- what are good starting values?
 newton_poisson = function(beta0 = c(0,0), 
                           x,
                           tol = 1e-6, max_iter = 100) {
@@ -215,7 +217,7 @@ newton_poisson = function(beta0 = c(0,0),
     beta_history[iter,] = beta_cur
     
     # Compute the gradient and hessian
-    gradient = as.numeric(t(y-exp(x%*%beta_cur))%*%x)
+    gradient = as.numeric(t(y-exp(x %*% beta_cur))%*% x)
     
     hessian_ls = as.list(rep(NA, length.out = length(y)))
     for(i in 1:length(y)){
@@ -227,7 +229,7 @@ newton_poisson = function(beta0 = c(0,0),
     gradient_vec[iter,] = gradient
     
     # Check stopping criterion
-    if(sqrt(sum(gradient^2)) < tol){
+    if(abs(sum(gradient)) < tol){
       message("Converged in ", iter, " iterations.\n")
       break
     }
@@ -252,25 +254,25 @@ newton_poisson = function(beta0 = c(0,0),
 
 
 
-```{r, eval = FALSE}
+```{r, eval = TRUE}
 set.seed(343243)
 n = 100
 beta0 = 1
-beta1 = 0.3
+beta1 = 2
 x = rnorm(n)
 xmat = cbind(1, x)
-lambda = exp(beta0 + beta1 * xmat)
+lambda = exp(beta0 + beta1 * x)
 y = rpois(n, lambda)
 
-beta0 = c(1,0.3)
+beta_init = c(-5,20)
 
-my_mod = newton_poisson(c(-2, 3), x = xmat)
+my_mod = newton_poisson(beta_init, x = xmat)
 
 my_mod$solution
-diag(my_mod$se)
+
 
 mod = glm(y ~x, family = poisson)
-summary(mod)
+summary(mod)$coefficients
 ```
 
 
@@ -283,6 +285,9 @@ Modify your `newton_poisson()` function to return a 95\% confidence interval for
 
 
 
+```{r}
+diag(my_mod$se)
+```
 
 
 
