@@ -423,7 +423,7 @@ IRLS algorithm:
 
 
 
-- McCullagh and Nelder (1983) showed that IRLS is equivalent to Fisher scoring.
+- McCullagh and Nelder (1983) showed that IRLS is equivalent to Fisher scoring in **standard GLMs**.
 - Using the canonical link, IRLS is also equivalent to Newton-Raphson
 
 
@@ -451,7 +451,7 @@ $$Z^2 = (\hat{\theta}_{MLE}- \theta_{H_0})^T[I(\hat{\theta}_{MLE})](\hat{\theta}
 ::: notes
 Use information from the final iteration of your algorithm
 
-If your algorithm doesn't converge your inference won't have asymptotic properties that hole
+If your algorithm doesn't converge your inference won't have asymptotic properties that holdD
 Asymptotically equivalent to use observed or expected information,
 
 Wald test showing multivariate version but the univariate version is the one we use all the time
