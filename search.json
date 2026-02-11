@@ -88,14 +88,14 @@
     "href": "content_optimization.html",
     "title": "Convex optimization",
     "section": "",
-    "text": "In this, we will introduce optimization and methods for gradient descent.\n\nSlide Deck: Introduction to optimizationSlide Deck: Gradient methodsLab: Introduction to optimizationLab: Gradient descent\n\n\n\nIntro optimization\nDownload slides (PDF)\n\n\n\n\nGradient Methods\nDownload slides (PDF)\n\n\n\n\n\nFor simplicity, we’ll focus on a one-dimensional example.\n\\[\nf(x) = (x-50)^2 + e^x/50, \\quad f'(x) = 2x - 100 + e^x/50 = 0\n\\]\nThe R function below, steepest_descent(), implements this algorithm for \\(f(x)\\).\n\n\n\nTry out the steepest descent algorithm with different x0 and alpha values\n\nFor each x0 and alpha value, plot the evolution of \\(x\\) with each iteration\nFor each x0 and alpha value, plot the evolution of \\(f'(x)\\) with each iteration\n\nWhat is the solution?\n\nNewton’s method\nWe’ll use the same example as from the steepest descent algorithm.\n\\[f(x) = (x-50)^2 + e^x/50, \\quad f'(x) = 2x - 100 + e^x/50 = 0\\]\n\n\\(f''(x) = 2 + e^x/50\\)\n\n\n\n\nModify the steepest_descent() function above to use Newtons method for adjusting step size and call this new function newton().\n\nHow does newton() compare with steepest_descent() in terms of number of iterations?\nHow does newton() compare with steepest_descent() in terms of computation time?\n\n\n\n\n\n\n\n\n\\[\\log(E[Y_i|X_i]) = X_i^T\\beta \\]\n\n\\(Y_i \\sim Poisson(\\mu_i)\\)\n\\(Var(\\mu_i) = \\mu_i\\)\n\\(g'(\\mu_i) = \\frac{1}{\\mu_i}\\)\n\n\\[l(\\beta) = \\sum_i \\left( y_iX_i^T\\beta-e^{X_i^T\\beta}-\\log y_i!\\right)\\]\n\ngradient: \\(\\frac{\\partial l(\\beta)}{\\partial \\beta} = \\sum_i(Y_i - e^{X_i^T\\beta})X_i\\)\nHessian: \\(\\frac{\\partial^2 l(\\beta)}{\\partial \\beta^2} = -\\sum_i e^{X_i^T\\beta} X_i^TX_i\\)\n\n\n\nThe function newton() below performs Newton’s method for the lab example from earlier. Make a new function, newton_poisson(), to find MLE estimates for \\(\\beta\\) in Poisson regression. Use a simulated dataset with the following parameters:\nSimulation study specification:\n\nsimulate from the model \\(log(E(Y_i = 1|X_i)) = \\beta_0 + \\beta_1X_i\\)\n\n\\(\\beta_0 = 1\\)\n\\(\\beta_1 = 0.3\\)\n\\(X_i \\sim N(0, 1)\\)\n\\(n = 100\\)\n\\(nsim = 1\\)\n\n\nTry a couple starting parameters for beta, including both good (close to the ground truth) and bad values.\n\nsimulate from the model \\(log(E(Y_i = 1|X_i)) = \\beta_0 + \\beta_1X_i\\)\n\n\\(\\beta_0 = 1\\)\n\\(\\beta_1 = 0.3\\)\n\\(X_i \\sim N(0, 1)\\)\n\\(n = 100\\)\n\\(nsim = 1\\)\n\n\n\n\nConverged in 21 iterations.\n\n\n           [,1]\n[1,]  1.3664363\n[2,] -0.0286162\n\n\n[1] 0.05113433 0.04826915\n\n\n\nCall:\nglm(formula = y ~ x, family = poisson)\n\nCoefficients:\n            Estimate Std. Error z value Pr(&gt;|z|)    \n(Intercept)  1.36644    0.05113  26.723   &lt;2e-16 ***\nx           -0.02862    0.04827  -0.593    0.553    \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n(Dispersion parameter for poisson family taken to be 1)\n\n    Null deviance: 93.889  on 99  degrees of freedom\nResidual deviance: 93.538  on 98  degrees of freedom\nAIC: 408.25\n\nNumber of Fisher Scoring iterations: 4\n\n\n\n\n\nModify your newton_poisson() function to return a 95% confidence interval for \\(\\beta\\). How do your results compare to glm()?\n\n\nfunction (x, y = NULL, na.rm = FALSE, use) \n{\n    if (missing(use)) \n        use &lt;- if (na.rm) \n            \"na.or.complete\"\n        else \"everything\"\n    na.method &lt;- pmatch(use, c(\"all.obs\", \"complete.obs\", \"pairwise.complete.obs\", \n        \"everything\", \"na.or.complete\"))\n    if (is.na(na.method)) \n        stop(\"invalid 'use' argument\")\n    if (is.data.frame(x)) \n        x &lt;- as.matrix(x)\n    else if (!is.null(x)) \n        stopifnot(is.atomic(x))\n    if (is.data.frame(y)) \n        y &lt;- as.matrix(y)\n    else if (!is.null(y)) \n        stopifnot(is.atomic(y))\n    .Call(C_cov, x, y, na.method, FALSE)\n}\n&lt;bytecode: 0x105384328&gt;\n&lt;environment: namespace:stats&gt;\n\n\n\n\n\n\nThis is the beginning of HW 2.\nFor a given subject in a study, we are interested in modeling \\(\\pi_i = P(Y_i = 1|X_i = x_i)\\), where \\(Y_i \\in \\{0, 1\\}\\). The logistic regression model takes the form\n\n\\[\\text{logit}(\\pi_i) = \\log \\left(\\frac{\\pi_i}{1-\\pi_i}\\right) = \\log\\left({\\frac{P(Y_i = 1|X_i)}{1-P(Y_i = 1|X_i)}}\\right) = \\beta_0 + \\beta_1X_{1i} + \\beta_2X_{2i} + \\ldots + \\beta_pX_{pi}\\]\n\n\\(Y_1, Y_2,\\ldots, Y_n \\sim Bernoulli(\\pi)\\)\nPDF is \\(f(y_i; \\pi) = \\pi^{y_i}(1-\\pi)^{1-y_i}\\)\n\n\n\n\nDerive likelihood, gradient, and Hessian for logistic regression for an arbitrary number of predictors \\(p\\)\nWhat is the Newton’s method update for \\(\\beta\\) for logistic regression?\nIs logistic regression a convex optimization problem? Why or why not?"
+    "text": "In this, we will introduce optimization and methods for gradient descent.\n\nSlide Deck: Introduction to optimizationSlide Deck: Gradient methodsLab: Introduction to optimizationLab: Gradient descent\n\n\n\nIntro optimization\nDownload slides (PDF)\n\n\n\n\nGradient Methods\nDownload slides (PDF)\n\n\n\n\n\nFor simplicity, we’ll focus on a one-dimensional example.\n\\[\nf(x) = (x-50)^2 + e^x/50, \\quad f'(x) = 2x - 100 + e^x/50 = 0\n\\]\nThe R function below, steepest_descent(), implements this algorithm for \\(f(x)\\).\n\n\n\nTry out the steepest descent algorithm with different x0 and alpha values\n\nFor each x0 and alpha value, plot the evolution of \\(x\\) with each iteration\nFor each x0 and alpha value, plot the evolution of \\(f'(x)\\) with each iteration\n\nWhat is the solution?\n\nNewton’s method\nWe’ll use the same example as from the steepest descent algorithm.\n\\[f(x) = (x-50)^2 + e^x/50, \\quad f'(x) = 2x - 100 + e^x/50 = 0\\]\n\n\\(f''(x) = 2 + e^x/50\\)\n\n\n\n\nModify the steepest_descent() function above to use Newtons method for adjusting step size and call this new function newton().\n\nHow does newton() compare with steepest_descent() in terms of number of iterations?\nHow does newton() compare with steepest_descent() in terms of computation time?\n\n\n\n\n\n\n\n\n\\[\\log(E[Y_i|X_i]) = X_i^T\\beta \\]\n\n\\(Y_i \\sim Poisson(\\mu_i)\\)\n\\(Var(\\mu_i) = \\mu_i\\)\n\\(g'(\\mu_i) = \\frac{1}{\\mu_i}\\)\n\n\\[l(\\beta) = \\sum_i \\left( y_iX_i^T\\beta-e^{X_i^T\\beta}-\\log y_i!\\right)\\]\n\ngradient: \\(\\frac{\\partial l(\\beta)}{\\partial \\beta} = \\sum_i(Y_i - e^{X_i^T\\beta})X_i\\)\nHessian: \\(\\frac{\\partial^2 l(\\beta)}{\\partial \\beta^2} = -\\sum_i e^{X_i^T\\beta} X_i^TX_i\\)\n\n\n\nThe function newton() below performs Newton’s method for the lab example from earlier. Make a new function, newton_poisson(), to find MLE estimates for \\(\\beta\\) in Poisson regression. Use a simulated dataset with the following parameters:\nSimulation study specification:\n\nsimulate from the model \\(log(E(Y_i = 1|X_i)) = \\beta_0 + \\beta_1X_i\\)\n\n\\(\\beta_0 = 1\\)\n\\(\\beta_1 = 0.3\\)\n\\(X_i \\sim N(0, 1)\\)\n\\(n = 100\\)\n\\(nsim = 1\\)\n\n\nTry a couple starting parameters for beta, including both good (close to the ground truth) and bad values.\n\nnewton = function(x0, tol = 1e-6, max_iter = 100) {\n\n  x = x0\n  \n  x_history = gradient_vec = hessian_vec = rep(NA, length.out = max_iter)\n  for (iter in 1:max_iter) {\n    \n    # store results\n    x_history[iter] = x\n    \n    \n    # Compute the gradient\n    gradient = 2 * x-100 + exp(x)/50\n    hessian = 2 + exp(x)/50\n    gradient_vec[iter] = gradient\n    hessian_vec[iter] = hessian\n    \n    \n    # Check stopping criterion\n    if(abs(gradient) &lt; tol){\n      message(\"Converged in \", iter, \" iterations.\\n\")\n      break\n    }\n    \n    # Update the solution\n    x = x - gradient/hessian\n\n  }\n  \n  return(list(solution = x, \n              x_history = x_history,\n              gradient = gradient_vec,\n              hessian = hessian_vec,\n              converged = (iter &lt; max_iter),\n              niter = iter))\n}\n\n\n\n\nModify your newton_poisson() function to return a 95% confidence interval for \\(\\beta\\). How do your results compare to glm()?\n\n\n\n\nThis is the beginning of HW 2.\nFor a given subject in a study, we are interested in modeling \\(\\pi_i = P(Y_i = 1|X_i = x_i)\\), where \\(Y_i \\in \\{0, 1\\}\\). The logistic regression model takes the form\n\n\\[\\text{logit}(\\pi_i) = \\log \\left(\\frac{\\pi_i}{1-\\pi_i}\\right) = \\log\\left({\\frac{P(Y_i = 1|X_i)}{1-P(Y_i = 1|X_i)}}\\right) = \\beta_0 + \\beta_1X_{1i} + \\beta_2X_{2i} + \\ldots + \\beta_pX_{pi}\\]\n\n\\(Y_1, Y_2,\\ldots, Y_n \\sim Bernoulli(\\pi)\\)\nPDF is \\(f(y_i; \\pi) = \\pi^{y_i}(1-\\pi)^{1-y_i}\\)\n\n\n\n\nDerive likelihood, gradient, and Hessian for logistic regression for an arbitrary number of predictors \\(p\\)\nWhat is the Newton’s method update for \\(\\beta\\) for logistic regression?\nIs logistic regression a convex optimization problem? Why or why not?"
   },
   {
     "objectID": "content_optimization.html#overview",
     "href": "content_optimization.html#overview",
     "title": "Convex optimization",
     "section": "",
-    "text": "In this, we will introduce optimization and methods for gradient descent.\n\nSlide Deck: Introduction to optimizationSlide Deck: Gradient methodsLab: Introduction to optimizationLab: Gradient descent\n\n\n\nIntro optimization\nDownload slides (PDF)\n\n\n\n\nGradient Methods\nDownload slides (PDF)\n\n\n\n\n\nFor simplicity, we’ll focus on a one-dimensional example.\n\\[\nf(x) = (x-50)^2 + e^x/50, \\quad f'(x) = 2x - 100 + e^x/50 = 0\n\\]\nThe R function below, steepest_descent(), implements this algorithm for \\(f(x)\\).\n\n\n\nTry out the steepest descent algorithm with different x0 and alpha values\n\nFor each x0 and alpha value, plot the evolution of \\(x\\) with each iteration\nFor each x0 and alpha value, plot the evolution of \\(f'(x)\\) with each iteration\n\nWhat is the solution?\n\nNewton’s method\nWe’ll use the same example as from the steepest descent algorithm.\n\\[f(x) = (x-50)^2 + e^x/50, \\quad f'(x) = 2x - 100 + e^x/50 = 0\\]\n\n\\(f''(x) = 2 + e^x/50\\)\n\n\n\n\nModify the steepest_descent() function above to use Newtons method for adjusting step size and call this new function newton().\n\nHow does newton() compare with steepest_descent() in terms of number of iterations?\nHow does newton() compare with steepest_descent() in terms of computation time?\n\n\n\n\n\n\n\n\n\\[\\log(E[Y_i|X_i]) = X_i^T\\beta \\]\n\n\\(Y_i \\sim Poisson(\\mu_i)\\)\n\\(Var(\\mu_i) = \\mu_i\\)\n\\(g'(\\mu_i) = \\frac{1}{\\mu_i}\\)\n\n\\[l(\\beta) = \\sum_i \\left( y_iX_i^T\\beta-e^{X_i^T\\beta}-\\log y_i!\\right)\\]\n\ngradient: \\(\\frac{\\partial l(\\beta)}{\\partial \\beta} = \\sum_i(Y_i - e^{X_i^T\\beta})X_i\\)\nHessian: \\(\\frac{\\partial^2 l(\\beta)}{\\partial \\beta^2} = -\\sum_i e^{X_i^T\\beta} X_i^TX_i\\)\n\n\n\nThe function newton() below performs Newton’s method for the lab example from earlier. Make a new function, newton_poisson(), to find MLE estimates for \\(\\beta\\) in Poisson regression. Use a simulated dataset with the following parameters:\nSimulation study specification:\n\nsimulate from the model \\(log(E(Y_i = 1|X_i)) = \\beta_0 + \\beta_1X_i\\)\n\n\\(\\beta_0 = 1\\)\n\\(\\beta_1 = 0.3\\)\n\\(X_i \\sim N(0, 1)\\)\n\\(n = 100\\)\n\\(nsim = 1\\)\n\n\nTry a couple starting parameters for beta, including both good (close to the ground truth) and bad values.\n\nsimulate from the model \\(log(E(Y_i = 1|X_i)) = \\beta_0 + \\beta_1X_i\\)\n\n\\(\\beta_0 = 1\\)\n\\(\\beta_1 = 0.3\\)\n\\(X_i \\sim N(0, 1)\\)\n\\(n = 100\\)\n\\(nsim = 1\\)\n\n\n\n\nConverged in 21 iterations.\n\n\n           [,1]\n[1,]  1.3664363\n[2,] -0.0286162\n\n\n[1] 0.05113433 0.04826915\n\n\n\nCall:\nglm(formula = y ~ x, family = poisson)\n\nCoefficients:\n            Estimate Std. Error z value Pr(&gt;|z|)    \n(Intercept)  1.36644    0.05113  26.723   &lt;2e-16 ***\nx           -0.02862    0.04827  -0.593    0.553    \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n(Dispersion parameter for poisson family taken to be 1)\n\n    Null deviance: 93.889  on 99  degrees of freedom\nResidual deviance: 93.538  on 98  degrees of freedom\nAIC: 408.25\n\nNumber of Fisher Scoring iterations: 4\n\n\n\n\n\nModify your newton_poisson() function to return a 95% confidence interval for \\(\\beta\\). How do your results compare to glm()?\n\n\nfunction (x, y = NULL, na.rm = FALSE, use) \n{\n    if (missing(use)) \n        use &lt;- if (na.rm) \n            \"na.or.complete\"\n        else \"everything\"\n    na.method &lt;- pmatch(use, c(\"all.obs\", \"complete.obs\", \"pairwise.complete.obs\", \n        \"everything\", \"na.or.complete\"))\n    if (is.na(na.method)) \n        stop(\"invalid 'use' argument\")\n    if (is.data.frame(x)) \n        x &lt;- as.matrix(x)\n    else if (!is.null(x)) \n        stopifnot(is.atomic(x))\n    if (is.data.frame(y)) \n        y &lt;- as.matrix(y)\n    else if (!is.null(y)) \n        stopifnot(is.atomic(y))\n    .Call(C_cov, x, y, na.method, FALSE)\n}\n&lt;bytecode: 0x105384328&gt;\n&lt;environment: namespace:stats&gt;\n\n\n\n\n\n\nThis is the beginning of HW 2.\nFor a given subject in a study, we are interested in modeling \\(\\pi_i = P(Y_i = 1|X_i = x_i)\\), where \\(Y_i \\in \\{0, 1\\}\\). The logistic regression model takes the form\n\n\\[\\text{logit}(\\pi_i) = \\log \\left(\\frac{\\pi_i}{1-\\pi_i}\\right) = \\log\\left({\\frac{P(Y_i = 1|X_i)}{1-P(Y_i = 1|X_i)}}\\right) = \\beta_0 + \\beta_1X_{1i} + \\beta_2X_{2i} + \\ldots + \\beta_pX_{pi}\\]\n\n\\(Y_1, Y_2,\\ldots, Y_n \\sim Bernoulli(\\pi)\\)\nPDF is \\(f(y_i; \\pi) = \\pi^{y_i}(1-\\pi)^{1-y_i}\\)\n\n\n\n\nDerive likelihood, gradient, and Hessian for logistic regression for an arbitrary number of predictors \\(p\\)\nWhat is the Newton’s method update for \\(\\beta\\) for logistic regression?\nIs logistic regression a convex optimization problem? Why or why not?"
+    "text": "In this, we will introduce optimization and methods for gradient descent.\n\nSlide Deck: Introduction to optimizationSlide Deck: Gradient methodsLab: Introduction to optimizationLab: Gradient descent\n\n\n\nIntro optimization\nDownload slides (PDF)\n\n\n\n\nGradient Methods\nDownload slides (PDF)\n\n\n\n\n\nFor simplicity, we’ll focus on a one-dimensional example.\n\\[\nf(x) = (x-50)^2 + e^x/50, \\quad f'(x) = 2x - 100 + e^x/50 = 0\n\\]\nThe R function below, steepest_descent(), implements this algorithm for \\(f(x)\\).\n\n\n\nTry out the steepest descent algorithm with different x0 and alpha values\n\nFor each x0 and alpha value, plot the evolution of \\(x\\) with each iteration\nFor each x0 and alpha value, plot the evolution of \\(f'(x)\\) with each iteration\n\nWhat is the solution?\n\nNewton’s method\nWe’ll use the same example as from the steepest descent algorithm.\n\\[f(x) = (x-50)^2 + e^x/50, \\quad f'(x) = 2x - 100 + e^x/50 = 0\\]\n\n\\(f''(x) = 2 + e^x/50\\)\n\n\n\n\nModify the steepest_descent() function above to use Newtons method for adjusting step size and call this new function newton().\n\nHow does newton() compare with steepest_descent() in terms of number of iterations?\nHow does newton() compare with steepest_descent() in terms of computation time?\n\n\n\n\n\n\n\n\n\\[\\log(E[Y_i|X_i]) = X_i^T\\beta \\]\n\n\\(Y_i \\sim Poisson(\\mu_i)\\)\n\\(Var(\\mu_i) = \\mu_i\\)\n\\(g'(\\mu_i) = \\frac{1}{\\mu_i}\\)\n\n\\[l(\\beta) = \\sum_i \\left( y_iX_i^T\\beta-e^{X_i^T\\beta}-\\log y_i!\\right)\\]\n\ngradient: \\(\\frac{\\partial l(\\beta)}{\\partial \\beta} = \\sum_i(Y_i - e^{X_i^T\\beta})X_i\\)\nHessian: \\(\\frac{\\partial^2 l(\\beta)}{\\partial \\beta^2} = -\\sum_i e^{X_i^T\\beta} X_i^TX_i\\)\n\n\n\nThe function newton() below performs Newton’s method for the lab example from earlier. Make a new function, newton_poisson(), to find MLE estimates for \\(\\beta\\) in Poisson regression. Use a simulated dataset with the following parameters:\nSimulation study specification:\n\nsimulate from the model \\(log(E(Y_i = 1|X_i)) = \\beta_0 + \\beta_1X_i\\)\n\n\\(\\beta_0 = 1\\)\n\\(\\beta_1 = 0.3\\)\n\\(X_i \\sim N(0, 1)\\)\n\\(n = 100\\)\n\\(nsim = 1\\)\n\n\nTry a couple starting parameters for beta, including both good (close to the ground truth) and bad values.\n\nnewton = function(x0, tol = 1e-6, max_iter = 100) {\n\n  x = x0\n  \n  x_history = gradient_vec = hessian_vec = rep(NA, length.out = max_iter)\n  for (iter in 1:max_iter) {\n    \n    # store results\n    x_history[iter] = x\n    \n    \n    # Compute the gradient\n    gradient = 2 * x-100 + exp(x)/50\n    hessian = 2 + exp(x)/50\n    gradient_vec[iter] = gradient\n    hessian_vec[iter] = hessian\n    \n    \n    # Check stopping criterion\n    if(abs(gradient) &lt; tol){\n      message(\"Converged in \", iter, \" iterations.\\n\")\n      break\n    }\n    \n    # Update the solution\n    x = x - gradient/hessian\n\n  }\n  \n  return(list(solution = x, \n              x_history = x_history,\n              gradient = gradient_vec,\n              hessian = hessian_vec,\n              converged = (iter &lt; max_iter),\n              niter = iter))\n}\n\n\n\n\nModify your newton_poisson() function to return a 95% confidence interval for \\(\\beta\\). How do your results compare to glm()?\n\n\n\n\nThis is the beginning of HW 2.\nFor a given subject in a study, we are interested in modeling \\(\\pi_i = P(Y_i = 1|X_i = x_i)\\), where \\(Y_i \\in \\{0, 1\\}\\). The logistic regression model takes the form\n\n\\[\\text{logit}(\\pi_i) = \\log \\left(\\frac{\\pi_i}{1-\\pi_i}\\right) = \\log\\left({\\frac{P(Y_i = 1|X_i)}{1-P(Y_i = 1|X_i)}}\\right) = \\beta_0 + \\beta_1X_{1i} + \\beta_2X_{2i} + \\ldots + \\beta_pX_{pi}\\]\n\n\\(Y_1, Y_2,\\ldots, Y_n \\sim Bernoulli(\\pi)\\)\nPDF is \\(f(y_i; \\pi) = \\pi^{y_i}(1-\\pi)^{1-y_i}\\)\n\n\n\n\nDerive likelihood, gradient, and Hessian for logistic regression for an arbitrary number of predictors \\(p\\)\nWhat is the Newton’s method update for \\(\\beta\\) for logistic regression?\nIs logistic regression a convex optimization problem? Why or why not?"
   },
   {
     "objectID": "topic_cloud_computing.html",
@@ -264,5 +264,425 @@
     "title": "Optimization: EM and MM Algorithms",
     "section": "",
     "text": "In this, we will focus on the EM and MM algorithms.\n\nSlide Deck: Introduction to the Expectation-Maximization (EM) AlgorithmSlide Deck: EM TheorySlide Deck: MMLab: Introduction to optimizationLab: Gradient descent\n\n\n\nIntro EM\nDownload slides (PDF)\n\n\n\n\nEM Theory\nDownload slides (PDF)\n\n\n\n\n\n\n\n\nFor simplicity, we’ll focus on a one-dimensional example.\n\\[\nf(x) = (x-50)^2 + e^x/50, \\quad f'(x) = 2x - 100 + e^x/50 = 0\n\\]\nThe R function below, steepest_descent(), implements this algorithm for \\(f(x)\\).\n\n\n\nTry out the steepest descent algorithm with different x0 and alpha values\n\nFor each x0 and alpha value, plot the evolution of \\(x\\) with each iteration\nFor each x0 and alpha value, plot the evolution of \\(f'(x)\\) with each iteration\n\nWhat is the solution?\n\nNewton’s method\nWe’ll use the same example as from the steepest descent algorithm.\n\\[f(x) = (x-50)^2 + e^x/50, \\quad f'(x) = 2x - 100 + e^x/50 = 0\\]\n\n\\(f''(x) = 2 + e^x/50\\)\n\n\n\n\nModify the steepest_descent() function above to use Newtons method for adjusting step size and call this new function newton().\n\nHow does newton() compare with steepest_descent() in terms of number of iterations?\nHow does newton() compare with steepest_descent() in terms of computation time?\n\n\n\n\n\n\n\n\n\\[\\log(E[Y_i|X_i]) = X_i^T\\beta \\]\n\n\\(Y_i \\sim Poisson(\\mu_i)\\)\n\\(Var(\\mu_i) = \\mu_i\\)\n\\(g'(\\mu_i) = \\frac{1}{\\mu_i}\\)\n\n\\[l(\\beta) = \\sum_i \\left( y_iX_i^T\\beta-e^{X_i^T\\beta}-\\log y_i!\\right)\\]\n\ngradient: \\(\\frac{\\partial l(\\beta)}{\\partial \\beta} = \\sum_i(Y_i - e^{X_i^T\\beta})X_i\\)\nHessian: \\(\\frac{\\partial^2 l(\\beta)}{\\partial \\beta^2} = -\\sum_i e^{X_i^T\\beta} X_i^TX_i\\)\n\n\n\nThe function newton() below performs Newton’s method for the lab example from earlier. Make a new function, newton_poisson(), to find MLE estimates for \\(\\beta\\) in Poisson regression. Use a simulated dataset with the following parameters:\nSimulation study specification:\n\nsimulate from the model \\(log(E(Y_i = 1|X_i)) = \\beta_0 + \\beta_1X_i\\)\n\n\\(\\beta_0 = 1\\)\n\\(\\beta_1 = 0.3\\)\n\\(X_i \\sim N(0, 1)\\)\n\\(n = 100\\)\n\\(nsim = 1\\)\n\n\nTry a couple starting parameters for beta, including both good (close to the ground truth) and bad values.\n\nsimulate from the model \\(log(E(Y_i = 1|X_i)) = \\beta_0 + \\beta_1X_i\\)\n\n\\(\\beta_0 = 1\\)\n\\(\\beta_1 = 0.3\\)\n\\(X_i \\sim N(0, 1)\\)\n\\(n = 100\\)\n\\(nsim = 1\\)\n\n\n\n\nConverged in 21 iterations.\n\n\n           [,1]\n[1,]  1.3664363\n[2,] -0.0286162\n\n\n[1] 0.05113433 0.04826915\n\n\n\nCall:\nglm(formula = y ~ x, family = poisson)\n\nCoefficients:\n            Estimate Std. Error z value Pr(&gt;|z|)    \n(Intercept)  1.36644    0.05113  26.723   &lt;2e-16 ***\nx           -0.02862    0.04827  -0.593    0.553    \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n(Dispersion parameter for poisson family taken to be 1)\n\n    Null deviance: 93.889  on 99  degrees of freedom\nResidual deviance: 93.538  on 98  degrees of freedom\nAIC: 408.25\n\nNumber of Fisher Scoring iterations: 4\n\n\n\n\n\nModify your newton_poisson() function to return a 95% confidence interval for \\(\\beta\\). How do your results compare to glm()?\n\n\nfunction (x, y = NULL, na.rm = FALSE, use) \n{\n    if (missing(use)) \n        use &lt;- if (na.rm) \n            \"na.or.complete\"\n        else \"everything\"\n    na.method &lt;- pmatch(use, c(\"all.obs\", \"complete.obs\", \"pairwise.complete.obs\", \n        \"everything\", \"na.or.complete\"))\n    if (is.na(na.method)) \n        stop(\"invalid 'use' argument\")\n    if (is.data.frame(x)) \n        x &lt;- as.matrix(x)\n    else if (!is.null(x)) \n        stopifnot(is.atomic(x))\n    if (is.data.frame(y)) \n        y &lt;- as.matrix(y)\n    else if (!is.null(y)) \n        stopifnot(is.atomic(y))\n    .Call(C_cov, x, y, na.method, FALSE)\n}\n&lt;bytecode: 0x10ef753a8&gt;\n&lt;environment: namespace:stats&gt;\n\n\n\n\n\n\nThis is the beginning of HW 2.\nFor a given subject in a study, we are interested in modeling \\(\\pi_i = P(Y_i = 1|X_i = x_i)\\), where \\(Y_i \\in \\{0, 1\\}\\). The logistic regression model takes the form\n\n\\[\\text{logit}(\\pi_i) = \\log \\left(\\frac{\\pi_i}{1-\\pi_i}\\right) = \\log\\left({\\frac{P(Y_i = 1|X_i)}{1-P(Y_i = 1|X_i)}}\\right) = \\beta_0 + \\beta_1X_{1i} + \\beta_2X_{2i} + \\ldots + \\beta_pX_{pi}\\]\n\n\\(Y_1, Y_2,\\ldots, Y_n \\sim Bernoulli(\\pi)\\)\nPDF is \\(f(y_i; \\pi) = \\pi^{y_i}(1-\\pi)^{1-y_i}\\)\n\n\n\n\nDerive likelihood, gradient, and Hessian for logistic regression for an arbitrary number of predictors \\(p\\)\nWhat is the Newton’s method update for \\(\\beta\\) for logistic regression?\nIs logistic regression a convex optimization problem? Why or why not?"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html",
+    "href": "slides/topic_optimization/s_MM.html",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "",
+    "text": "Today, we cover:\n\nThe MM Algorithm\n\nAnnouncements\n\nHW3 posted and due 3/4 at 10:00AM\n\nReadings:\n\nHunter and Lange: A tutorial on MM algorithms, The American Statistician\n\n\nTutorial article is very concise but overall pretty good if you want to learn more."
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#overview",
+    "href": "slides/topic_optimization/s_MM.html#overview",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "",
+    "text": "Today, we cover:\n\nThe MM Algorithm\n\nAnnouncements\n\nHW3 posted and due 3/4 at 10:00AM\n\nReadings:\n\nHunter and Lange: A tutorial on MM algorithms, The American Statistician\n\n\nTutorial article is very concise but overall pretty good if you want to learn more."
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#em-as-mm",
+    "href": "slides/topic_optimization/s_MM.html#em-as-mm",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "EM as MM",
+    "text": "EM as MM\nThe EM is a minorization approach. Instead of directly maximizing. the log-likelihood, which is hard, the algorithm constructs a minorizing function and optimizes that function instead.\nA function \\(g\\) minorizes \\(f\\) over \\(\\mathcal{X}\\) at \\(y\\) if:\n\n\\(g(x) \\le f(x) \\mbox{ for all } x \\in \\mathcal{X}\\)\n\\(g(y) = f(y)\\)"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#mm-algorithm",
+    "href": "slides/topic_optimization/s_MM.html#mm-algorithm",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "MM algorithm",
+    "text": "MM algorithm\n\nStands for “Majorize-Minimization” or “Minorize-Maximization”, depending on whether the desired optimization is a minimization or a maximization\nNot actually an algorithm, but a strategy for constructing optimization algorithms\nEM is a special case"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#mm-algorithm-1",
+    "href": "slides/topic_optimization/s_MM.html#mm-algorithm-1",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "MM algorithm",
+    "text": "MM algorithm\n\nStands for “Majorize-Minimization” or “Minorize-Maximization”,depending on whether the desired optimization is a minimization or a maximization\nNot actually an algorithm, but a strategy for constructing optimization algorithms\nEM is a special case\n\nIdea: MM algorithm operates by creating a surrogate function that minorizes or majorizes the objective function. When the surrogate function is optimized, the objective function is driven uphill or downhill as needed."
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#definition-of-an-mm-algorithm-for-minimization",
+    "href": "slides/topic_optimization/s_MM.html#definition-of-an-mm-algorithm-for-minimization",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Definition of an MM algorithm for Minimization",
+    "text": "Definition of an MM algorithm for Minimization\nWe first focus on the minimization problem, in which MM = Majorize–Minimize.\n\nA function \\(g(\\theta|\\theta^t)\\) is said to majorize the function \\(f(\\theta)\\) at \\(\\theta^t\\) if\n\n\\[\\begin{align}\nf(\\theta) &\\le g(\\theta|\\theta^t) \\mbox{ for all } \\theta\\\\[2mm]\nf(\\theta^t) &= g(\\theta^t|\\theta^t)\n\\end{align}\\]\n\nWe choose a majorizing function \\(g(\\theta|\\theta^t)\\) and minimize it, instead of minimizing \\(f(\\theta)\\). Denote \\(\\theta^{t+1} =\\arg\\min_{\\theta}g(\\theta|\\theta^t)\\). Iterate until \\(\\theta^t\\) converges.\nDescent property: \\(f(\\theta^t) \\le g(\\theta^{t+1}|\\theta^t)\\le g(\\theta^t|\\theta^t) = f(\\theta^t)\\)\n\n\nI think pictures really help here"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#definition-of-an-mm-algorithm-for-minimization-1",
+    "href": "slides/topic_optimization/s_MM.html#definition-of-an-mm-algorithm-for-minimization-1",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Definition of an MM algorithm for Minimization",
+    "text": "Definition of an MM algorithm for Minimization\n\n\n\n\n\n\n\n\n\n\nTwo examples: Dotted line here is the majorizing function"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#mm-algorithm-for-maximization",
+    "href": "slides/topic_optimization/s_MM.html#mm-algorithm-for-maximization",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "MM algorithm for Maximization",
+    "text": "MM algorithm for Maximization\nIn a maximization problem, MM = Minorize–Maximize.\n\nTo maximize \\(f(\\theta)\\), we minorize it by a surrogate function \\(g(\\theta|\\theta^t)\\) and maximize \\(g(\\theta|\\theta^t)\\) to produce the next iteration \\(\\theta^{t+1}\\)\n\\(g(\\theta|\\theta^t)\\) minorizes \\(f(\\theta)\\) at \\(\\theta^t\\) if \\(-g(\\theta|\\theta^t)\\) majorizes \\(-f(\\theta)\\)"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#separation-of-high-dimensional-parameter-spaces",
+    "href": "slides/topic_optimization/s_MM.html#separation-of-high-dimensional-parameter-spaces",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Separation of high-dimensional parameter spaces",
+    "text": "Separation of high-dimensional parameter spaces\nOne of the key criteria in judging majorizing or minorizing functions is their ease of optimization.\n\nSuccessful MM algorithms in high-dimensional parameter spaces often rely on surrogate functions in which the individual parameter components are separated, i.e., for \\(\\theta = (\\theta_1, \\ldots, \\theta_p)\\),\n\n\\[g(\\theta|\\theta^t) = \\sum_{j = 1}^p q_j(\\theta_j)\\] where \\(q_j(\\cdot)\\) are univariate functions.\nBecause the \\(p\\) univariate functions may be optimized one by one, this makes the surrogate function easier to optimize at each iteration."
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#advantages-of-the-mm-algorithm",
+    "href": "slides/topic_optimization/s_MM.html#advantages-of-the-mm-algorithm",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Advantages of the MM algorithm",
+    "text": "Advantages of the MM algorithm\n\nNumerical stability: warranted by the descent (or ascent) property\nSimplicity: Turn a difficult optimization problem into a simple one\n\nIt can turn a non-differentiable problem into a smooth problem (Example 2).\nIt can separate the parameters of a problem (Example 3).\nIt can linearize an optimization problem (Example 3).\nIt can deal gracefully with equality and inequality constraints (Example 4).\nIt can generate an algorithm that avoids large matrix inversion (5).\n\nIteration is the price we pay for simplifying the original problem.\n\n\nSeems like magic. How do you actually construct the surrogate function?"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#em-algorithm-vs.-mm-algorithm",
+    "href": "slides/topic_optimization/s_MM.html#em-algorithm-vs.-mm-algorithm",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "EM algorithm vs. MM algorithm",
+    "text": "EM algorithm vs. MM algorithm\n\nEM: The E-step creates a surrogate function by identifying a complete-data log-likelihood function and evaluating it with respect to the observed data. The M-step maximizes the surrogate function. Every EM algorithm is an example of an MM algorithm.\nEM: demands creativity in identifying the missing data (complete data) and technical skill in calculating an often complicated conditional expectation and then maximizing it analytically.\nMM: requires creativity in identifying the surrogate function, using proper inequalities."
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#inequalities-to-construct-majorizingminorizing-function",
+    "href": "slides/topic_optimization/s_MM.html#inequalities-to-construct-majorizingminorizing-function",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Inequalities to construct majorizing/minorizing function",
+    "text": "Inequalities to construct majorizing/minorizing function\n\nProperty of convex function: A function \\(f: R^p \\to R\\) is \\(\\textbf{convex}\\) if for all \\(x_1, x_2 \\in R^p\\) and all \\(\\alpha \\in [0,1]\\), \\[\nf(\\alpha x_1 + (1-\\alpha)x_2)\\leq \\alpha f(x_1) + (1-\\alpha) f(x_2)\n\\]\nJensen’s inequality: for any convex function \\(f\\) and r.v. \\(x\\),\n\n\\[f[E(x)] \\le E[f(x)]\\]\n\nSupporting hyperplanes: If \\(f\\) is convex and differentiable, then\n\n\\[f(y)\\geq f(x)+\\nabla f(x)^\\top(y-x), \\forall x,y\\in\\mathbb{R}^p,\\]\nand equality holds when \\(y = x\\).\n\n\nFor concave function, jensen’s inequality reverses\nDraw supporting hyperplane from slide 7 of Hao MM lecture"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#inequalities-continued",
+    "href": "slides/topic_optimization/s_MM.html#inequalities-continued",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Inequalities (continued)",
+    "text": "Inequalities (continued)\n\nArithmetic-Geometric Mean Inequality: For nonnegative \\(x_1,\\ldots, x_m,\\) \\[\\sqrt[m]{\\prod_i^mx_i}\\le \\frac{1}{m}\\sum_{i=1}^mx_i,\\] and the equality holds iff \\(x_1 = x_2 = \\ldots = x_m\\).\nCauchy-Schwartz Inequality: for \\(p\\)-vectors \\(x\\) and \\(y\\),\n\n\\[x^Ty\\le ||x||\\cdot ||y||,\\]\nwhere \\(||x|| = \\sqrt{\\sum_i^p x_i^2}\\) is the norm of the vector.\n\nCheck that this definition of Cauchy-Schwartz is correct. Shouldn’t this be called the L2 norm? Or is it any norm?"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#inequalities-continued-1",
+    "href": "slides/topic_optimization/s_MM.html#inequalities-continued-1",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Inequalities (continued)",
+    "text": "Inequalities (continued)\n\nQuadratic upper bound: If a convex function \\(f(x)\\) is twice differentiable and has bounded curvature, then we can majorize \\(f(x)\\) by a quadratic function with sufficiently high curvature and tangent to \\(f(x)\\) at \\(x^t\\). In algebraic terms, we can find a positive definite matrix \\(M\\) such that \\(M-\\nabla^2f(x)\\) is nonnegative for all \\(x\\), then\n\n\\[f(x)\\le f(x^t) + \\nabla f(x^t)^T(x-x^t) + \\frac{1}{2}(x-x^t)^TM(x-x^t)\\] provides a quadratic upper bound that majorizes \\(f(x)\\).\n\nHow do you check if it has bounded curvature?"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#example-1-em-algorithms",
+    "href": "slides/topic_optimization/s_MM.html#example-1-em-algorithms",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Example 1: EM algorithms",
+    "text": "Example 1: EM algorithms\n\nBy Jensen’s inequality and the convexity of the function \\(-\\log(y)\\), we have for probability densities \\(a(y)\\) and \\(b(y)\\) that\n\n\\[-\\log \\left\\{E\\left[\\frac{a(y)}{b(y)}\\right]\\right\\} \\le E\\left[ -\\log\\frac{a(y)}{b(y)} \\right]\\]\n\n\\(Y\\) has the density \\(b(y)\\), then \\(E[a(y)/b(y)] = 1\\). The left hand side vanishes, and we obtain \\[E[\\log a(y)] \\le E[\\log b(y)],\\]\n\nthe Kullback-Leibler divergence.\n\nThis inequality guarantees that a minorizing function is constructed in the E-step of any EM algorithm, making every EM algorithm an MM algorithm.\n\n\nI’m glossing over a lot of details here but this is basically shorthand for another proof of EM that uses Jensen’s inequality"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#example-1-em-algorithms-cont",
+    "href": "slides/topic_optimization/s_MM.html#example-1-em-algorithms-cont",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Example 1: EM algorithms, cont",
+    "text": "Example 1: EM algorithms, cont\n\nWe have the decomposition\n\n\\[\\begin{align}\nQ(\\theta|\\theta^t) &= E_z\\left[\\log p(y, z |\\theta)|y, \\theta^t\\right]\\\\[2mm]\n&= E\\left[\\log p(z|y,\\theta)|y, \\theta^t\\right] + \\log p(y|\\theta)\n\\end{align}\\]\nBY KL divergence,\n\\[E\\left[\\log p(z|y,\\theta)|y, \\theta^t\\right] \\le E\\left[\\log p(z|y,\\theta^t)|y, \\theta^t\\right] \\forall \\theta\\]\nWe obtain the surrogate function that minorizes the objective function\n\\[ \\log p(y|\\theta) \\ge Q(\\theta|\\theta^t) -  E\\left[\\log p(z|y,\\theta^t)|y, \\theta^t\\right]\\]"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#example-2-finding-a-sample-median",
+    "href": "slides/topic_optimization/s_MM.html#example-2-finding-a-sample-median",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Example 2: finding a sample median",
+    "text": "Example 2: finding a sample median\n\nConsider the sequence of numbers \\(y_1, \\ldots y_n\\). The sample median \\(\\theta\\) minimizes the non-differentiable objective function\n\n\\[f(\\theta) = \\sum_i^n |y_i-\\theta|.\\]\n\nThe quadratic function\n\n\\[h_i(\\theta|\\theta^t) = \\frac{(y_i-\\theta)^2}{2|y_i-\\theta^t|}+\\frac 1 2 |y_i-\\theta^t|\\] majorizes \\(|y_i-\\theta|\\) at the point \\(\\theta^t\\) (Arithmetic-Geometric Mean Inequality).\n\nHence, \\(g(\\theta|\\theta^t) = \\sum_i^n h_i(\\theta|\\theta^t)\\) majorizes \\(f(\\theta)\\).\n\n\nCan we draw a picture of this to make it more obvious?"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#example-2-finding-a-sample-median-continued",
+    "href": "slides/topic_optimization/s_MM.html#example-2-finding-a-sample-median-continued",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Example 2: finding a sample median (continued)",
+    "text": "Example 2: finding a sample median (continued)\nWe have the following objective function (a weighted sum of squares):\n\\[g(\\theta|\\theta^t) = \\frac{1}{2}\\sum_i^n\\left[\\frac{(y_i-\\theta)^2}{|y_i-\\theta^t|}+|y_i-\\theta^t|\\right]\\] - The minimum of \\(g(\\theta|\\theta^t)\\) occurs at\n\\[\\theta^{t+1} = \\frac{\\sum_i^nw_i^ty_i}{w^t_i}, w_i^t = |y_i-\\theta^t|^{-1}\\] - This algorithm works except when a weight \\(w_i^t=\\infty\\). It generalizes to sample quantiles, LASSO, and quantile regression.\n\nMight be good to think through how to generalize this to a non-median quantile"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#example-2-finding-a-sample-median-continued-1",
+    "href": "slides/topic_optimization/s_MM.html#example-2-finding-a-sample-median-continued-1",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Example 2: finding a sample median (continued)",
+    "text": "Example 2: finding a sample median (continued)\nDo lab exercise 1"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#finding-a-sample-quantile",
+    "href": "slides/topic_optimization/s_MM.html#finding-a-sample-quantile",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Finding a sample quantile",
+    "text": "Finding a sample quantile\nMedian example generalizes to finding a sample quantile. A \\(q\\)th sample quantile of \\(y_1,\\ldots, y_n\\) is one that minimizes the function\n\\[f(\\theta) = \\sum_i p_q(y_i-\\theta)\\]\nWhere \\(p_q(\\theta) = q\\theta\\) if \\(\\theta \\ge 0\\) and \\(p_q(\\theta) = -q(1-\\theta)\\) if \\(\\theta &lt; 0\\). A majorizing function is\n\\[g_q(\\theta|\\theta^t) = \\frac{1}{4}\\sum_i^n\\left[\\frac{(y_i-\\theta)^2}{|y_i-\\theta^t|}+ (4q-2)(y_i-\\theta)+ |y_i-\\theta^t|\\right]\\]"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#finding-a-sample-quantile-1",
+    "href": "slides/topic_optimization/s_MM.html#finding-a-sample-quantile-1",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Finding a sample quantile",
+    "text": "Finding a sample quantile"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#example-3-bradley-terry-ranking",
+    "href": "slides/topic_optimization/s_MM.html#example-3-bradley-terry-ranking",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Example 3: Bradley-Terry Ranking",
+    "text": "Example 3: Bradley-Terry Ranking\nConsider a sports league with \\(n\\) teams. Assign team \\(i\\) the skill level \\(\\theta_i\\), where \\(\\theta_1 = 1\\) for identifiability. Bradley and Terry proposed the model\n\\[Pr(i \\mbox{ beats } j) = \\frac{\\theta_i}{\\theta_i + \\theta_j}.\\]\n\nIf \\(b_{ij}\\) is the number of times \\(i\\) beats \\(j\\), then the likelihood of the data is\n\n\\[L(\\theta) = \\prod_{i\\ne j}\\left(\\frac{\\theta_i}{\\theta_i + \\theta_j}\\right)^{b_{ij}}.\\] We estimate \\(\\theta\\) by maximizing \\(f(\\theta) = \\log L(\\theta)\\) and then rank the teams on the basis of the estimates."
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#example-3-bradley-terry-ranking-1",
+    "href": "slides/topic_optimization/s_MM.html#example-3-bradley-terry-ranking-1",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Example 3: Bradley-Terry Ranking",
+    "text": "Example 3: Bradley-Terry Ranking\n\nThe log-likelihood is \\(f(\\theta) = \\sum_{i \\ne j}b_{ij}[\\log\\theta_i - \\log(\\theta_i + \\theta_j)]\\).\nWe need to linearize the term \\(-\\log(\\theta_i + \\theta_j)\\) to separate parameters.\n\n\nThis whole lecture is more about neat things you should come back to if you need more rather than stuff to build on or try yourself, necessarily"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#example-3-bradley-terry-ranking-continued",
+    "href": "slides/topic_optimization/s_MM.html#example-3-bradley-terry-ranking-continued",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Example 3: Bradley-Terry Ranking (continued)",
+    "text": "Example 3: Bradley-Terry Ranking (continued)\n\nBy the supporting hyperplane property when \\(f\\) is convex and the convecity of \\(-\\log(\\cdot)\\), we have\n\n\\[-\\log(y)\\ge -\\log(x) - x^{-1}(y-x) = -\\log(x) - y/x+ 1\\]\n\nThe inequality indicates that\n\n\\[-\\log(\\theta_i+\\theta_j) \\ge -\\log(\\theta_i^t+\\theta_j^t) - \\frac{\\theta_i+\\theta_j}{\\theta_i^t+\\theta_j^t}+ 1\\]"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#example-3-bradley-terry-ranking-continued-1",
+    "href": "slides/topic_optimization/s_MM.html#example-3-bradley-terry-ranking-continued-1",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Example 3: Bradley-Terry Ranking (continued)",
+    "text": "Example 3: Bradley-Terry Ranking (continued)\n\nThus, the minorizing function is\n\n\\[g(\\theta|\\theta^t) = \\sum_{i\\ne j}b_{ij}\\left[ \\log\\theta_i -\\log(\\theta_i^t +\\theta_j^t) - \\frac{\\theta_i + \\theta_j}{\\theta_i^t+\\theta_j^t} + 1\\right].\\]\n\nThe parameters are now separated. We can easily find the optimal point\n\n\\[\\theta_i^t = \\frac{\\sum_{i\\ne j}b_{ij}}{\\sum_{i\\ne j}(b_{ij}+b_{ji})/(\\theta_i^t + \\theta_j^t)}\\]"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#bt-ranking",
+    "href": "slides/topic_optimization/s_MM.html#bt-ranking",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "BT Ranking",
+    "text": "BT Ranking\nLab exercise 2"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#example-4-handling-constraints",
+    "href": "slides/topic_optimization/s_MM.html#example-4-handling-constraints",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Example 4: Handling constraints",
+    "text": "Example 4: Handling constraints\n\nConsider the problem of minimizing \\(f(\\theta)\\) subject to the constraints \\(v_j(\\theta)\\ge 0\\) for \\(1\\le j\\le q\\), where each \\(v_j(\\theta)\\) is a concave, differentiable function.\nBy the supporting hyperplane property and the convexity of \\(-v_j(\\theta)\\),\n\n\\[v_j(\\theta^t) - v_j(\\theta) \\ge -[\\nabla v_j(\\theta^t)]^T(\\theta-\\theta^t) \\tag{2}.\\]\n\nAgain, by the supporting hyperplane property and the convexity of \\(-\\log(\\cdot)\\), we have \\(-\\log y + log x \\ge -x^{-1}(y-x) \\implies x(-\\log y + \\log x) \\ge x-y\\). Then:\n\n\\[\\begin{equation}\nv_j(\\theta^t)[-\\log v_j(\\theta)+\\log v_j(\\theta^t)]\\ge v_j(\\theta^t)-v_j(\\theta).\n\\end{equation}\\tag{3}\\]"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#example-4-handling-constraints-1",
+    "href": "slides/topic_optimization/s_MM.html#example-4-handling-constraints-1",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Example 4: Handling constraints",
+    "text": "Example 4: Handling constraints\nBy (2) and (3) on the previous slide,\n\\[v_j(\\theta^t)[-\\log v_j(\\theta)+\\log v_j(\\theta^t)] + [\\nabla v_j(\\theta^t)]^T(\\theta-\\theta^t) \\ge 0\\]\nand the equality holds when \\(\\theta = \\theta^t\\).\n\nSumming over \\(j\\) and multiplying by a positive tuning parameter \\(\\omega\\), we construct the surrogate function that majorizes \\(f(\\theta)\\),\n\n\\[g(\\theta|\\theta^t) = f(\\theta) + \\omega \\sum_{j = 1}^q \\left[v_j(\\theta^t)\\log\\frac{v_j(\\theta^t)}{v_j(\\theta)} + [\\nabla v_j(\\theta^t)]^T(\\theta-\\theta^t) \\right] \\ge f(\\theta)\\]"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#handling-constraints-continued",
+    "href": "slides/topic_optimization/s_MM.html#handling-constraints-continued",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Handling constraints (continued)",
+    "text": "Handling constraints (continued)\n\nNote:\n\nMajorization gets rid of the inequality constraints!\nThe presence of \\(\\log v_j(\\theta)\\) ensures \\(v_j(\\theta)\\ge 0\\)\n\nAn initial point \\(\\theta^0\\) must be selected with all inequality constraints strictly satisfied. All iterates stay within the interior region but allows strict inequalities to become equalities at the limit\nThe minimization step of the MM algorithm can be carried out approximately by Newton’s method.\nWhere there are linear equality constraints \\(A\\theta = b\\) in addition to the inequality constraints \\(v_j(\\theta)\\ge 0\\), these should be enforced by introducing Lagrange multipliers during the minimization of \\(g(\\theta|\\theta^t)\\).\n\n\nWe will talk more about constrained optimization and consider different approaches in a later lecture"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#comparing-mm-and-newtons-method",
+    "href": "slides/topic_optimization/s_MM.html#comparing-mm-and-newtons-method",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Comparing MM and Newton’s Method",
+    "text": "Comparing MM and Newton’s Method\n\nConvergence rate\n\nN: a quadratic rate \\(\\lim ||\\theta^{t+1}-\\hat{\\theta}||/||\\theta^{t+1}-\\hat{\\theta}||^2 = c\\)\nMM: a linear rate \\(\\lim ||\\theta^{t+1}-\\hat{\\theta}||/||\\theta^{t+1}-\\hat{\\theta}|| = c &lt; 1\\)\n\nComplexity of each iteration\n\nN: requires evaluation and inversion of Hessian, \\(O(p^3)\\)\nMM: separates parameters, \\(O(p)\\) or \\(O(p^2)\\)\n\nStability of the algorithm\n\nN: behaves poorly if started too far from an optimum point\nMM: guaranteed to increase/decrease the objective function at every iteration"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#comparing-mm-and-newtons-method-1",
+    "href": "slides/topic_optimization/s_MM.html#comparing-mm-and-newtons-method-1",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Comparing MM and Newton’s Method",
+    "text": "Comparing MM and Newton’s Method\nIn conclusion, well-designed MM algorithms tend to require more iterations but simpler iterations than Newton’s method; thus MM sometimes enjoy an advantage in computation speed and numerical stability."
+  },
+  {
+    "objectID": "slides/topic_optimization/s_MM.html#resources",
+    "href": "slides/topic_optimization/s_MM.html#resources",
+    "title": "The EM algorithm II: theory and inference",
+    "section": "Resources",
+    "text": "Resources\n\nKenneth Lange lecture\nExample with NMF\nLange examples of MM\n\n–"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html",
+    "href": "slides/topic_optimization/s_gradient_methods.html",
+    "title": "Gradient Methods",
+    "section": "",
+    "text": "Today, we cover:\n\nReview of GLMs\nGradient methods\n\nNewtons method continued\nIteratively reweighted least squares for GLM\nQuasi-Newton\n\n\nAnnouncements\n\nHW3 posted later today and due 3/4 at 10:00AM\nNo class tomorrow, 2/12\n\nReadings:\n\nPeng Chapter 3\nGivens and Hoeting Chapter 2"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#overview",
+    "href": "slides/topic_optimization/s_gradient_methods.html#overview",
+    "title": "Gradient Methods",
+    "section": "",
+    "text": "Today, we cover:\n\nReview of GLMs\nGradient methods\n\nNewtons method continued\nIteratively reweighted least squares for GLM\nQuasi-Newton\n\n\nAnnouncements\n\nHW3 posted later today and due 3/4 at 10:00AM\nNo class tomorrow, 2/12\n\nReadings:\n\nPeng Chapter 3\nGivens and Hoeting Chapter 2"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#rates-of-convergence",
+    "href": "slides/topic_optimization/s_gradient_methods.html#rates-of-convergence",
+    "title": "Gradient Methods",
+    "section": "Rates of convergence",
+    "text": "Rates of convergence\nOne of the ways algorithms can be compared is via their rates of convergence to some limiting value.\n\nTypically we have an iterative algorithm that is trying to find the max/min of an objective function \\(f\\)\n\nWant to estimate how long it will take to reach that optimal value\n\nThree rates of convergence we will focus on:\n\nlinear (slowest)\nsuperlinear (faster)\nquadratic (fastest)\n\n\nAlgorithms that require more information about \\(f\\) (such as its derivative) tend to converge more quickly.\n\nFaster rate here means fewer iterations, not necessarily faster computation time.\n\nimportant caveat is that these describe local convergence i.e. what happens when you’re already near the solution\ncost per iteration matters and sometimes cost is larger per iteration for quadratic methods"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#rates-of-convergence-1",
+    "href": "slides/topic_optimization/s_gradient_methods.html#rates-of-convergence-1",
+    "title": "Gradient Methods",
+    "section": "Rates of convergence",
+    "text": "Rates of convergence"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#generalized-linear-models-glms",
+    "href": "slides/topic_optimization/s_gradient_methods.html#generalized-linear-models-glms",
+    "title": "Gradient Methods",
+    "section": "Generalized linear models (GLMs)",
+    "text": "Generalized linear models (GLMs)\nExtension of standard linear model to allow for non-Normal response distributions.\n\\[\\begin{align}\ng(\\mu_i) &= x_i^T\\beta\\\\[3mm]\n\\mu_i &= E(Y_i|x_i)\n\\end{align}\\]\n\n\\(g(\\cdot)\\) is a known link function\n\\(Y_i \\sim EF\\), iid\n\nExponential Family distribution, i.e. Normal, binomial, Poisson, etc.\n\n\\(Var(Y_i|X_i) = \\phi Var(\\mu)\\)\n\nKnown variance function that (often) depends on the mean\n\n\n\nSometimes \\(g(\\mu_i) = \\eta_i\\) is called the linear predictor Link function links the linear predictor (linear combination of the covariates) with the mean of the outcome Linearity assumption now applies to \\(g(\\mu_i)\\)"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#canonical-links",
+    "href": "slides/topic_optimization/s_gradient_methods.html#canonical-links",
+    "title": "Gradient Methods",
+    "section": "Canonical links",
+    "text": "Canonical links"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#generalized-linear-models-glms-1",
+    "href": "slides/topic_optimization/s_gradient_methods.html#generalized-linear-models-glms-1",
+    "title": "Gradient Methods",
+    "section": "Generalized linear models (GLMs)",
+    "text": "Generalized linear models (GLMs)\nLinear regression:\n\\[\\hat{\\beta} = (X^TX)^{-1}X^TY\\]\nGLMs:\n\n\\(\\hat{\\beta}\\) (typically) cannot be obtained in closed form\nNeed an numeric estimation approach, i.e. an iterative algorithm"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#poisson-regression",
+    "href": "slides/topic_optimization/s_gradient_methods.html#poisson-regression",
+    "title": "Gradient Methods",
+    "section": "Poisson regression",
+    "text": "Poisson regression\n\\[\\log(E[Y_i|X_i]) = X_i^T\\beta \\]\n\n\\(Y_i \\sim Poisson(\\mu_i)\\)\n\\(Var(\\mu_i) = \\mu_i\\)\n\\(g'(\\mu_i) = \\frac{1}{\\mu_i}\\)\n\n How do we find \\(\\beta\\)?\n\nUse maximum likelihood"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#poisson-regression-log-likelihood",
+    "href": "slides/topic_optimization/s_gradient_methods.html#poisson-regression-log-likelihood",
+    "title": "Gradient Methods",
+    "section": "Poisson regression log-likelihood",
+    "text": "Poisson regression log-likelihood\n\\[l(\\mu_i) = \\sum_i \\left( y_i\\log\\mu_i-\\mu_i-\\log y_i!\\right)\\]\n\n\\(\\mu_i = e^{X_i^T\\beta}\\)\n\n\\[l(\\beta) = \\sum_i \\left( y_iX_i^T\\beta-e^{X_i^T\\beta}-\\log y_i!\\right)\\]\nEstimate unknown \\(\\beta\\) by solving\n\\[\\hat{\\beta} = \\arg\\min_{\\beta} \\sum_i \\left( y_iX_i^T\\beta-e^{X_i^T\\beta}-\\log y_i!\\right)\\]\n\nWrite this out in both latex and Yes,you can check second derivative"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#poisson-regression-log-likelihood-1",
+    "href": "slides/topic_optimization/s_gradient_methods.html#poisson-regression-log-likelihood-1",
+    "title": "Gradient Methods",
+    "section": "Poisson regression log-likelihood",
+    "text": "Poisson regression log-likelihood\nCan solve using steepest descent or Newton\n\nNeed gradient and Hessian\n\n - gradient: \\(\\frac{\\partial l(\\beta)}{\\partial \\beta} = \\sum_i(Y_i - e^{X_i^T\\beta})X_i\\)\n - Hessian: \\(\\frac{\\partial^2 l(\\beta)}{\\partial \\beta^2} = -\\sum_i e^{X_i^T\\beta} X_i^TX_i\\)\n\nIs this a convex optimization problem?\n\n\nSomething of an abuse of notation here. Always make sure your dimensions line up! Check the dimensions on this and make sure they are good, if not mess around with the transpose"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#poisson-regression-optimization",
+    "href": "slides/topic_optimization/s_gradient_methods.html#poisson-regression-optimization",
+    "title": "Gradient Methods",
+    "section": "Poisson regression optimization",
+    "text": "Poisson regression optimization\nUsing Steepest Descent:\n\\[\\beta_{t+1} = \\beta_t - \\alpha \\frac{\\partial l(\\beta)}{\\partial \\beta}\\]\nUsing Newton’s Method\n\\[\\beta_{t+1} = \\beta_t -  \\left[\\frac{\\partial^2 l(\\beta)}{\\partial \\beta^2}\\right]^{-1} \\frac{\\partial l(\\beta)}{\\partial \\beta}\\]\n\nNext we will look at Fisher scoring and IRLS, other numerical methods for obtaining MLE in GLMs"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#exercise",
+    "href": "slides/topic_optimization/s_gradient_methods.html#exercise",
+    "title": "Gradient Methods",
+    "section": "Exercise",
+    "text": "Exercise\nGo to lab exercise, implement Newton’s method for Poisson regression. Compare with result from glm()\n\nHave them start with the lab solution from last week For homework 2, they will do the same thing for logistic regression"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#fishers-information",
+    "href": "slides/topic_optimization/s_gradient_methods.html#fishers-information",
+    "title": "Gradient Methods",
+    "section": "Fisher’s information",
+    "text": "Fisher’s information\nSometimes, gradient and Hessian (or related quantities) go by other names in the context of statistical modeling.\n\nScore function: first derivative of log-likelihood with respect to parameter vector \\(\\boldsymbol{\\beta}\\). This is the gradient.\n\n\\[U(\\boldsymbol{\\beta}) = \\nabla \\log L(\\boldsymbol{\\beta})\\]\n\nInformation (aka Fisher’s information): negative expected value of the Hessian.\n\n\\[I(\\boldsymbol{\\beta}) = Var[U(\\boldsymbol{\\beta})] = -E\\left[ \\nabla^2 \\log L(\\boldsymbol{\\beta})\\right] = [Var(\\beta)]^{-1}\\]\n\nobserved information: A function of the sample size \\(n\\)\n\n\\[I_n(\\boldsymbol{\\theta}) = - [\\nabla^2 \\log L(\\boldsymbol{\\theta})]_{\\theta = \\hat{\\theta}}\\]\n\nOften you will see different notation for the observed vs. expected information"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#observed-vs.-expected-information",
+    "href": "slides/topic_optimization/s_gradient_methods.html#observed-vs.-expected-information",
+    "title": "Gradient Methods",
+    "section": "Observed vs. Expected information",
+    "text": "Observed vs. Expected information\n\nObserved information is often easier to work with\nIn many GLMs, observed and expected information are equivalent\nExpected information shown to outperform observed in constructing confidence intervals"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#observed-vs.-expected-information-poisson",
+    "href": "slides/topic_optimization/s_gradient_methods.html#observed-vs.-expected-information-poisson",
+    "title": "Gradient Methods",
+    "section": "Observed vs. Expected information: Poisson",
+    "text": "Observed vs. Expected information: Poisson\n\nFor other GLMs with canonical link this is also true"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#newtons-method-for-glms",
+    "href": "slides/topic_optimization/s_gradient_methods.html#newtons-method-for-glms",
+    "title": "Gradient Methods",
+    "section": "Newton’s method for GLMs",
+    "text": "Newton’s method for GLMs\nFrom last lecture, the Newton’s method update is:\n\\[x_{t+1} = x_t - \\{ f''(x_t) \\}^{-1} f'(x_t).\\]\nIf you are trying to optimize parameters \\(\\beta\\) in a log-likelihood function, this becomes:\n\\[\\begin{align}\n\\beta_{t+1} &= \\beta_t - \\{ l''(\\beta_t) \\}^{-1} l'(\\beta_t)\\\\\n&= \\beta_t + \\{I_n(\\beta_t) \\}^{-1}U(\\beta_t)\n\\end{align}\\]\n Fisher Scoring \\[\\beta_{t+1}= \\beta_t + \\{I(\\beta_t) \\}^{-1}U(\\beta_t)\\]\n\nFor exponential family in canonical form, Newton’s method and fisher scoring are identical (prove this to yourself- is it for only one parameter? Does it apply for GLMs?)"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#fisher-scoring",
+    "href": "slides/topic_optimization/s_gradient_methods.html#fisher-scoring",
+    "title": "Gradient Methods",
+    "section": "Fisher scoring",
+    "text": "Fisher scoring\nSimilar to Newton’s method, but replace observed information for Expected information.\n\nNewton’s method and Fisher scoring have the same asympotic properties, but for individual problems one or another may be easier computationally or analytically\n\nI.E., for when observed information isn’t semi positive definite and can’t be inverted\n\nHowever, Newton’s method and Fisher scoring are equivalent for GLM with canonical link\n\nThis is because the observed and expected information are the same in this setting (check!)\n\n\n\\[\\beta_{t+1} = \\beta_t + \\{I(\\beta_t) \\}^{-1}U(\\beta_t)\\]\n\nReally, this is just a special case of gradient descent similar but less general than Newton."
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#iteratively-reweighted-least-squares-for-glm",
+    "href": "slides/topic_optimization/s_gradient_methods.html#iteratively-reweighted-least-squares-for-glm",
+    "title": "Gradient Methods",
+    "section": "Iteratively reweighted least squares for GLM",
+    "text": "Iteratively reweighted least squares for GLM\nIn GLM, there is usually no closed form solution for the MLE, so the model fitting is done numerically as we’ve seen. In linear regression models, \\(E(y_i |x_i)  = x_i^T \\beta\\), and we minimize\n\\[S(\\beta) = \\sum_i (y_i - x_i^T \\beta)^2, \\]\nto get \\(\\hat{\\beta} = (X^TX)^{-1}X^TY\\).\nQuestion: For GLMs, can we minimize \\(S(\\beta) = \\sum_i (g(y_i) - x_i^T \\beta)^2\\)? Answer: No, because \\(E(g(y|x))\\ne g(E(y|x)) = x^\\beta\\), since \\(g\\) is nonlinear. This means we cannot transform \\(y\\) by \\(g\\) and then run linear regression.\n\nWhy or why not? Idea is that it would be nice if we could do linear regression"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#iteratively-reweighted-least-squares",
+    "href": "slides/topic_optimization/s_gradient_methods.html#iteratively-reweighted-least-squares",
+    "title": "Gradient Methods",
+    "section": "Iteratively reweighted least squares",
+    "text": "Iteratively reweighted least squares\nIdea: Approximate \\(g(y_i)\\) by a linear function so that the OLS formula can be used.\n Algorithm: at step \\(t\\) with current solution \\(\\beta^t\\), linearize \\(g(y_i)\\) around \\(\\hat{\\mu}^t = g^{-1}(x_i^T\\beta^t)\\) (the fitted value for \\(y_i\\) at current step).\nDenote the linearized value by \\(\\tilde{y}_i^t\\)\n\\[\\tilde{y}_i^t = g(\\hat{\\mu}^t) + (y_i-\\hat{\\mu}^t)g'(\\hat{\\mu}^t ).\\]\nNow we can regress \\(\\tilde{y}_i^t\\) on \\(x_i\\) to estimate \\(\\beta^{t + 1}\\). However, \\(\\tilde{y}_i^t\\) is heteroscedastic, i.e., the variances are not identical. - For most distributions the variances is related to the mean.\n\nI don’t love this notation, but it seems to make sense"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#iteratively-reweighted-least-squares-1",
+    "href": "slides/topic_optimization/s_gradient_methods.html#iteratively-reweighted-least-squares-1",
+    "title": "Gradient Methods",
+    "section": "Iteratively reweighted least squares",
+    "text": "Iteratively reweighted least squares\nDerive the variances of \\(\\tilde{y}_i^t\\), and use the inverse of the variance as weights in a weighted least square (WLS):\n\\[W_i^t = \\left[Var(\\tilde{y}_i^t) \\right]^{-1} = \\left[ \\{g'(\\hat{\\mu}^t)\\}^2V(\\hat{\\mu}^t) \\right]^{-1}\\]\nWe can then minimize the following:\n\\[S(\\beta) = \\sum_i W_i^t(\\tilde{y}_i^t - x_i^T \\beta)^2. \\]\nWhich gives solution\n\\[\\hat{\\beta} = (X^TW^tX)^{-1}(X^TW^t \\tilde{y}^t)\\]"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#iteratively-reweighted-least-squares-2",
+    "href": "slides/topic_optimization/s_gradient_methods.html#iteratively-reweighted-least-squares-2",
+    "title": "Gradient Methods",
+    "section": "Iteratively reweighted least squares",
+    "text": "Iteratively reweighted least squares\nIRLS algorithm:\n\nStart with initial estimates, generally \\(\\mu_i^0 = y_i\\)\nForm \\(\\tilde{y}^t\\) and \\(W^t\\)\nEstimate \\(\\beta^{t+1}\\)\nForm \\(\\mu_i^{t+ 1}= g^{-1}(x_i^T\\beta^{t+1})\\), and return to step 2\n\n\nMcCullagh and Nelder (1983) showed that IRLS is equivalent to Fisher scoring.\nUsing the canonical link, IRLS is also equivalent to Newton-Raphson\n\n\nIRLS comes up in gams too, but we’re not going to cover that this eyar Newton is same as Newton-Raphson"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#inference-on-glm-parameter-estimates",
+    "href": "slides/topic_optimization/s_gradient_methods.html#inference-on-glm-parameter-estimates",
+    "title": "Gradient Methods",
+    "section": "Inference on GLM parameter estimates",
+    "text": "Inference on GLM parameter estimates\n\n\\(\\hat{Var}(\\hat{\\theta}) = [I(\\hat{\\theta})]^{-1}\\)\nThen can use LRT, Wald, or Score test to obtain \\(p\\)-values and confidence intervals\n\n Wald test statistic \\(Z\\) is given by \\[Z^2 = (\\hat{\\theta}_{MLE}- \\theta_{H_0})^T[I(\\hat{\\theta}_{MLE})](\\hat{\\theta}_{MLE}- \\theta_{H_0}) \\sim \\chi^2_{df}\\]\n\ndf is the number of parameters being estimated in \\(\\theta\\)\n\n\nUse information from the final iteration of your algorithm\nIf your algorithm doesn’t converge your inference won’t have asymptotic properties that hole Asymptotically equivalent to use observed or expected information,\nWald test showing multivariate version but the univariate version is the one we use all the time\nPlan to write out univariate version"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#quasi-newton",
+    "href": "slides/topic_optimization/s_gradient_methods.html#quasi-newton",
+    "title": "Gradient Methods",
+    "section": "Quasi-Newton",
+    "text": "Quasi-Newton\nQuasi-Newton methods use Newton-like updates while avoiding repeated Hessian at each step.\n\nMotivation:\n\nComputing \\(H\\) scales as \\(O(n^2)\\), inverting it scales as \\(O(n^3)\\)\nFor \\(50\\)-dimensional parameter, need to calculate \\(50(50+1)/2 = 1275\\) values for \\(H\\) at each step, then perform another \\(\\approx 50^3\\) operations to invert it.\n\n\n\\[x_{t+1} = x_t - \\{ f''(x_t) \\}^{-1} f'(x_t).\\]\nQuasi-Newton:\n\\[x_{t+1} = x_t - B_t^{-1} f'(x_t).\\]\nWhere \\(B_t\\) is simpler to compute.\n\nSteps of Newton can be slow when Hessian is large. Idea is to replace hessian with something easier to compute that still retains good convergence properties."
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#quasi-newton-1",
+    "href": "slides/topic_optimization/s_gradient_methods.html#quasi-newton-1",
+    "title": "Gradient Methods",
+    "section": "Quasi-Newton",
+    "text": "Quasi-Newton\nChallenging because \\(f''(x_t)\\) gives us a lot of information about the surface of \\(f\\) at \\(x_t\\) and throwing this out results in loss of information. Idea with Quasi-Newton is to find a solution \\(B_t\\) to the secant equation,\n\\[f'(x_t)-f'(x_{t-1}) = B_t(x_t-x_{t-1}).\\]\nIn one dimension, this is simple. In multiple dimensions there are infinite solutions and we need to constrain the problem:\n\n\\(B_t\\) should be symmetric\nShould be close to \\(B_{t-1}\\)\n\n\nshow what the solution is in one dimension symmetric because it approximates hessian\n\nessentially, we are replacing need to take second derivative with finite difference from previous iteration\nreplacing the second derivative with its finite difference approximation"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#quasi-newton-2",
+    "href": "slides/topic_optimization/s_gradient_methods.html#quasi-newton-2",
+    "title": "Gradient Methods",
+    "section": "Quasi-Newton",
+    "text": "Quasi-Newton\nLet \\(y_t = f'(x_t)-f'(x_{t-1})\\) and \\(s_t = x_t-x_{t-1}\\) such that \\(y_t = B_ts_t\\).\n Broyden, Fletcher, Goldfarb, and Shanno (BFGS) update:\n\\[B_t = B_{t-1} + \\frac{y_ty_t'}{y_t's_t} - \\frac{B_{t-1}s_ts'_tB'_{t-1}}{s'_tB_{t-1}s_t}\\]\n\nImplemented in optim() function in R\nInitialize \\(B_{t-1}^{-1}\\):\n\nset \\(B_{t-1}^{-1} = I\\)\ncompute and invert true Hessian at initial point\n\n\n\nTechnically, we use \\(B_t^{-1}\\) in the actual Newton equation. The Sherman-Morrison update formula allows us to generate the new inverse matrix without having to apply this and invert.\nI’m glossing over a lot of details here so that we can move on to other topics, but I have a nice blog post at the end of this lecture if you want to read more."
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#exercise-1",
+    "href": "slides/topic_optimization/s_gradient_methods.html#exercise-1",
+    "title": "Gradient Methods",
+    "section": "Exercise",
+    "text": "Exercise\nAdd inference to your Newton’s method for Poisson function. Compare with results from glm()."
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#homework-3",
+    "href": "slides/topic_optimization/s_gradient_methods.html#homework-3",
+    "title": "Gradient Methods",
+    "section": "Homework 3",
+    "text": "Homework 3\nLab Exercise 3: Begin to implement Newton’s method with inference for logistic regression (part 1 of Homework 3).\n\nFor homework 3, they will do the same thing for logistic regression"
+  },
+  {
+    "objectID": "slides/topic_optimization/s_gradient_methods.html#resources",
+    "href": "slides/topic_optimization/s_gradient_methods.html#resources",
+    "title": "Gradient Methods",
+    "section": "Resources",
+    "text": "Resources\n\nGreat blog post on Quasi Newton"
   }
 ]

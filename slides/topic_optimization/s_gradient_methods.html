@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Julia Wrobel">
+
+<title>Gradient Methods – BIOS731</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-ff63373b1067ca6f91cf1456aa1f00a2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+</head><body class="nav-fixed quarto-light">\usepackage{xcolor}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\green}[1]{\textcolor{green}{#1}}
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">BIOS731</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-topics" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Topics</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-topics">    
+        <li>
+    <a class="dropdown-item" href="../../topic_reproducible_computing.html">
+ <span class="dropdown-text">Reproducible Computing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_simulation.html">
+ <span class="dropdown-text">Simulation and Resampling</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_optimization.html">
+ <span class="dropdown-text">Optimization I</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_bayesian_computing.html">
+ <span class="dropdown-text">Bayesian Computing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_cloud_computing.html">
+ <span class="dropdown-text">Cloud Computing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_R_packages.html">
+ <span class="dropdown-text">R packages</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_optimization_II.html">
+ <span class="dropdown-text">Optimization II</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_other_material.qmd">
+ <span class="dropdown-text">Other Materials</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-datasets" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Datasets</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-datasets">    
+        <li>
+    <a class="dropdown-item" href="../../dataset_airbnb.qmd">
+ <span class="dropdown-text">Cannabis</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../dataset_brfss.qmd">
+ <span class="dropdown-text">Craniosynothosis</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../syllabus.html"> 
+<span class="menu-text">Syllabus</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/BIOS731/BIOS731.github.io"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="s_gradient_methods.pdf"><i class="bi bi-file-pdf"></i>Beamer</a></li></ul></div></div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Gradient Methods</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Julia Wrobel </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>Today, we cover:</p>
+<ul>
+<li>Review of GLMs</li>
+<li>Gradient methods
+<ul>
+<li>Newtons method continued</li>
+<li>Iteratively reweighted least squares for GLM</li>
+<li>Quasi-Newton</li>
+</ul></li>
+</ul>
+<p>Announcements</p>
+<ul>
+<li>HW3 posted later today and due 3/4 at 10:00AM</li>
+<li>No class tomorrow, 2/12</li>
+</ul>
+<p>Readings:</p>
+<ul>
+<li>Peng Chapter 3</li>
+<li>Givens and Hoeting Chapter 2</li>
+</ul>
+<hr>
+</section>
+<section id="rates-of-convergence" class="level2">
+<h2 class="anchored" data-anchor-id="rates-of-convergence">Rates of convergence</h2>
+<p>One of the ways algorithms can be compared is via their rates of convergence to some limiting value.</p>
+<ul>
+<li>Typically we have an iterative algorithm that is trying to find the max/min of an objective function <span class="math inline">\(f\)</span>
+<ul>
+<li>Want to estimate how long it will take to reach that optimal value</li>
+</ul></li>
+<li>Three rates of convergence we will focus on:
+<ul>
+<li><strong>linear</strong> (slowest)</li>
+<li><strong>superlinear</strong> (faster)</li>
+<li><strong>quadratic</strong> (fastest)</li>
+</ul></li>
+</ul>
+<p>Algorithms that require more information about <span class="math inline">\(f\)</span> (such as its derivative) tend to converge more quickly.</p>
+<div class="notes">
+<p>Faster rate here means fewer iterations, not necessarily faster computation time.</p>
+<ul>
+<li>important caveat is that these describe local convergence i.e.&nbsp;what happens when you’re already near the solution</li>
+<li>cost per iteration matters and sometimes cost is larger per iteration for quadratic methods</li>
+</ul>
+</div>
+<hr>
+</section>
+<section id="rates-of-convergence-1" class="level2">
+<h2 class="anchored" data-anchor-id="rates-of-convergence-1">Rates of convergence</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="s_gradient_methods_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="generalized-linear-models-glms" class="level2">
+<h2 class="anchored" data-anchor-id="generalized-linear-models-glms">Generalized linear models (GLMs)</h2>
+<p>Extension of standard linear model to allow for non-Normal response distributions.</p>
+<p><span class="math display">\[\begin{align}
+g(\mu_i) &amp;= x_i^T\beta\\[3mm]
+\mu_i &amp;= E(Y_i|x_i)
+\end{align}\]</span></p>
+<ul>
+<li><span class="math inline">\(g(\cdot)\)</span> is a known link function</li>
+<li><span class="math inline">\(Y_i \sim EF\)</span>, iid
+<ul>
+<li>Exponential Family distribution, i.e.&nbsp;Normal, binomial, Poisson, etc.</li>
+</ul></li>
+<li><span class="math inline">\(Var(Y_i|X_i) = \phi Var(\mu)\)</span>
+<ul>
+<li>Known variance function that (often) depends on the mean</li>
+</ul></li>
+</ul>
+<div class="notes">
+<p>Sometimes <span class="math inline">\(g(\mu_i) = \eta_i\)</span> is called the linear predictor Link function links the linear predictor (linear combination of the covariates) with the mean of the outcome Linearity assumption now applies to <span class="math inline">\(g(\mu_i)\)</span></p>
+</div>
+<hr>
+</section>
+<section id="canonical-links" class="level2">
+<h2 class="anchored" data-anchor-id="canonical-links">Canonical links</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="canonical.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="generalized-linear-models-glms-1" class="level2">
+<h2 class="anchored" data-anchor-id="generalized-linear-models-glms-1">Generalized linear models (GLMs)</h2>
+<p><strong>Linear regression</strong>:</p>
+<p><span class="math display">\[\hat{\beta} = (X^TX)^{-1}X^TY\]</span></p>
+<p><strong>GLMs</strong>:</p>
+<ul>
+<li><span class="math inline">\(\hat{\beta}\)</span> (typically) cannot be obtained in closed form</li>
+<li>Need an numeric estimation approach, i.e.&nbsp;an <strong>iterative algorithm</strong></li>
+</ul>
+<hr>
+</section>
+<section id="poisson-regression" class="level2">
+<h2 class="anchored" data-anchor-id="poisson-regression">Poisson regression</h2>
+<p><span class="math display">\[\log(E[Y_i|X_i]) = X_i^T\beta \]</span></p>
+<ul>
+<li><span class="math inline">\(Y_i \sim Poisson(\mu_i)\)</span></li>
+<li><span class="math inline">\(Var(\mu_i) = \mu_i\)</span></li>
+<li><span class="math inline">\(g'(\mu_i) = \frac{1}{\mu_i}\)</span></li>
+</ul>
+<p><br> How do we find <span class="math inline">\(\beta\)</span>?</p>
+<ul>
+<li>Use maximum likelihood</li>
+</ul>
+<hr>
+</section>
+<section id="poisson-regression-log-likelihood" class="level2">
+<h2 class="anchored" data-anchor-id="poisson-regression-log-likelihood">Poisson regression log-likelihood</h2>
+<p><span class="math display">\[l(\mu_i) = \sum_i \left( y_i\log\mu_i-\mu_i-\log y_i!\right)\]</span></p>
+<ul>
+<li><span class="math inline">\(\mu_i = e^{X_i^T\beta}\)</span></li>
+</ul>
+<p><span class="math display">\[l(\beta) = \sum_i \left( y_iX_i^T\beta-e^{X_i^T\beta}-\log y_i!\right)\]</span></p>
+<p>Estimate unknown <span class="math inline">\(\beta\)</span> by solving</p>
+<p><span class="math display">\[\hat{\beta} = \arg\min_{\beta} \sum_i \left( y_iX_i^T\beta-e^{X_i^T\beta}-\log y_i!\right)\]</span></p>
+<div class="notes">
+<p>Write this out in both latex and Yes,you can check second derivative</p>
+</div>
+<hr>
+</section>
+<section id="poisson-regression-log-likelihood-1" class="level2">
+<h2 class="anchored" data-anchor-id="poisson-regression-log-likelihood-1">Poisson regression log-likelihood</h2>
+<p>Can solve using steepest descent or Newton</p>
+<ul>
+<li>Need gradient and Hessian</li>
+</ul>
+<p><br> - <strong>gradient</strong>: <span class="math inline">\(\frac{\partial l(\beta)}{\partial \beta} = \sum_i(Y_i - e^{X_i^T\beta})X_i\)</span></p>
+<p><br> - <strong>Hessian</strong>: <span class="math inline">\(\frac{\partial^2 l(\beta)}{\partial \beta^2} = -\sum_i e^{X_i^T\beta} X_i^TX_i\)</span></p>
+<ul>
+<li><strong>Is this a convex optimization problem?</strong></li>
+</ul>
+<div class="notes">
+<p>Something of an abuse of notation here. Always make sure your dimensions line up! Check the dimensions on this and make sure they are good, if not mess around with the transpose</p>
+</div>
+<hr>
+</section>
+<section id="poisson-regression-optimization" class="level2">
+<h2 class="anchored" data-anchor-id="poisson-regression-optimization">Poisson regression optimization</h2>
+<p>Using <strong>Steepest Descent</strong>:</p>
+<p><span class="math display">\[\beta_{t+1} = \beta_t - \alpha \frac{\partial l(\beta)}{\partial \beta}\]</span></p>
+<p>Using <strong>Newton’s Method</strong></p>
+<p><span class="math display">\[\beta_{t+1} = \beta_t -  \left[\frac{\partial^2 l(\beta)}{\partial \beta^2}\right]^{-1} \frac{\partial l(\beta)}{\partial \beta}\]</span></p>
+<div class="notes">
+<p>Next we will look at Fisher scoring and IRLS, other numerical methods for obtaining MLE in GLMs</p>
+</div>
+<hr>
+</section>
+<section id="exercise" class="level2">
+<h2 class="anchored" data-anchor-id="exercise">Exercise</h2>
+<p>Go to lab exercise, implement Newton’s method for Poisson regression. Compare with result from <code>glm()</code></p>
+<div class="notes">
+<p>Have them start with the lab solution from last week For homework 2, they will do the same thing for logistic regression</p>
+</div>
+<hr>
+</section>
+<section id="fishers-information" class="level2">
+<h2 class="anchored" data-anchor-id="fishers-information">Fisher’s information</h2>
+<p>Sometimes, gradient and Hessian (or related quantities) go by other names in the context of statistical modeling.</p>
+<ul>
+<li><strong>Score function</strong>: first derivative of log-likelihood with respect to parameter vector <span class="math inline">\(\boldsymbol{\beta}\)</span>. This is the gradient.</li>
+</ul>
+<p><span class="math display">\[U(\boldsymbol{\beta}) = \nabla \log L(\boldsymbol{\beta})\]</span></p>
+<ul>
+<li><strong>Information</strong> (aka Fisher’s information): negative expected value of the Hessian.</li>
+</ul>
+<p><span class="math display">\[I(\boldsymbol{\beta}) = Var[U(\boldsymbol{\beta})] = -E\left[ \nabla^2 \log L(\boldsymbol{\beta})\right] = [Var(\beta)]^{-1}\]</span></p>
+<ul>
+<li><strong>observed information</strong>: A function of the sample size <span class="math inline">\(n\)</span></li>
+</ul>
+<p><span class="math display">\[I_n(\boldsymbol{\theta}) = - [\nabla^2 \log L(\boldsymbol{\theta})]_{\theta = \hat{\theta}}\]</span></p>
+<div class="notes">
+<p>Often you will see different notation for the observed vs.&nbsp;expected information</p>
+</div>
+<hr>
+</section>
+<section id="observed-vs.-expected-information" class="level2">
+<h2 class="anchored" data-anchor-id="observed-vs.-expected-information">Observed vs.&nbsp;Expected information</h2>
+<ul>
+<li><p>Observed information is often easier to work with</p></li>
+<li><p>In many GLMs, observed and expected information are equivalent</p></li>
+<li><p>Expected information shown to outperform observed in constructing confidence intervals</p></li>
+</ul>
+<hr>
+</section>
+<section id="observed-vs.-expected-information-poisson" class="level2">
+<h2 class="anchored" data-anchor-id="observed-vs.-expected-information-poisson">Observed vs.&nbsp;Expected information: Poisson</h2>
+<div class="notes">
+<p>For other GLMs with canonical link this is also true</p>
+</div>
+<hr>
+</section>
+<section id="newtons-method-for-glms" class="level2">
+<h2 class="anchored" data-anchor-id="newtons-method-for-glms">Newton’s method for GLMs</h2>
+<p>From last lecture, the Newton’s method update is:</p>
+<p><span class="math display">\[x_{t+1} = x_t - \{ f''(x_t) \}^{-1} f'(x_t).\]</span></p>
+<p>If you are trying to optimize parameters <span class="math inline">\(\beta\)</span> in a log-likelihood function, this becomes:</p>
+<p><span class="math display">\[\begin{align}
+\beta_{t+1} &amp;= \beta_t - \{ l''(\beta_t) \}^{-1} l'(\beta_t)\\
+&amp;= \beta_t + \{I_n(\beta_t) \}^{-1}U(\beta_t)
+\end{align}\]</span></p>
+<p><br> <strong>Fisher Scoring</strong> <span class="math display">\[\beta_{t+1}= \beta_t + \{I(\beta_t) \}^{-1}U(\beta_t)\]</span></p>
+<div class="notes">
+<p>For exponential family in canonical form, Newton’s method and fisher scoring are identical (prove this to yourself- is it for only one parameter? Does it apply for GLMs?)</p>
+</div>
+<hr>
+</section>
+<section id="fisher-scoring" class="level2">
+<h2 class="anchored" data-anchor-id="fisher-scoring">Fisher scoring</h2>
+<p>Similar to Newton’s method, but replace <strong>observed information</strong> for <strong>Expected information</strong>.</p>
+<ul>
+<li>Newton’s method and Fisher scoring have the same asympotic properties, but for individual problems one or another may be easier computationally or analytically
+<ul>
+<li>I.E., for when observed information isn’t semi positive definite and can’t be inverted</li>
+</ul></li>
+<li>However, Newton’s method and Fisher scoring are equivalent for GLM with canonical link
+<ul>
+<li>This is because the observed and expected information are the same in this setting (<strong>check</strong>!)</li>
+</ul></li>
+</ul>
+<p><span class="math display">\[\beta_{t+1} = \beta_t + \{I(\beta_t) \}^{-1}U(\beta_t)\]</span></p>
+<div class="notes">
+<p>Really, this is just a special case of gradient descent similar but less general than Newton.</p>
+</div>
+<hr>
+</section>
+<section id="iteratively-reweighted-least-squares-for-glm" class="level2">
+<h2 class="anchored" data-anchor-id="iteratively-reweighted-least-squares-for-glm">Iteratively reweighted least squares for GLM</h2>
+<p>In GLM, there is usually no closed form solution for the MLE, so the model fitting is done numerically as we’ve seen. In linear regression models, <span class="math inline">\(E(y_i |x_i)  = x_i^T \beta\)</span>, and we minimize</p>
+<p><span class="math display">\[S(\beta) = \sum_i (y_i - x_i^T \beta)^2, \]</span></p>
+<p>to get <span class="math inline">\(\hat{\beta} = (X^TX)^{-1}X^TY\)</span>.</p>
+<p><strong>Question</strong>: For GLMs, can we minimize <span class="math inline">\(S(\beta) = \sum_i (g(y_i) - x_i^T \beta)^2\)</span>? <strong>Answer</strong>: No, because <span class="math inline">\(E(g(y|x))\ne g(E(y|x)) = x^\beta\)</span>, since <span class="math inline">\(g\)</span> is nonlinear. This means we cannot transform <span class="math inline">\(y\)</span> by <span class="math inline">\(g\)</span> and then run linear regression.</p>
+<div class="notes">
+<p>Why or why not? Idea is that it would be nice if we could do linear regression</p>
+</div>
+<hr>
+</section>
+<section id="iteratively-reweighted-least-squares" class="level2">
+<h2 class="anchored" data-anchor-id="iteratively-reweighted-least-squares">Iteratively reweighted least squares</h2>
+<p><strong>Idea</strong>: Approximate <span class="math inline">\(g(y_i)\)</span> by a linear function so that the OLS formula can be used.</p>
+<p><br> <strong>Algorithm</strong>: at step <span class="math inline">\(t\)</span> with current solution <span class="math inline">\(\beta^t\)</span>, linearize <span class="math inline">\(g(y_i)\)</span> around <span class="math inline">\(\hat{\mu}^t = g^{-1}(x_i^T\beta^t)\)</span> (the fitted value for <span class="math inline">\(y_i\)</span> at current step).</p>
+<p>Denote the linearized value by <span class="math inline">\(\tilde{y}_i^t\)</span></p>
+<p><span class="math display">\[\tilde{y}_i^t = g(\hat{\mu}^t) + (y_i-\hat{\mu}^t)g'(\hat{\mu}^t ).\]</span></p>
+<p>Now we can regress <span class="math inline">\(\tilde{y}_i^t\)</span> on <span class="math inline">\(x_i\)</span> to estimate <span class="math inline">\(\beta^{t + 1}\)</span>. However, <span class="math inline">\(\tilde{y}_i^t\)</span> is heteroscedastic, i.e., the variances are not identical. - For most distributions the variances is related to the mean.</p>
+<div class="notes">
+<p>I don’t love this notation, but it seems to make sense</p>
+</div>
+<hr>
+</section>
+<section id="iteratively-reweighted-least-squares-1" class="level2">
+<h2 class="anchored" data-anchor-id="iteratively-reweighted-least-squares-1">Iteratively reweighted least squares</h2>
+<p>Derive the variances of <span class="math inline">\(\tilde{y}_i^t\)</span>, and use the inverse of the variance as weights in a weighted least square (WLS):</p>
+<p><span class="math display">\[W_i^t = \left[Var(\tilde{y}_i^t) \right]^{-1} = \left[ \{g'(\hat{\mu}^t)\}^2V(\hat{\mu}^t) \right]^{-1}\]</span></p>
+<p>We can then minimize the following:</p>
+<p><span class="math display">\[S(\beta) = \sum_i W_i^t(\tilde{y}_i^t - x_i^T \beta)^2. \]</span></p>
+<p>Which gives solution</p>
+<p><span class="math display">\[\hat{\beta} = (X^TW^tX)^{-1}(X^TW^t \tilde{y}^t)\]</span></p>
+<hr>
+</section>
+<section id="iteratively-reweighted-least-squares-2" class="level2">
+<h2 class="anchored" data-anchor-id="iteratively-reweighted-least-squares-2">Iteratively reweighted least squares</h2>
+<p>IRLS algorithm:</p>
+<ol type="1">
+<li>Start with initial estimates, generally <span class="math inline">\(\mu_i^0 = y_i\)</span></li>
+<li>Form <span class="math inline">\(\tilde{y}^t\)</span> and <span class="math inline">\(W^t\)</span></li>
+<li>Estimate <span class="math inline">\(\beta^{t+1}\)</span></li>
+<li>Form <span class="math inline">\(\mu_i^{t+ 1}= g^{-1}(x_i^T\beta^{t+1})\)</span>, and return to step 2</li>
+</ol>
+<ul>
+<li>McCullagh and Nelder (1983) showed that IRLS is equivalent to Fisher scoring.</li>
+<li>Using the canonical link, IRLS is also equivalent to Newton-Raphson</li>
+</ul>
+<div class="notes">
+<p>IRLS comes up in gams too, but we’re not going to cover that this eyar Newton is same as Newton-Raphson</p>
+</div>
+<hr>
+</section>
+<section id="inference-on-glm-parameter-estimates" class="level2">
+<h2 class="anchored" data-anchor-id="inference-on-glm-parameter-estimates">Inference on GLM parameter estimates</h2>
+<ul>
+<li><span class="math inline">\(\hat{Var}(\hat{\theta}) = [I(\hat{\theta})]^{-1}\)</span></li>
+<li>Then can use LRT, Wald, or Score test to obtain <span class="math inline">\(p\)</span>-values and confidence intervals</li>
+</ul>
+<p><br> Wald test statistic <span class="math inline">\(Z\)</span> is given by <span class="math display">\[Z^2 = (\hat{\theta}_{MLE}- \theta_{H_0})^T[I(\hat{\theta}_{MLE})](\hat{\theta}_{MLE}- \theta_{H_0}) \sim \chi^2_{df}\]</span></p>
+<ul>
+<li><strong>df</strong> is the number of parameters being estimated in <span class="math inline">\(\theta\)</span></li>
+</ul>
+<div class="notes">
+<p>Use information from the final iteration of your algorithm</p>
+<p>If your algorithm doesn’t converge your inference won’t have asymptotic properties that hole Asymptotically equivalent to use observed or expected information,</p>
+<p>Wald test showing multivariate version but the univariate version is the one we use all the time</p>
+<p>Plan to write out univariate version</p>
+</div>
+<hr>
+</section>
+<section id="quasi-newton" class="level2">
+<h2 class="anchored" data-anchor-id="quasi-newton">Quasi-Newton</h2>
+<p>Quasi-Newton methods use Newton-like updates while avoiding repeated Hessian at each step.</p>
+<ul>
+<li><strong>Motivation</strong>:
+<ul>
+<li>Computing <span class="math inline">\(H\)</span> scales as <span class="math inline">\(O(n^2)\)</span>, inverting it scales as <span class="math inline">\(O(n^3)\)</span></li>
+<li>For <span class="math inline">\(50\)</span>-dimensional parameter, need to calculate <span class="math inline">\(50(50+1)/2 = 1275\)</span> values for <span class="math inline">\(H\)</span> at each step, then perform another <span class="math inline">\(\approx 50^3\)</span> operations to invert it.</li>
+</ul></li>
+</ul>
+<p><span class="math display">\[x_{t+1} = x_t - \{ f''(x_t) \}^{-1} f'(x_t).\]</span></p>
+<p>Quasi-Newton:</p>
+<p><span class="math display">\[x_{t+1} = x_t - B_t^{-1} f'(x_t).\]</span></p>
+<p>Where <span class="math inline">\(B_t\)</span> is simpler to compute.</p>
+<div class="notes">
+<p>Steps of Newton can be slow when Hessian is large. Idea is to replace hessian with something easier to compute that still retains good convergence properties.</p>
+</div>
+<hr>
+</section>
+<section id="quasi-newton-1" class="level2">
+<h2 class="anchored" data-anchor-id="quasi-newton-1">Quasi-Newton</h2>
+<p>Challenging because <span class="math inline">\(f''(x_t)\)</span> gives us a lot of information about the surface of <span class="math inline">\(f\)</span> at <span class="math inline">\(x_t\)</span> and throwing this out results in loss of information. Idea with Quasi-Newton is to find a solution <span class="math inline">\(B_t\)</span> to the <strong>secant equation</strong>,</p>
+<p><span class="math display">\[f'(x_t)-f'(x_{t-1}) = B_t(x_t-x_{t-1}).\]</span></p>
+<p>In one dimension, this is simple. In multiple dimensions there are infinite solutions and we need to constrain the problem:</p>
+<ul>
+<li><span class="math inline">\(B_t\)</span> should be symmetric</li>
+<li>Should be close to <span class="math inline">\(B_{t-1}\)</span></li>
+</ul>
+<div class="notes">
+<p>show what the solution is in one dimension symmetric because it approximates hessian</p>
+<ul>
+<li>essentially, we are replacing need to take second derivative with finite difference from previous iteration</li>
+<li>replacing the second derivative with its finite difference approximation</li>
+</ul>
+</div>
+<hr>
+</section>
+<section id="quasi-newton-2" class="level2">
+<h2 class="anchored" data-anchor-id="quasi-newton-2">Quasi-Newton</h2>
+<p>Let <span class="math inline">\(y_t = f'(x_t)-f'(x_{t-1})\)</span> and <span class="math inline">\(s_t = x_t-x_{t-1}\)</span> such that <span class="math inline">\(y_t = B_ts_t\)</span>.</p>
+<p><br> <strong>Broyden, Fletcher, Goldfarb, and Shanno (BFGS)</strong> update:</p>
+<p><span class="math display">\[B_t = B_{t-1} + \frac{y_ty_t'}{y_t's_t} - \frac{B_{t-1}s_ts'_tB'_{t-1}}{s'_tB_{t-1}s_t}\]</span></p>
+<ul>
+<li>Implemented in <code>optim()</code> function in R</li>
+<li>Initialize <span class="math inline">\(B_{t-1}^{-1}\)</span>:
+<ul>
+<li>set <span class="math inline">\(B_{t-1}^{-1} = I\)</span></li>
+<li>compute and invert true Hessian at initial point</li>
+</ul></li>
+</ul>
+<div class="notes">
+<p>Technically, we use <span class="math inline">\(B_t^{-1}\)</span> in the actual Newton equation. The Sherman-Morrison update formula allows us to generate the new inverse matrix without having to apply this and invert.</p>
+<p>I’m glossing over a lot of details here so that we can move on to other topics, but I have a nice blog post at the end of this lecture if you want to read more.</p>
+</div>
+<hr>
+</section>
+<section id="exercise-1" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-1">Exercise</h2>
+<p>Add inference to your Newton’s method for Poisson function. Compare with results from glm().</p>
+<hr>
+</section>
+<section id="homework-3" class="level2">
+<h2 class="anchored" data-anchor-id="homework-3">Homework 3</h2>
+<p>Lab Exercise 3: Begin to implement Newton’s method with inference for logistic regression (part 1 of Homework 3).</p>
+<div class="notes">
+<p>For homework 3, they will do the same thing for logistic regression</p>
+</div>
+<hr>
+</section>
+<section id="resources" class="level2">
+<h2 class="anchored" data-anchor-id="resources">Resources</h2>
+<ul>
+<li><a href="https://medium.com/towards-data-science/bfgs-in-a-nutshell-an-introduction-to-quasi-newton-methods-21b0e13ee504">Great blog post on Quasi Newton</a></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

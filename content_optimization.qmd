@@ -160,8 +160,48 @@ Simulation study specification:
 
 Try a couple starting parameters for beta, including both good (close to the ground truth) and bad values.
 
+```{r, echo = TRUE, eval = FALSE}
+newton = function(x0, tol = 1e-6, max_iter = 100) {
 
-```{r}
+  x = x0
+  
+  x_history = gradient_vec = hessian_vec = rep(NA, length.out = max_iter)
+  for (iter in 1:max_iter) {
+    
+    # store results
+    x_history[iter] = x
+    
+    
+    # Compute the gradient
+    gradient = 2 * x-100 + exp(x)/50
+    hessian = 2 + exp(x)/50
+    gradient_vec[iter] = gradient
+    hessian_vec[iter] = hessian
+    
+    
+    # Check stopping criterion
+    if(abs(gradient) < tol){
+      message("Converged in ", iter, " iterations.\n")
+      break
+    }
+    
+    # Update the solution
+    x = x - gradient/hessian
+
+  }
+  
+  return(list(solution = x, 
+              x_history = x_history,
+              gradient = gradient_vec,
+              hessian = hessian_vec,
+              converged = (iter < max_iter),
+              niter = iter))
+}
+```
+
+
+
+```{r, echo = FALSE, eval = FALSE}
 newton_poisson = function(beta0 = c(0,0), 
                           x,
                           tol = 1e-6, max_iter = 100) {
@@ -210,14 +250,9 @@ newton_poisson = function(beta0 = c(0,0),
 }
 ```
 
-- simulate from the model $log(E(Y_i = 1|X_i)) = \beta_0 + \beta_1X_i$
-  - $\beta_0 = 1$
-  - $\beta_1 = 0.3$
-  - $X_i \sim N(0, 1)$
-  - $n = 100$
-  - $nsim = 1$
 
-```{r}
+
+```{r, eval = FALSE}
 set.seed(343243)
 n = 100
 beta0 = 1
@@ -246,9 +281,6 @@ summary(mod)
 Modify your `newton_poisson()` function to return a 95\% confidence interval for $\beta$.  How do your results compare to `glm()`?
 
 
-```{r}
-var
-```
 
 
 

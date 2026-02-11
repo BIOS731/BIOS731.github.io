@@ -33,7 +33,7 @@ Today, we cover:
   - Newtons method continued
   - Iteratively reweighted least squares for GLM
   - Quasi-Newton
-  - Coordinate descent
+
   
 Announcements
 
@@ -46,11 +46,7 @@ Readings:
 - Givens and Hoeting Chapter 2
 
 
-::: notes
-Just for today if you haven't done it I will let you do it later today and only take a couple of points off.
 
-Lots of science/math funded my practical purposes- in this case the atom bomb
-:::
 
 ---
 
@@ -144,7 +140,7 @@ g(\mu_i) &= x_i^T\beta\\[3mm]
   - Known variance function that (often) depends on the mean
 
 ::: notes
-Sometimes $g^{-1}(\mu_i) = \eta_i$ is called the linear predictor
+Sometimes $g(\mu_i) = \eta_i$ is called the linear predictor
 Link function links the linear predictor (linear combination of the covariates) with the mean of the outcome
 Linearity assumption now applies to $g(\mu_i)$
 :::
@@ -280,7 +276,7 @@ $$U(\boldsymbol{\beta}) = \nabla \log L(\boldsymbol{\beta})$$
 
 $$I(\boldsymbol{\beta}) = Var[U(\boldsymbol{\beta})] = -E\left[ \nabla^2 \log L(\boldsymbol{\beta})\right] = [Var(\beta)]^{-1}$$
 
-- **observed information**: A function of the sample size $n$
+- **observed information**: A function of the sample size $n$. Negative of the Hessian.     
 
 
 $$I_n(\boldsymbol{\theta}) = - [\nabla^2 \log L(\boldsymbol{\theta})]_{\theta = \hat{\theta}}$$
@@ -366,7 +362,7 @@ $$S(\beta) = \sum_i (y_i - x_i^T \beta)^2, $$
 to get $\hat{\beta} = (X^TX)^{-1}X^TY$.
 
 **Question**: For GLMs, can we minimize $S(\beta) = \sum_i (g(y_i) - x_i^T \beta)^2$?
-**Answer**: No, because $E(g(y|x))\ne g(E(y|x)) = x^\beta$, since $g$ is nonlinear. This means we cannot transform $y$ by $g$ and then run linear regression.
+**Answer**: No, because $E(g(y|x))\ne g(E(y|x)) = x^T\beta$, since $g$ is nonlinear. This means we cannot transform $y$ by $g$ and then run linear regression.
 
 ::: notes
 Why or why not?
@@ -389,6 +385,7 @@ Denote the linearized value by $\tilde{y}_i^t$
 $$\tilde{y}_i^t = g(\hat{\mu}^t) + (y_i-\hat{\mu}^t)g'(\hat{\mu}^t ).$$
 
 Now we can regress $\tilde{y}_i^t$ on $x_i$ to estimate $\beta^{t + 1}$. However, $\tilde{y}_i^t$ is heteroscedastic, i.e., the variances are not identical. 
+
 - For most distributions the variances is related to the mean.
 
 ::: notes
