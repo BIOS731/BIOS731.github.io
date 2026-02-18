@@ -31,10 +31,12 @@ Today, we cover:
 - The EM Algorithm: intro and applications
 - Review of some MLE theory
 
+
   
 Announcements
 
 - HW3 posted and due 3/4 at 10:00AM
+- Message me if you DO NOT have access to the Rollins computing cluster
 
 Readings:
 
@@ -120,12 +122,12 @@ M-step: joint likelihood maximized given (E-step estimate of) the missing data
 Widely used algorithm!! Some common uses include:
 
 
-
+- Missing data imputation
 - Gaussian mixture models
 - Hidden Markov models
-- Missing data imputation
 - Latent variable models (i.e. factor analysis, latent growth curves)
 - Censored or truncated data
+- Mixed effects models
 
 
 
@@ -336,6 +338,11 @@ Need to spend more time thinking through why this is the joint density
 
 ---
 
+## Two-part Gaussian mixture model
+
+
+---
+
 
 ## Two-part Gaussian mixture model
 
@@ -395,6 +402,7 @@ Q(\theta|\theta_0) &= E_z\left[\log p(y, z |\theta)|y, \theta_0\right]\\[3mm]
 
 
 Need current estimates of $\mu_1, \mu_2, \sigma_1^2, \sigma_2^2, \lambda$
+
 - Also, compute $E[z_i|y_i, \theta] := \pi_i$
 
 
@@ -457,45 +465,6 @@ What is the missing data in each of these examples? What is theta?
 ---
 
 
-## Censored exponential data
-
-Suppose we have survival times $t_1, \ldots, t_n \sim Exponential(\lambda)$. 
-
-- Do not observe all survival times because some are censored at times $c_1, \ldots, c_n$.  
-- Actually observe $y_1, \ldots, y_n$, where $y_i = min(t_i, c_i)$
-  - Also have an indicator $\delta_i$ where $\delta_i = 1$ is $t_i \le c_i$
-    - i.e. $\delta_i = 1$ if not censored and $\delta_i = 0$ if censored
-
-
----
-
-
-## Censored exponential data
-
-Suppose we have survival times $t_1, \ldots, t_n \sim Exponential(\lambda)$. 
-
-- Do not observe all survival times because some are censored at times $c_1, \ldots, c_n$.  
-- Actually observe $y_1, \ldots, y_n$, where $y_i = min(t_i, c_i)$
-  - Also have an indicator $\delta_i$ where $\delta_i = 1$ is $t_i \le c_i$
-    - i.e. $\delta_i = 1$ if not censored and $\delta_i = 0$ if censored
-
-<br>
-
-- What is $p(y, z |\theta)$, the complete data density?
-- What is $z$?
-
-::: notes
-We will answer these questions in lab, and implementing this EM will be part of homework 2.
-:::
-
----
-
-
-## Censored exponential data
-
-
-
----
 
 ## EM algorithm
 
@@ -584,6 +553,46 @@ Suppose $Y_1, Y_2, \ldots, Y_n$ is a sample of independent Normal  $N(\mu, \sigm
 What is the MLE of $1/\mu$? Using invariance property of MLEs,
 
 - $1/\hat{\mu} = 1/\bar{Y}$ is the MLE of $1/\mu$
+
+
+---
+
+## Censored exponential data
+
+Suppose we have survival times $t_1, \ldots, t_n \sim Exponential(\lambda)$. 
+
+- Do not observe all survival times because some are censored at times $c_1, \ldots, c_n$.  
+- Actually observe $y_1, \ldots, y_n$, where $y_i = min(t_i, c_i)$
+  - Also have an indicator $\delta_i$ where $\delta_i = 1$ is $t_i \le c_i$
+    - i.e. $\delta_i = 1$ if not censored and $\delta_i = 0$ if censored
+
+
+---
+
+
+## Censored exponential data
+
+Suppose we have survival times $t_1, \ldots, t_n \sim Exponential(\lambda)$. 
+
+- Do not observe all survival times because some are censored at times $c_1, \ldots, c_n$.  
+- Actually observe $y_1, \ldots, y_n$, where $y_i = min(t_i, c_i)$
+  - Also have an indicator $\delta_i$ where $\delta_i = 1$ is $t_i \le c_i$
+    - i.e. $\delta_i = 1$ if not censored and $\delta_i = 0$ if censored
+
+<br>
+
+- What is $p(y, z |\theta)$, the complete data density?
+- What is $z$?
+
+::: notes
+We will answer these questions in lab, and implementing this EM will be part of homework 2.
+:::
+
+---
+
+
+## Censored exponential data
+
 
 
 ---
