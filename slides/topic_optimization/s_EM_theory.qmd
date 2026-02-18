@@ -135,7 +135,7 @@ KL divergence is non-negative, and basically a measure of similarity of two prob
 ## EM: proof of ascent property
 
 \fontsize{10pt}{11pt}\selectfont
-**Theorem**: at each iteration of the EM algoirthm,
+**Theorem**: at each iteration of the EM algorithm,
 
 $$\log p(y|\theta^{t+ 1}) \ge \log p(y|\theta^t),$$
 and equality holds if and only if $\theta^{t+1} = \theta^t.$
@@ -161,6 +161,7 @@ This theorem is the ascent property of EM
 
 ## EM: proof of ascent property
 
+\fontsize{10pt}{11pt}\selectfont
 $$E\left[\log p(z|y,\theta^{t+1})|y, \theta^t\right] + \log p(y|\theta^{t+1}) \ge E\left[\log p(z|y,\theta^{t})|y, \theta^t\right] + \log p(y|\theta^{t})\tag{1}$$
 
 
@@ -186,6 +187,7 @@ Good, but we aren't done yet! Only proved part of the theorem. Still need to pro
 ## EM: proof of ascent property
 
 Combining (3) and (4), we have 
+
 $$\log p(y,z|\theta^{t+1}) = \log p(y, z|\theta^t).$$
 
 The uniqueness of $\theta$ leads to $\theta^{t+1} = \theta^t$
@@ -488,6 +490,7 @@ Jacobian: is a matrix of all first-order partial derivatives of a vector-valued 
 
 ## Supplemented EM (SEM)
 
+\fontsize{10pt}{11pt}\selectfont
 Dempster et al showed that
 
 $$\Psi'(\hat{\theta})^T = I_{Z |Y}(\hat{\theta}) I_{Y,Z}(\hat{\theta})^{-1}\tag{1}$$ 
