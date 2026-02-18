@@ -46,241 +46,55 @@ In this, we will focus on the EM and MM algorithms.
 
 ***
 
-### Lab: Introduction to optimization
+### Lab: Introduction to EM
 
 
-#### Steepest descent
+#### Exercise 1: Two-component Gaussian mixture model
 
-For simplicity, we'll focus on a one-dimensional example.  
-
-$$
-f(x) = (x-50)^2 + e^x/50, \quad f'(x) = 2x - 100 + e^x/50 = 0
-$$
+This will use the example given in Lecture for the two component GMM.  Your role will be to modify the code `EM_GMM.R`.  
 
 
-The R function below, `steepest_descent()`, implements this algorithm for $f(x)$.
-
-```{r}
-# x0: Initial guess for the solution
-# alpha: Step size value
-# tol: Tolerance for stopping criterion
-# max_iter: Maximum number of iterations
-steepest_descent = function(x0, alpha, tol = 1e-6, max_iter = 100) {
-
-  x = x0
-  
-  x_history = gradient_vec = rep(NA, length.out = max_iter)
-  for (iter in 1:max_iter) {
-    
-    # store results
-    x_history[iter] = x
-    
-    
-    # Compute the gradient
-    gradient = 2 * x-100 + exp(x)/50
-    gradient_vec[iter] = gradient
-    
-    # Check stopping criterion
-    if(sqrt(sum(gradient^2)) < tol){
-      message("Converged in", iter, "iterations.\n")
-      break
-    }
-    
-    # Update the solution
-    x = x - alpha * gradient
-    
-
-
-  }
-  
-  return(list(solution = x, 
-              x_history = x_history,
-              gradient = gradient_vec,
-              converged = (iter < max_iter),
-              niter = iter))
-}
-```
-
-
-##### **Exercise 1**
-
-
-- Try out the steepest descent algorithm with different `x0` and `alpha` values
-  - For each `x0` and `alpha` value, plot the evolution of $x$ with each iteration
-  - For each `x0` and `alpha` value, plot the evolution of $f'(x)$ with each iteration
-- What is the solution?
-
-
-**Newton's method**
-
-We'll use the same example as from the steepest descent algorithm. 
-
-$$f(x) = (x-50)^2 + e^x/50, \quad f'(x) = 2x - 100 + e^x/50 = 0$$
-
-- $f''(x) = 2 + e^x/50$
-
-##### **Exercise 2**
-
-Modify the `steepest_descent()` function above to use Newtons method for adjusting step size and call this new function `newton()`.
-
-- How does `newton()` compare with `steepest_descent()` in terms of number of iterations?
-- How does `newton()` compare with `steepest_descent()` in terms of computation time?
-
-
-***
-
-### Lab: Gradient descent
-
-
-
-#### Poisson regression
-
-$$\log(E[Y_i|X_i]) = X_i^T\beta $$
-
-- $Y_i \sim Poisson(\mu_i)$
-- $Var(\mu_i) = \mu_i$
-- $g'(\mu_i) = \frac{1}{\mu_i}$
-
-$$l(\beta) = \sum_i \left( y_iX_i^T\beta-e^{X_i^T\beta}-\log y_i!\right)$$
-
-
-- **gradient**: $\frac{\partial l(\beta)}{\partial \beta} = \sum_i(Y_i - e^{X_i^T\beta})X_i$
-
-
-- **Hessian**: $\frac{\partial^2 l(\beta)}{\partial \beta^2} = -\sum_i e^{X_i^T\beta} X_i^TX_i$
-
-
-
-##### **Exercise 1**
-
-The function `newton()` below performs Newton's method for the lab example from earlier.  Make a new function, `newton_poisson()`, to find MLE estimates for $\beta$ in Poisson regression. Use a simulated dataset with the following parameters:
-
-Simulation study specification:
-
-- simulate from the model $log(E(Y_i = 1|X_i)) = \beta_0 + \beta_1X_i$
-  - $\beta_0 = 1$
-  - $\beta_1 = 0.3$
-  - $X_i \sim N(0, 1)$
-  - $n = 100$
-  - $nsim = 1$
-
-Try a couple starting parameters for beta, including both good (close to the ground truth) and bad values.
+In this code, we are implementing a two component Gaussian mixture model to fit to the Old Faithful Geyser dataset.  This dataset provides the waiting time between eruptions for Old Faithul in Yellowstone National Park.  Notice that the waiting times between eruptions have a bimodal distribution:
 
 
 ```{r}
-newton_poisson = function(beta0 = c(0,0), 
-                          x,
-                          tol = 1e-6, max_iter = 100) {
-
-  beta_cur = beta0
-  beta_history = gradient_vec = matrix(NA, nrow = max_iter, 
-                                       ncol = length(beta0))
-  for (iter in 1:max_iter) {
-    
-    # store results
-    beta_history[iter,] = beta_cur
-    
-    # Compute the gradient and hessian
-    gradient = as.numeric(t(y-exp(x%*%beta_cur))%*%x)
-    
-    hessian_ls = as.list(rep(NA, length.out = length(y)))
-    for(i in 1:length(y)){
-      hessian_ls[[i]] = as.numeric(exp(x[i,]%*%beta_cur)) * tcrossprod(x[i,], x[i,])
-    }
-    
-    hessian <- -1 * Reduce("+", hessian_ls)
-    
-    gradient_vec[iter,] = gradient
-    
-    # Check stopping criterion
-    if(sqrt(sum(gradient^2)) < tol){
-      message("Converged in ", iter, " iterations.\n")
-      break
-    }
-    
-    # Update the solution
-    beta_cur = beta_cur - solve(hessian) %*% gradient
-  }
-  
-  # calculate standard errors
-  information = -hessian
-  se = sqrt(solve(information))
-  
-  return(list(solution = beta_cur, 
-              beta_history = beta_history,
-              gradient = gradient_vec,
-              se = se,
-              information = information, # final hessian matrix
-              converged = (iter < max_iter),
-              niter = iter))
-}
-```
-
-- simulate from the model $log(E(Y_i = 1|X_i)) = \beta_0 + \beta_1X_i$
-  - $\beta_0 = 1$
-  - $\beta_1 = 0.3$
-  - $X_i \sim N(0, 1)$
-  - $n = 100$
-  - $nsim = 1$
-
-```{r}
-set.seed(343243)
-n = 100
-beta0 = 1
-beta1 = 0.3
-x = rnorm(n)
-xmat = cbind(1, x)
-lambda = exp(beta0 + beta1 * xmat)
-y = rpois(n, lambda)
-
-beta0 = c(1,0.3)
-
-my_mod = newton_poisson(c(-2, 3), x = xmat)
-
-my_mod$solution
-diag(my_mod$se)
-
-mod = glm(y ~x, family = poisson)
-summary(mod)
+data(faithful)
+hist(faithful$waiting)
 ```
 
 
+We will use a GMM to find the mean and variance of the two modes (assumption a Gaussian distribution or each mode), and assign a probability that each waiting time belongs to each mode.  
 
 
-##### **Exercise 2**
-
-Modify your `newton_poisson()` function to return a 95\% confidence interval for $\beta$.  How do your results compare to `glm()`?
+Open the code `EM_GMM.R` and do the following:
 
 
-```{r}
-var
-```
+- Complete the E-step of the EM algorithm (M-step is already complete)
+- Add in tolerance criteria to the `while` loop
+  - What likelihood should we be monitoring for convergence?
+  - Plot this likelihood at each iteration.  Is it monotonic?
+
+- Once your code is complete, try out different initialization parameters. Do you get to the same answer? 
 
 
 
+#### Exercise 2: Censored exponential data
 
 
-#### Logistic regression
+Suppose we have survival times $t_1, \ldots, t_n \sim Exponential(\lambda)$. 
 
-This is the beginning of HW 2.
-
-For a given subject in a study, we are interested in modeling $\pi_i = P(Y_i = 1|X_i = x_i)$, where $Y_i \in \{0, 1\}$. The logistic regression model takes the form
+* Do not observe all survival times because some are censored at times $c_1, \ldots, c_n$.  
+* Actually observe $y_1, \ldots, y_n$, where $y_i = min(y_0, c_i)$
+  * Also have an indicator $\delta_i$ where $\delta_i = 1$ is $y_i \le c_i$
+    * i.e. $\delta_i = 1$ if not censored and $\delta_i = 0$ if censored
 
 <br>
 
-$$\text{logit}(\pi_i) = \log \left(\frac{\pi_i}{1-\pi_i}\right) = \log\left({\frac{P(Y_i = 1|X_i)}{1-P(Y_i = 1|X_i)}}\right) = \beta_0 + \beta_1X_{1i} + \beta_2X_{2i} + \ldots + \beta_pX_{pi}$$
-
-* $Y_1, Y_2,\ldots, Y_n \sim Bernoulli(\pi)$ 
-* PDF is $f(y_i; \pi) = \pi^{y_i}(1-\pi)^{1-y_i}$
-
-##### **Exercise 3**
-
-- Derive likelihood, gradient, and Hessian for logistic regression for an arbitrary number of predictors $p$
-- What is the Newton's method update for $\beta$ for logistic regression?
+* What is $p(y, z |\theta)$, the complete data density?
 
 
-- Is logistic regression a convex optimization problem? Why or why not?
+* What is $z$?
 
+* Set up the function $Q(\lambda|\lambda_0)$
 
-***
 :::

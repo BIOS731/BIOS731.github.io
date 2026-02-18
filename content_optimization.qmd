@@ -54,7 +54,7 @@ $$
 
 The R function below, `steepest_descent()`, implements this algorithm for $f(x)$.
 
-```{r}
+```{r, eval = FALSE}
 # x0: Initial guess for the solution
 # alpha: Step size value
 # tol: Tolerance for stopping criterion
@@ -201,7 +201,7 @@ newton = function(x0, tol = 1e-6, max_iter = 100) {
 
 
 
-```{r, echo = TRUE, eval = TRUE}
+```{r, echo = TRUE, eval = FALSE}
 # x is a matric of the covariate values
 # beta0 is a vector of the initial values for beta- what are good starting values?
 newton_poisson = function(beta0 = c(0,0), 
@@ -254,9 +254,9 @@ newton_poisson = function(beta0 = c(0,0),
 
 
 
-```{r, eval = TRUE, echo = TRUE}
+```{r, eval = FALSE, echo = TRUE}
 set.seed(343243)
-n = 100
+n = 400
 beta0 = 1
 beta1 = 2
 x = rnorm(n)
@@ -285,8 +285,29 @@ Modify your `newton_poisson()` function to return a 95\% confidence interval for
 
 
 
-```{r}
+```{r, eval = FALSE}
 diag(my_mod$se)
+
+lower = as.numeric(my_mod$solution - 1.96 * diag(my_mod$se))
+upper = as.numeric(my_mod$solution + 1.96 * diag(my_mod$se))
+
+tibble(beta = as.numeric(my_mod$solution),
+       lower = lower, 
+       upper = upper)
+
+
+# compare with glm
+broom::tidy(mod, conf.int = TRUE)
+
+
+# calculate p value for Wald test
+# assume null hypothesis beta = 0
+
+beta_hat = my_mod$solution
+info_hat = my_mod$information
+
+
+
 ```
 
 

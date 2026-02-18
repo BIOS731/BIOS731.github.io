@@ -42,6 +42,38 @@ Readings:
 - Givens and Hoeting Chapter 4
 
 
+---
+
+
+## Homework 2: coverage
+
+
+```{r echo=FALSE, eval = TRUE, fig.align='center', out.width='100%'}
+knitr::include_graphics("coverage2.png")
+```
+
+
+---
+
+
+## Homework 2: coverage
+
+
+```{r echo=FALSE, eval = TRUE, fig.align='center', out.width='100%'}
+knitr::include_graphics("coverage.png")
+```
+
+
+---
+
+
+## Homework 2: computation time
+
+
+```{r echo=FALSE, eval = TRUE, fig.align='center', out.width='100%'}
+knitr::include_graphics("computation_time.png")
+```
+
 
 ---
 
@@ -377,7 +409,7 @@ Why is the expectation taken with respect to this density?  Intuitively feels li
 ## Two-part Gaussian mixture model
 
 
-\fontsize{10pt}{11pt}\selectfont
+\fontsize{9pt}{10pt}\selectfont
 **M-Step**! Maximize $Q$ to get current estimates of $\mu_1, \mu_2, \sigma_1^2, \sigma_2^2, \lambda$.
 
 \begin{align}
@@ -448,6 +480,7 @@ Suppose we have survival times $t_1, \ldots, t_n \sim Exponential(\lambda)$.
     - i.e. $\delta_i = 1$ if not censored and $\delta_i = 0$ if censored
 
 <br>
+
 - What is $p(y, z |\theta)$, the complete data density?
 - What is $z$?
 
