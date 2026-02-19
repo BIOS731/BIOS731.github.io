@@ -109,94 +109,6 @@ For $p(y|\theta)$ z gets marginalized out
 ---
 
 
-## EM: proof of ascent property
-
-First, some definitions
-
-- **Bayes rule**: $P(A|B) = \frac{P(B|A)P(A)}{P(B)}$
-
-
-- **Kullback-Leibler divergence** (aka "relative entropy"):
-
-$$\int\log \frac{p(x)}{q(x)}p(x)dx \ge 0 \mbox{ for densities } p(x), q(x)$$
-
-  - KL divergence is non-negative
-  - Attains its minimum 0 when $p(x)$ and $q(x)$ are equal
-
-
-::: notes
-KL divergence is non-negative, and basically a measure of similarity of two probability distributions
-:::
-
----
-
-
-
-## EM: proof of ascent property
-
-\fontsize{10pt}{11pt}\selectfont
-**Theorem**: at each iteration of the EM algorithm,
-
-$$\log p(y|\theta^{t+ 1}) \ge \log p(y|\theta^t),$$
-and equality holds if and only if $\theta^{t+1} = \theta^t.$
-
-
-**Proof**: The definition of $\theta^{t+1}$ gives
-
-
-$$Q(\theta^{t+1}|\theta^t) \ge Q(\theta^t|\theta^t) \implies$$
-
-
-$$E_z\left[\log p(y, z |\theta^{t+1})|y, \theta^t\right] \ge E_z\left[\log p(y, z |\theta^t)|y, \theta^t\right]$$
-
-Using Bayes rule and the law of conditional probability, this can be expanded to...
-
-::: notes
-This theorem is the ascent property of EM
-:::
-
----
-
-
-
-## EM: proof of ascent property
-
-\fontsize{10pt}{11pt}\selectfont
-$$E\left[\log p(z|y,\theta^{t+1})|y, \theta^t\right] + \log p(y|\theta^{t+1}) \ge E\left[\log p(z|y,\theta^{t})|y, \theta^t\right] + \log p(y|\theta^{t})\tag{1}$$
-
-
-Also, by non-negativity of KL divergence,
-
-$$\int_z \log\frac{p(z|y,\theta^t)}{p(z|y,\theta^{t+1})}p(z|y,\theta^t)dz = E\left[\log\frac{p(z|y,\theta^t)}{p(z|y,\theta^{t+1})}|y,\theta^t\right] \ge 0\tag{2}$$
-<br>
-Combining (1) and (2) yields 
-
-$$\log p(y|\theta^{t+1}) \ge \log p(y|\theta^t)$$
-
-::: notes
-Show why combining (1) and (2) yields this.
-
-Good, but we aren't done yet! Only proved part of the theorem. Still need to prove the if and only if part
-:::
-
----
-
-## EM: proof of ascent property
----
-
-## EM: proof of ascent property
-
-Combining (3) and (4), we have 
-
-$$\log p(y,z|\theta^{t+1}) = \log p(y, z|\theta^t).$$
-
-The uniqueness of $\theta$ leads to $\theta^{t+1} = \theta^t$
-
-
----
-
-
-
 ## EM: Why does it work?
 
 \fontsize{10pt}{11pt}\selectfont
@@ -359,6 +271,105 @@ col = c(1, 2, 4), lty = 1, bty = "n")
 
 ---
 
+
+
+
+## EM: proof of ascent property
+
+First, some definitions
+
+- **Bayes rule**: $P(A|B) = \frac{P(B|A)P(A)}{P(B)}$
+
+
+- **Kullback-Leibler divergence** (aka "relative entropy"):
+
+$$\int\log \frac{p(x)}{q(x)}p(x)dx \ge 0 \mbox{ for densities } p(x), q(x)$$
+
+  - KL divergence is non-negative
+  - Attains its minimum 0 when $p(x)$ and $q(x)$ are equal
+
+
+::: notes
+KL divergence is non-negative, and basically a measure of similarity of two probability distributions
+:::
+
+---
+
+
+## EM: proof of ascent property
+
+---
+
+
+## EM: proof of ascent property
+
+---
+
+
+## EM: proof of ascent property
+
+---
+
+## EM: proof of ascent property
+
+\fontsize{10pt}{11pt}\selectfont
+**Theorem**: at each iteration of the EM algorithm,
+
+$$\log p(y|\theta^{t+ 1}) \ge \log p(y|\theta^t),$$
+and equality holds if and only if $\theta^{t+1} = \theta^t.$
+
+
+**Proof**: The definition of $\theta^{t+1}$ gives
+
+
+$$Q(\theta^{t+1}|\theta^t) \ge Q(\theta^t|\theta^t) \implies$$
+
+
+$$E_z\left[\log p(y, z |\theta^{t+1})|y, \theta^t\right] \ge E_z\left[\log p(y, z |\theta^t)|y, \theta^t\right]$$
+
+Using Bayes rule and the law of conditional probability, this can be expanded to...
+
+::: notes
+This theorem is the ascent property of EM
+:::
+
+---
+
+
+
+## EM: proof of ascent property
+
+\fontsize{9pt}{10pt}\selectfont
+$$E\left[\log p(z|y,\theta^{t+1})|y, \theta^t\right] + \log p(y|\theta^{t+1}) \ge E\left[\log p(z|y,\theta^{t})|y, \theta^t\right] + \log p(y|\theta^{t})\tag{1}$$
+
+
+Also, by non-negativity of KL divergence,
+
+$$\int_z \log\frac{p(z|y,\theta^t)}{p(z|y,\theta^{t+1})}p(z|y,\theta^t)dz = E\left[\log\frac{p(z|y,\theta^t)}{p(z|y,\theta^{t+1})}|y,\theta^t\right] \ge 0\tag{2}$$
+
+Combining (1) and (2) yields 
+
+$$\log p(y|\theta^{t+1}) \ge \log p(y|\theta^t)$$
+
+::: notes
+Show why combining (1) and (2) yields this.
+
+Good, but we aren't done yet! Only proved part of the theorem. Still need to prove the if and only if part
+:::
+
+---
+
+
+## EM: proof of ascent property
+
+Combining (3) and (4), we have 
+
+$$\log p(y,z|\theta^{t+1}) = \log p(y, z|\theta^t).$$
+
+The uniqueness of $\theta$ leads to $\theta^{t+1} = \theta^t$
+
+
+---
 
 
 
