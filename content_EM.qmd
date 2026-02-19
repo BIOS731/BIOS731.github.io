@@ -46,7 +46,7 @@ In this, we will focus on the EM and MM algorithms.
 
 ***
 
-### Lab: Introduction to EM
+### Lab: EM
 
 
 #### Exercise 1: Two-component Gaussian mixture model
@@ -96,5 +96,20 @@ Suppose we have survival times $t_1, \ldots, t_n \sim Exponential(\lambda)$.
 * What is $z$?
 
 * Set up the function $Q(\lambda|\lambda_0)$
+
+
+#### Exercise 3: EM Standard Errors
+
+We will use a GMM to find the mean and variance of the two modes (assumption a Gaussian distribution or each mode), and assign a probability that each waiting time belongs to each mode.  
+
+
+Open the code `SEM_GMM.R` and do the following:
+
+- Implement bootstrap standard errors for parameters $\theta$
+
+- Bootstrap
+
+
+
 
 :::

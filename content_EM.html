@@ -229,7 +229,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
 <p>In this, we will focus on the EM and MM algorithms.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset panel-pills">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Slide Deck: Introduction to the Expectation-Maximization (EM) Algorithm</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Slide Deck: EM Theory</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Slide Deck: MM</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false" href="">Lab: Introduction to EM</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Slide Deck: Introduction to the Expectation-Maximization (EM) Algorithm</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Slide Deck: EM Theory</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Slide Deck: MM</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false" href="">Lab: EM</a></li></ul>
 <div class="tab-content panel-pills">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <p><a href="./slides/topic_optimization/s_EM.pdf"><img src="./slides/topic_optimization/preview_EM.png" class="img-fluid" style="width:70.0%"></a></p>
@@ -291,6 +291,15 @@ window.Quarto = {
 <li><p>What is <span class="math inline">\(p(y, z |\theta)\)</span>, the complete data density?</p></li>
 <li><p>What is <span class="math inline">\(z\)</span>?</p></li>
 <li><p>Set up the function <span class="math inline">\(Q(\lambda|\lambda_0)\)</span></p></li>
+</ul>
+</section>
+<section id="exercise-3-em-standard-errors" class="level4">
+<h4 class="anchored" data-anchor-id="exercise-3-em-standard-errors">Exercise 3: EM Standard Errors</h4>
+<p>We will use a GMM to find the mean and variance of the two modes (assumption a Gaussian distribution or each mode), and assign a probability that each waiting time belongs to each mode.</p>
+<p>Open the code <code>SEM_GMM.R</code> and do the following:</p>
+<ul>
+<li><p>Implement bootstrap standard errors for parameters <span class="math inline">\(\theta\)</span></p></li>
+<li><p>Bootstrap</p></li>
 </ul>
 </section>
 </div>
