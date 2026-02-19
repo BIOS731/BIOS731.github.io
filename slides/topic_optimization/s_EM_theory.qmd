@@ -35,6 +35,8 @@ Today, we cover:
 Announcements
 
 - HW3 posted and due 3/4 at 10:00AM
+  - Update: Extra credit if you implement SEM or Louis' method
+- Where to find lab solutions
 
 Readings:
 
@@ -42,6 +44,27 @@ Readings:
 - Givens and Hoeting Chapter 4
 
 
+
+---
+
+
+
+## EM: notation
+
+- $Y$: observed data vector
+- $Z$: vector of data that are missing
+- $\theta$: vector of parameters we want to estimate
+- $p(y, z |\theta)$: complete data density
+- $p(y|\theta) = \int_z p(y,z|\theta)dz$: observed data density
+  - $l(\theta|y) = \log f(y|\theta)$: observed data likelihood
+  
+- $p(z|y, \theta)$: conditional density of missing data given observed data 
+
+
+::: notes
+We observe data Y, but some data Z are missing
+For $p(y|\theta)$ z gets marginalized out
+:::
 
 ---
 
@@ -111,11 +134,11 @@ For $p(y|\theta)$ z gets marginalized out
 
 ## EM: Why does it work?
 
-\fontsize{10pt}{11pt}\selectfont
+  
 $Q(\theta |\theta_0)$ function serves as a lower bound to the observed data density $p(y|\theta)$. 
 
 
-The EM is a **minorization** approach. Instead of directly maximizing. the log-likelihood, which is hard, the algorithm constructs a minorizing function and optimizes that function instead.
+- The EM is a **minorization** approach. Instead of directly maximizing. the log-likelihood, which is hard, the algorithm constructs a minorizing function and optimizes that function instead.
 
 A function $g$ *minorizes* $f$ over $\mathcal{X}$ at $y$ if:
 
@@ -151,14 +174,14 @@ Pause and let this sink in. Helps to look at the picture.
 
 ## Example: minorization in Two-part Gaussian mixture model
 
-\fontsize{9pt}{10pt}\selectfont
+
 Suppose we have data $y_1,\ldots, y_n$ that are sampled independently from a two-part mixture of Normals with density
 
 $$p(y|\theta) = \lambda \mathcal{N}(y|\mu_1,\sigma_1^2) + (1-\lambda)\mathcal{N}(y|\mu_2, \sigma^2_2).$$
 
 We can simulate some data from this model:
 
-```{r, eval = TRUE}
+```{r, eval = TRUE, echo = FALSE}
 mu1 = 1; mu2 = 4
 s1 = 2; s2 = 1
 lambda0 = 0.4
@@ -179,8 +202,9 @@ Here we will revisit the two-part Normal mixture model from before.
 
 
 ```{r, eval = TRUE, out.width="60%", fig.align = "center", echo = FALSE}
-hist(x)
-rug(x)
+y = x
+hist(y)
+rug(y)
 ```
 
 ::: notes
@@ -207,7 +231,7 @@ sum(log(f(x, lambda)))
 loglike <- Vectorize(loglike, "lambda") ## Vectorize for plotting
 
 par(mar = c(5,4, 1, 1))
-curve(loglike, 0.01, 0.95, n = 200,xlab = expression(lambda))
+curve(loglike, 0.01, 0.95, n = 200,xlab = expression(lambda), ylab = "loglik(y)")
 ```
 
 ::: notes
@@ -378,7 +402,7 @@ The uniqueness of $\theta$ leads to $\theta^{t+1} = \theta^t$
 Original EM paper did not discuss how to obtain any measures of uncertainty, such as standard errors.
 
 
-- *Observed information matrix* would provide inference
+- *Information matrix* from *observed data log-likelihood* would provide inference
   - Like observed data log-likelihood, often difficult to compute because of the missing data
   
 
@@ -415,7 +439,7 @@ $$I_Y(\theta) = I_{Y,Z}(\theta) - I_{Z|Y}(\theta)$$
 - What is $I_{Z|Y}(\theta)$?
 
 
-- $S(y|\theta) = \nabla\log p(y|\theta)$: observed score function
+- $S(y|\theta) = \nabla\log p(y|\theta)$: observed data score function
 - $S(y,z|\theta) = \nabla\log p(y,z|\theta)$: complete data score function
 
 
@@ -681,7 +705,7 @@ Not gonna go into details of how these work, just want you to know that they exi
 
 ## Exercise
 
-Start to implement SEM method for the two-part GMM.
+Try doing some inference for the two-part GMM.
 
 
 

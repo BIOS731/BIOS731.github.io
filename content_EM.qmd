@@ -103,11 +103,11 @@ Suppose we have survival times $t_1, \ldots, t_n \sim Exponential(\lambda)$.
 We will use a GMM to find the mean and variance of the two modes (assumption a Gaussian distribution or each mode), and assign a probability that each waiting time belongs to each mode.  
 
 
-Open the code `SEM_GMM.R` and do the following:
+Open the code `EM_GMM.R` and do the following:
 
 - Implement bootstrap standard errors for parameters $\theta$
 
-- Bootstrap
+- Try out Louis's method or SEM
 
 
 
