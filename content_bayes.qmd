@@ -1,0 +1,39 @@
+---
+title: "Bayesian Computing"
+format:
+  html:
+    toc: true
+    toc-location: right
+execute:
+  echo: false
+  fig-width: 6
+  fig-asp: 0.6
+  out-width: "90%"
+---
+
+
+
+## Overview
+
+In this, we will introduce optimization and methods for gradient descent.
+
+
+::: {.panel-tabset .panel-pills}
+
+### Slide Deck: Numerical Integration and Sampling
+
+[![](./slides/topic_bayes/preview_integration.png){width=70%}](./slides/topic_bayes/s_integration.pdf)
+
+**Numerical Integration**  
+[Download slides (PDF)](./slides/topic_bayes/s_integration.pdf)
+
+
+***
+
+
+
+### Lab: Numerical Integration and Sampling
+
+
+
+:::

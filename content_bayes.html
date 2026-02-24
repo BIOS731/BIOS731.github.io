@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>BIOS 731: Advanced Statistical Computing – BIOS731</title>
+<title>Bayesian Computing – BIOS731</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -146,7 +146,7 @@ ul.task-list li input[type="checkbox"] {
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link active" href="./syllabus.html" aria-current="page"> 
+    <a class="nav-link" href="./syllabus.html"> 
 <span class="menu-text">Syllabus</span></a>
   </li>  
   <li class="nav-item compact">
@@ -170,33 +170,7 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#instructor-contact-information" id="toc-instructor-contact-information" class="nav-link active" data-scroll-target="#instructor-contact-information">Instructor Contact Information</a></li>
-  <li><a href="#course-description" id="toc-course-description" class="nav-link" data-scroll-target="#course-description">Course Description</a></li>
-  <li><a href="#course-learning-objectives" id="toc-course-learning-objectives" class="nav-link" data-scroll-target="#course-learning-objectives">Course Learning Objectives</a>
-  <ul class="collapse">
-  <li><a href="#phd-competency-assessed" id="toc-phd-competency-assessed" class="nav-link" data-scroll-target="#phd-competency-assessed">PhD Competency Assessed</a></li>
-  </ul></li>
-  <li><a href="#evaluation" id="toc-evaluation" class="nav-link" data-scroll-target="#evaluation">Evaluation</a>
-  <ul class="collapse">
-  <li><a href="#grading-scale" id="toc-grading-scale" class="nav-link" data-scroll-target="#grading-scale">Grading Scale</a></li>
-  </ul></li>
-  <li><a href="#homework-50" id="toc-homework-50" class="nav-link" data-scroll-target="#homework-50">Homework (50%)</a></li>
-  <li><a href="#participation-10" id="toc-participation-10" class="nav-link" data-scroll-target="#participation-10">Participation (10%)</a></li>
-  <li><a href="#final-project-and-presentation-30" id="toc-final-project-and-presentation-30" class="nav-link" data-scroll-target="#final-project-and-presentation-30">Final Project and Presentation (30%)</a></li>
-  <li><a href="#discussion-board-10" id="toc-discussion-board-10" class="nav-link" data-scroll-target="#discussion-board-10">Discussion Board (10%)</a></li>
-  <li><a href="#course-structure" id="toc-course-structure" class="nav-link" data-scroll-target="#course-structure">Course Structure</a></li>
-  <li><a href="#course-policies" id="toc-course-policies" class="nav-link" data-scroll-target="#course-policies">Course Policies</a>
-  <ul class="collapse">
-  <li><a href="#attendance" id="toc-attendance" class="nav-link" data-scroll-target="#attendance">Attendance</a></li>
-  <li><a href="#readings-and-texts" id="toc-readings-and-texts" class="nav-link" data-scroll-target="#readings-and-texts">Readings and Texts</a></li>
-  <li><a href="#inclusivity" id="toc-inclusivity" class="nav-link" data-scroll-target="#inclusivity">Inclusivity</a></li>
-  </ul></li>
-  <li><a href="#rsph-policies" id="toc-rsph-policies" class="nav-link" data-scroll-target="#rsph-policies">RSPH Policies</a>
-  <ul class="collapse">
-  <li><a href="#accessibility-and-accommodations" id="toc-accessibility-and-accommodations" class="nav-link" data-scroll-target="#accessibility-and-accommodations">Accessibility and Accommodations</a></li>
-  <li><a href="#honor-code-and-academic-integrity" id="toc-honor-code-and-academic-integrity" class="nav-link" data-scroll-target="#honor-code-and-academic-integrity">Honor Code and Academic Integrity</a></li>
-  </ul></li>
-  <li><a href="#class-schedule-updated" id="toc-class-schedule-updated" class="nav-link" data-scroll-target="#class-schedule-updated">Class Schedule (Updated)</a></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
   </ul>
 </nav>
     </div>
@@ -205,7 +179,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">BIOS 731: Advanced Statistical Computing</h1>
+<h1 class="title">Bayesian Computing</h1>
 </div>
 
 
@@ -222,441 +196,23 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="instructor-contact-information" class="level2">
-<h2 class="anchored" data-anchor-id="instructor-contact-information">Instructor Contact Information</h2>
-<p><strong>Department:</strong> Biostatistics and Bioinformatics</p>
-<p><strong>Course Number:</strong> BIOS 731<br>
-<strong>Section Number:</strong> 1<br>
-<strong>Credit Hours:</strong> 4<br>
-<strong>Semester:</strong> Spring 2026</p>
-<p><strong>Class Hours and Location:</strong><br>
-Wednesday &amp; Thursday, 10:00 AM – 11:50 AM, GCR P39</p>
-<p><strong>Instructor:</strong><br>
-Julia Wrobel, PhD</p>
-<p><strong>Email:</strong><br>
-julia.wrobel@emory.edu</p>
-<p><strong>School Address / Mailbox:</strong><br>
-1518 Clifton Rd, 1518-002-3AA</p>
-<p><strong>Office Hours:</strong><br>
-Thursdays 1:00 PM- 2:00 PM<br>
-GCR Room 210</p>
-<p><strong>Teaching Assistant:</strong><br>
-Weijia Qian (weijia.qian@emory.edu)</p>
-<p><strong>TA Office Hours:</strong> Tuesdays 11:00 AM - 12:00 PM GCR Room 369</p>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>In this, we will introduce optimization and methods for gradient descent.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset panel-pills">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Slide Deck: Numerical Integration and Sampling</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Lab: Numerical Integration and Sampling</a></li></ul>
+<div class="tab-content panel-pills">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p><a href="./slides/topic_bayes/s_integration.pdf"><img src="./slides/topic_bayes/preview_integration.png" class="img-fluid" style="width:70.0%"></a></p>
+<p><strong>Numerical Integration</strong><br>
+<a href="./slides/topic_bayes/s_integration.pdf">Download slides (PDF)</a></p>
 <hr>
-</section>
-<section id="course-description" class="level2">
-<h2 class="anchored" data-anchor-id="course-description">Course Description</h2>
-<p>This course, designed for Ph.D.&nbsp;biostatistics students, dives into the methods and applications of essential statistical computing techniques. Students will achieve two key goals:<br>
-1. Master the implementation of algorithms behind widely used statistical models<br>
-2. Build fluency in reproducible statistical programming</p>
-<p>With a focus on practical implementation, the course balances foundational theory with hands-on computational experience. Topics include random number generation, bootstrap methods, optimization techniques, Expectation-Maximization (EM), Minorization-Maximization (MM), and Markov chain Monte Carlo (MCMC). On the programming side, students will explore simulation design, cluster computing, code profiling, parallelization, and R package development.</p>
-<p>This course requires a significant amount of programming. Class examples and homework assignments will be predominantly in <strong>R</strong>. Because R can be relatively slow, students will learn how to optimize R for computational efficiency through code profiling and parallelization, and how to implement faster C++ backends using <strong>Rcpp</strong>.</p>
-<p>For standard algorithms such as Newton–Raphson, EM, iteratively reweighted least squares, and Gibbs sampling, homework assignments will require students to directly implement the algorithm rather than use existing software packages. For more advanced topics—including ADMM, variational inference, and deep learning—assignments will focus on reading and summarizing journal articles and performing analyses using existing software.</p>
-<p>The final project allows students to apply tools learned in class to topics related to their dissertation research.</p>
-<p><strong>Prerequisites:</strong> BIOS 707, BIOS 709, or permission of the instructor.</p>
-<p>The course will make heavy use of matrix algebra, including vector and matrix derivatives, norms, eigenvalues and eigenvectors, and matrix inverses.</p>
-<p>R is required for homework assignments unless otherwise specified.</p>
-<hr>
-</section>
-<section id="course-learning-objectives" class="level2">
-<h2 class="anchored" data-anchor-id="course-learning-objectives">Course Learning Objectives</h2>
-<p>Upon successful completion of the course, students should be able to:</p>
-<ul>
-<li>Understand the theoretical and computational foundations of algorithms covered in the course<br>
-</li>
-<li>Implement algorithms using high-level programming languages<br>
-</li>
-<li>Apply methods to real-world data<br>
-</li>
-<li>Write efficient, reproducible R code locally and on computing clusters</li>
-</ul>
-<section id="phd-competency-assessed" class="level3">
-<h3 class="anchored" data-anchor-id="phd-competency-assessed">PhD Competency Assessed</h3>
-<ul>
-<li><strong>Develop and assess new statistical methods</strong>
-<ul>
-<li>Homework 1 involves designing and implementing a simulation study.</li>
-</ul></li>
-<li><strong>Conduct complex statistical analyses</strong>
-<ul>
-<li>The final project applies a recent computational method to a real dataset.</li>
-</ul></li>
-<li><strong>Conduct independent research in biostatistics</strong>
-<ul>
-<li>The final exam involves reading a research paper and implementing the proposed method.</li>
-</ul></li>
-</ul>
-<hr>
-</section>
-</section>
-<section id="evaluation" class="level2">
-<h2 class="anchored" data-anchor-id="evaluation">Evaluation</h2>
-<p>Evaluation will be based on the following components:</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Assessment</th>
-<th>Percentage</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Homework (7 assignments)</td>
-<td>50%</td>
-</tr>
-<tr class="even">
-<td>Final Project and Presentation</td>
-<td>30%</td>
-</tr>
-<tr class="odd">
-<td>Discussion Board (4 posts)</td>
-<td>10%</td>
-</tr>
-<tr class="even">
-<td>Participation</td>
-<td>10%</td>
-</tr>
-</tbody>
-</table>
-<section id="grading-scale" class="level3">
-<h3 class="anchored" data-anchor-id="grading-scale">Grading Scale</h3>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Grade</th>
-<th>Percentage</th>
-<th>Points</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>A</td>
-<td>93–100%</td>
-<td>4.0</td>
-</tr>
-<tr class="even">
-<td>A−</td>
-<td>90–93%</td>
-<td>3.7</td>
-</tr>
-<tr class="odd">
-<td>B+</td>
-<td>87–90%</td>
-<td>3.3</td>
-</tr>
-<tr class="even">
-<td>B</td>
-<td>83–87%</td>
-<td>3.0</td>
-</tr>
-<tr class="odd">
-<td>B−</td>
-<td>80–83%</td>
-<td>2.7</td>
-</tr>
-<tr class="even">
-<td>C</td>
-<td>65–80%</td>
-<td>2.0</td>
-</tr>
-<tr class="odd">
-<td>F</td>
-<td>&lt;65%</td>
-<td>0.0</td>
-</tr>
-</tbody>
-</table>
-<hr>
-</section>
-</section>
-<section id="homework-50" class="level2">
-<h2 class="anchored" data-anchor-id="homework-50">Homework (50%)</h2>
-<p>Homework must be neat, well organized, and typed. Raw computer output is not acceptable. Numerical output should be incorporated into text or tables, and plots must be clearly labeled.</p>
-<p>Students may collaborate, but submitted work must be their own and not identical to others.</p>
-<p>Late assignments receive a maximum of half credit. Assignments more than three days late will not be graded.</p>
-<hr>
-</section>
-<section id="participation-10" class="level2">
-<h2 class="anchored" data-anchor-id="participation-10">Participation (10%)</h2>
-<p>Students are expected to attend class in person. Participation credit requires attendance and engagement in at least 20 lectures through asking or answering questions.</p>
-<hr>
-</section>
-<section id="final-project-and-presentation-30" class="level2">
-<h2 class="anchored" data-anchor-id="final-project-and-presentation-30">Final Project and Presentation (30%)</h2>
-<p>Students will select a computational method from the past five years, apply it to a dataset, and present results to the class.</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Component</th>
-<th>Weight</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Written report</td>
-<td>50%</td>
-</tr>
-<tr class="even">
-<td>In-class presentation</td>
-<td>50%</td>
-</tr>
-</tbody>
-</table>
-<hr>
-</section>
-<section id="discussion-board-10" class="level2">
-<h2 class="anchored" data-anchor-id="discussion-board-10">Discussion Board (10%)</h2>
-<p>Four discussion posts based on readings and/or seminar lectures.</p>
-<hr>
-</section>
-<section id="course-structure" class="level2">
-<h2 class="anchored" data-anchor-id="course-structure">Course Structure</h2>
-<p>This course meets in person twice weekly. The first half of each class is lecture-based, and the second half focuses on problem-solving in small groups.</p>
-<hr>
-</section>
-<section id="course-policies" class="level2">
-<h2 class="anchored" data-anchor-id="course-policies">Course Policies</h2>
-<section id="attendance" class="level3">
-<h3 class="anchored" data-anchor-id="attendance">Attendance</h3>
-<p>Regular attendance is expected. Classes will be recorded and posted on Canvas.</p>
-</section>
-<section id="readings-and-texts" class="level3">
-<h3 class="anchored" data-anchor-id="readings-and-texts">Readings and Texts</h3>
-<p>No required textbook. Suggested references include:</p>
-<ul>
-<li>Matloff, <em>The Art of R Programming</em></li>
-<li>Wickham, <em>Advanced R</em></li>
-<li>Boyd &amp; Vandenberghe, <em>Convex Optimization</em></li>
-<li>Hastie et al., <em>Statistical Learning with Sparsity</em></li>
-<li>Hastie et al., <em>The Elements of Statistical Learning</em></li>
-<li>Golub &amp; Van Loan, <em>Matrix Computations</em></li>
-</ul>
-</section>
-<section id="inclusivity" class="level3">
-<h3 class="anchored" data-anchor-id="inclusivity">Inclusivity</h3>
-<p>This course values diverse perspectives. Please share your preferred name and pronouns.</p>
-<hr>
-</section>
-</section>
-<section id="rsph-policies" class="level2">
-<h2 class="anchored" data-anchor-id="rsph-policies">RSPH Policies</h2>
-<section id="accessibility-and-accommodations" class="level3">
-<h3 class="anchored" data-anchor-id="accessibility-and-accommodations">Accessibility and Accommodations</h3>
-<p>Students requiring accommodations must register with the Office of Accessibility Services.</p>
-</section>
-<section id="honor-code-and-academic-integrity" class="level3">
-<h3 class="anchored" data-anchor-id="honor-code-and-academic-integrity">Honor Code and Academic Integrity</h3>
-<p>Students are expected to uphold the Laney Graduate School Honor Code.</p>
-<hr>
-</section>
-</section>
-<section id="class-schedule-updated" class="level2">
-<h2 class="anchored" data-anchor-id="class-schedule-updated">Class Schedule (Updated)</h2>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 6%">
-<col style="width: 25%">
-<col style="width: 43%">
-<col style="width: 24%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Date</th>
-<th>Module</th>
-<th>Topic</th>
-<th>Assignment</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>1/14</td>
-<td>Reproducible Computing</td>
-<td>Git/GitHub, reproducible R</td>
-<td>—</td>
-</tr>
-<tr class="even">
-<td>1/15</td>
-<td>Reproducible Computing</td>
-<td>Debugging, profiling</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>1/21</td>
-<td>Simulation &amp; Resampling</td>
-<td>Simulation studies</td>
-<td>HW1 due</td>
-</tr>
-<tr class="even">
-<td>1/22</td>
-<td>Simulation &amp; Resampling</td>
-<td>Bootstrap &amp; permutation tests</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>1/28</td>
-<td>Reproducible Computing</td>
-<td>Parallelization, parametric reports</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>1/29</td>
-<td>—</td>
-<td>No class</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>2/4</td>
-<td>Optimization I</td>
-<td>Introduction to optimization</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>2/5</td>
-<td>Optimization I</td>
-<td>Gradient methods, GLMs</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>2/11</td>
-<td>Optimization I</td>
-<td>EM I: applications</td>
-<td>HW2 due</td>
-</tr>
-<tr class="even">
-<td>2/18</td>
-<td>Optimization I</td>
-<td>EM II: theory</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>2/19</td>
-<td>Optimization I</td>
-<td>MM algorithm</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>2/25</td>
-<td>Bayesian Computing</td>
-<td>Numerical integration &amp; sampling</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>2/26</td>
-<td>Bayesian Computing</td>
-<td>Introduction to MCMC</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>3/4</td>
-<td>Bayesian Computing</td>
-<td>MCMC II</td>
-<td>HW3 due</td>
-</tr>
-<tr class="odd">
-<td>3/5</td>
-<td>Bayesian Computing</td>
-<td></td>
-<td></td>
-</tr>
-<tr class="even">
-<td>3/11</td>
-<td>Spring Break</td>
-<td>No class</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>3/12</td>
-<td>Spring Break</td>
-<td>No class</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>3/18</td>
-<td>ENAR</td>
-<td>No class</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>3/19</td>
-<td>Cloud Computing</td>
-<td>HPC usage (guest lecture)</td>
-<td>Project proposals due</td>
-</tr>
-<tr class="even">
-<td>3/25</td>
-<td>Cloud Computing</td>
-<td>Cluster project organization</td>
-<td>HW 4 due</td>
-</tr>
-<tr class="odd">
-<td>3/26</td>
-<td>Bayesian Computing</td>
-<td>Variational Bayes</td>
-<td>Discussion Post</td>
-</tr>
-<tr class="even">
-<td>4/1</td>
-<td>R Packages</td>
-<td>Package basics</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>4/2</td>
-<td>R Packages</td>
-<td>RcPP</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>4/8</td>
-<td>Optimization II</td>
-<td>LP, quantile regression</td>
-<td>HW5 due</td>
-</tr>
-<tr class="odd">
-<td>4/9</td>
-<td>Optimization II</td>
-<td>QP, LASSO</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>4/15</td>
-<td>Optimization II</td>
-<td>HMM and ADMM</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>4/16</td>
-<td>Optimization II</td>
-<td>Stochastic gradient descent</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>4/22</td>
-<td>Special Topics</td>
-<td>(Previously 4/16 content moved forward)</td>
-<td>HW6 due</td>
-</tr>
-<tr class="odd">
-<td>4/23</td>
-<td>Final Presentations</td>
-<td>First half</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>4/29</td>
-<td>Final Presentations</td>
-<td>Second half</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>5/6</td>
-<td>Final Project Due</td>
-<td></td>
-<td></td>
-</tr>
-</tbody>
-</table>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+
+</div>
+</div>
+</div>
 
 
 </section>

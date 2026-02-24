@@ -4,4 +4,11 @@ toc: true
 sidebar: false
 ---
 
-In progress.
+Is this module we will cover concepts from Bayesian Computing.
+
+
+-   [Numerical Integration and Sampling](content_optimization.qmd)
+-   [Introduction to MCMC](content_EM.qmd)
+-   [MCMC 2](content_EM.qmd)
+-   [Variational Bayes](tbd.qmd)
+
