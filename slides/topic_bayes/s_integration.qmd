@@ -38,7 +38,7 @@ Today, we cover:
 - Rejection sampling
 - Monte Carlo integration
 
-To do: **sign up for a final presentation slot on Canvas calendar**
+  
 
 Resources:
 
@@ -92,6 +92,15 @@ Exact techniques only exact in the sense that as some index (like time or resour
 
 ---
 
+## Quadrature rules
+
+\fontsize{10pt}{11pt}\selectfont
+**Quadrature rules** approximate the value of a definite integral by taking a weighted sum of function values at specific points:
+
+$$\int_a^b f(x)dx \approx \sum_{i = 1}^n w_i f(x)$$
+
+
+---
 
 ## Quadrature rules
 
@@ -108,13 +117,15 @@ $$\int_a^b f(x)dx \approx \sum_{i = 1}^n w_i f(x)$$
 - Gaussian quadrature
   - Nodes not equally spaced
   - Use more optimal spacing and weights to improve accuracy
+- **Best for lower-dimensional problems**
+
 
 ---
 
 ## Newton-Cotes quadrature
 
 
-```{r echo=FALSE, eval = TRUE, fig.align='center', out.width='60%'}
+```{r echo=FALSE, eval = TRUE, fig.align='center', out.width='70%'}
 knitr::include_graphics("nc.png")
 ```
 
@@ -158,11 +169,12 @@ knitr::include_graphics("midpoint.png")
 
 ## Trapezoidal rule
 
-**Trapezoidal rule** approximates the function in each subinterval by a line (i.e., polynomial of degree 1). 
+\fontsize{10pt}{11pt}\selectfont
+**Trapezoidal rule** approximates the function in each subinterval by a line 
 
 $$\int_a^b f(x) dx \approx \sum_{i = 0}^{n -1}\frac{x_{i+1}-x_i}{2}\times [f(x_i)+f(x_{i+1})] \triangleq T_n(f)$$
 
-```{r echo=FALSE, fig.align='center', out.width='55%'}
+```{r echo=FALSE, eval = TRUE, fig.align='center', out.width='45%'}
 knitr::include_graphics("trap.png")
 ```
 
@@ -186,6 +198,7 @@ $$\left|\int_a^bf(x) dx - T_n(f)\right| = \left| \frac{(b-a)^3f''(x^*)}{12n^2} \
 
 \fontsize{10pt}{11pt}\selectfont
 Simpson's rule uses a **quadratic polynomial** to approximate each subinterval
+
 - With $n$ equally spaced intervals of length $2h = (b-a)/n$:
 
 
@@ -215,7 +228,7 @@ $$\left|\int_a^bf(x) dx - S_n(f)\right| = \left| \frac{(b-a)^5f''''(x^*)}{180n^4
 - For convex functions, the midpoint rule under-estimates and the
 trapezoid rule over-estimates.
 - For concave functions, the midpoint rule over-estimates and the
-trapeziod rule under-estimates.
+trapezoid rule under-estimates.
 - It can be shown that Simpson's rule is a weighted average of the
 midpoint (M) and trapezoid (T) rules:
 

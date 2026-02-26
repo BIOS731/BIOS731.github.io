@@ -69,6 +69,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -209,7 +238,20 @@ ul.task-list li input[type="checkbox"] {
 <hr>
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
-
+<section id="exercise-1-comparing-newton-cotes-integration-in-r" class="level4">
+<h4 class="anchored" data-anchor-id="exercise-1-comparing-newton-cotes-integration-in-r"><strong>Exercise 1</strong>: Comparing Newton-Cotes integration in R</h4>
+<p>Using the functions defined above, integrate the function <span class="math inline">\(f(x) = \frac{1}{(x+1)x^{1/2}}\)</span> from 0 to 1. What values to you get for the trapezoidal and Simpson’s rules when <span class="math inline">\(n = 10\)</span>? When <span class="math inline">\(n = 100\)</span>?</p>
+</section>
+<section id="exercise-2-rejection-sampling" class="level4">
+<h4 class="anchored" data-anchor-id="exercise-2-rejection-sampling"><strong>Exercise 2</strong>: Rejection sampling</h4>
+<p>Code below provides an example of performing rejection sampling where the proposal distribution is <span class="math inline">\(t_2\)</span> and the target distribution is <span class="math inline">\(N(0,1)\)</span>.</p>
+<p>Try out this function.</p>
+<ul>
+<li>How did we define <span class="math inline">\(M\)</span>?</li>
+<li>Which samples are accepted and which are a rejected?</li>
+<li>Make a plot of a histogram of the accepted values against the <span class="math inline">\(N(0,1)\)</span> density. How closely does your sample match?</li>
+</ul>
+</section>
 </div>
 </div>
 </div>

@@ -63,6 +63,7 @@ In this code, we are implementing a two component Gaussian mixture model to fit 
 
 
 ```{r}
+library(tictoc)
 data(faithful)
 hist(faithful$waiting)
 ```
@@ -129,6 +130,13 @@ The code below performs implements an MM algorithm for finding the sample median
 - you may note that the MM value is different from that obtained using `median()`. Why?
 
 
+```{r}
+## simulate some data
+n = 1000001
+true_median = 5
+y = rnorm(n, true_median)   # symmetric dist, so mean = median
+```
+
 
 
 ```{r, eval = FALSE, echo = TRUE}
@@ -137,23 +145,24 @@ tol_criteria = Inf
 
 # define vectors to store elements of interest
 max_iter = 100
-tol = 0.00000001
-objective = theta_vec = rep(NA, length = max_iter)
+tol = 0.00001
+surrogate = objective = theta_vec = rep(NA, length = max_iter)
 
 
-
+## Add initial value
+theta0 = 100
+theta = theta0
 ####
 
-
-theta = theta0
-
+tic()
 while(iter < max_iter  & tol_criteria > tol){
 
   ###############################################################
   ## Majorization
   ###############################################################
 
-  objective[iter] = 1/2 *sum((y-theta)^2/abs(y-theta) + abs(y-theta))
+  surrogate[iter] = 1/2 *sum((y-theta)^2/abs(y-theta) + abs(y-theta))
+  objective[iter] = sum(abs(y - theta))
   w = 1/abs(y-theta)
 
   ###############################################################
@@ -161,7 +170,7 @@ while(iter < max_iter  & tol_criteria > tol){
   ###############################################################
 
   theta = sum(w * y)/sum(w)
-  m[iter] = theta
+  theta_vec[iter] = theta
   ###############################################################
 
   if(iter > 1){
@@ -170,8 +179,24 @@ while(iter < max_iter  & tol_criteria > tol){
   iter = iter + 1
   message(paste0("iteration: ", iter, "; ll: ", round(tol_criteria, 4)))
 }
+
+time_mm = toc()
+
+
 ```
 
+
+```{r, eval = FALSE, echo = TRUE}
+tic()
+median(y)
+time_med = toc()
+time_med$toc- time_med$tic
+
+
+theta
+time_mm$toc- time_mm$tic
+
+```
 
 
 #### **Exercise 2**: MM for Bradley-Terry ranking

@@ -35,5 +35,85 @@ In this, we will introduce optimization and methods for gradient descent.
 ### Lab: Numerical Integration and Sampling
 
 
+#### **Exercise 1**: Comparing Newton-Cotes integration in R
+
+```{r}
+# Trapezoid Rule
+trapezoid = function (f, a, b, n) {
+  # numerical integral of f from a to b
+  # using the trapezoid rule with n subdivisions
+  # assumes a < b and n is a positive integer 
+  h = (b-a)/n
+  x = seq (a, b, by=h)
+  y = f (x)
+  s = (h/2) * (y[1] + 2*sum (y[2:n]) + y[n+1])
+  return(s)
+}
+
+# Simpson's Rule
+simpson = function (f, a, b, n) {
+# numerical integral using Simpson's rule
+# assumes a < b and n is an even positive integer
+  h = (b-a)/n
+  x = seq(a, b, by=h)
+  evens = x[seq (2, n, by=2)]
+  odds = x[seq (3, n-1, by=2)]
+  s = f(x[1]) + f(x[n+1]) + 4*sum(f(evens)) + 2*sum(f(odds))
+  s = s*h/3
+  return(s)
+}
+```
+
+
+Using the functions defined above, integrate the function $f(x) = \frac{1}{(x+1)x^{1/2}}$ from 0 to 1. What values to you get for the trapezoidal and Simpson's rules when $n = 10$? When $n = 100$?
+
+
+#### **Exercise 2**: Rejection sampling
+
+Code below provides an example of performing rejection sampling where the proposal distribution is $t_2$ and the target distribution is $N(0,1)$.
+
+Try out this function.
+
+- How did we define $M$?
+- Which samples are accepted and which are a rejected?
+- Make a plot of a histogram of the accepted values against the $N(0,1)$ density. How closely does your sample match?
+
+```{r}
+# Target: standard normal
+f <- function(x) {
+  dnorm(x)
+}
+
+# Proposal: t-distribution with 2 degrees of freedom
+g <- function(x) {
+  dt(x, df = 2)
+}
+
+# Estimate M
+x_vals <- seq(-10, 10, length.out = 1000)
+M <- max(f(x_vals) / g(x_vals))
+
+
+# Rejection sampling function
+rejection_sample <- function(n) {
+  samples <- numeric(n)
+  i <- 1
+  while (i <= n) {
+    x <- rt(1, df = 2)       # Proposal from t(2)
+    u <- runif(1)
+    if (u <= f(x) / (M * g(x))) {
+      samples[i] <- x
+      i <- i + 1
+    }
+  }
+  return(samples)
+}
+
+# Generate samples
+set.seed(43232)
+samples <- rejection_sample(10000)
+
+```
+
 
 :::
