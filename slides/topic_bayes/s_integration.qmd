@@ -308,7 +308,7 @@ $$\int_a^b \omega(x)p_i(x)p_j(x) = \delta_{ij}c_i$$
 
 If your limits of integration are $[-1,1]$, you can use the set of **Legendre polynomials** with $\omega(x) = 1.$
 
-```{r echo=FALSE, fig.align='center', out.width='80%'}
+```{r echo=FALSE, eval = TRUE, fig.align='center', out.width='70%'}
 knitr::include_graphics("legendre.png")
 ```
 
@@ -460,7 +460,7 @@ Normal density with mean $x_0$ and variance $-h''(x_0)^{-1}$.
 At this point we are just one call to the `pnorm()` function
 away from approximating our integral. All we need is to compute our normalizing constants.
 
-- Let $\Phi(x|\mu,\sigma^2)$ denote the CDF of the Normal distribution with mean $\mu$ and variance $\sigma^2$, and $\phi(x|\mu,\sigma^2)$ its density.
+- Let $\Phi(x|\mu,\sigma^2)$ denote the CDF of the Normal distribution with mean $\mu$ and variance $\sigma^2$, and $\varphi(x|\mu,\sigma^2)$ its density.
 - Then, the approximation can be written as:
 
 
@@ -485,16 +485,27 @@ function optimizers than integrating the function of interest using a different 
 
 ---
 
+## Laplace approximation
+
+- Location of peak must be located first
+  - Often found using Newton or Quasi-Newton methods
+- Assumes a symmetric distribution
+- Much faster than MCMC
+- Assumes unimodal
+
+::: notes
+If your data is substantially skewed or multimodal laplace can be very biased
+:::
+
+---
+
 ## Laplace approximation and GLMMs
 
 Generalized linear mixed models (GLMMs) take the form:
 
-<br>
-<br>
-<br>
-<br>
-<br>
-
+\vfill
+\vfill
+\vfill
 
 The GLM likelihood involves an integral over random effects:
 
@@ -550,185 +561,6 @@ We had a seminar speaker come and talk about this. Does fast approx bayes.  Gonn
 :::
 
 ---
-
-## Posterior mean
-
-
-In Bayesian computations we often want to compute the posterior
-mean of a parameter given the observed data.
-
-- If $y$ represents data we observe, and $y$ comes from the density $f(y|\theta)$ with $\theta \sim \pi(\theta)$, then we usually want to compute the posterior distribution $p(\theta|y)$ and its mean:
-
-$$E_p[\theta] = \int \theta p(\theta|y)d\theta$$
-
-
-::: notes
-We'll talk more about Bayesian data analysis tomorrow
-:::
-
----
-
-
-
-## Posterior mean
-
-\fontsize{10pt}{11pt}\selectfont
-Note that 
-
-\begin{align}
-\int \theta \, p(\theta \mid y) \, d\theta 
-&= \int \theta \, \frac{f(y \mid \theta) \, \pi(\theta)}{\int f(y \mid \theta) \, \pi(\theta) \, d\theta} \, d\theta \\[3mm]
-&= \int \theta \, \frac{\exp\{\log [f(y \mid \theta) \, \pi(\theta)]\}}{\int \exp\{\log [f(y \mid \theta) \, \pi(\theta)]\} \, d\theta} \, d\theta
-\end{align}
-
-
-- Let $h(\theta) = \log f(y|\theta)\pi(\theta)$
-- Now we can use Laplace approximation for this interval, but need to know where $h(\theta)$ achieves its maximum
-
-::: notes
-In the last step we just did the trick of exponential and log-ging
-:::
-
----
-
-## Posterior mean
-
-- Let $h(\theta) = \log f(y|\theta)\pi(\theta)$
-- Now we can use Laplace approximation for this interval, but need to know where $h(\theta)$ achieves its maximum
-  - Since $f(y|\theta)\pi(\theta)$ is proportional to the posterior density, it achieves its maximum at the **posterior mode**
-  - Since $h(\cdot)$ is a monotonic transformation of $f(y|\theta)\pi(\theta)$, $h(\theta)$ also achieves its maximum at the posterior mode
-  
----
-
-## Posterior mean
-
-\fontsize{10pt}{11pt}\selectfont
-- Let $\hat{\theta}$ denote the posterior mode. Then:
-
-\begin{align}
-\int \theta \, p(\theta \mid y) \, d\theta 
-&\approx 
-\frac{
-    \int \theta \exp\left(h(\hat{\theta}) + \tfrac{1}{2} h''(\hat{\theta})(\theta - \hat{\theta})^2\right) d\theta
-}{
-    \int \exp\left(h(\hat{\theta}) + \tfrac{1}{2} h''(\hat{\theta})(\theta - \hat{\theta})^2\right) d\theta
-} \\
-&= 
-\frac{
-    \int \theta \exp\left( \tfrac{1}{2} h''(\hat{\theta})(\theta - \hat{\theta})^2 \right) d\theta
-}{
-    \int \exp\left( \tfrac{1}{2} h''(\hat{\theta})(\theta - \hat{\theta})^2 \right) d\theta
-} \\
-&= 
-\frac{
-    \sqrt{\frac{2\pi}{-h''(\hat{\theta})}} \int \theta \, \phi(\theta \mid \hat{\theta}, -h''(\hat{\theta})^{-1}) \, d\theta
-}{
-    \sqrt{\frac{2\pi}{-h''(\hat{\theta})}} \int \phi(\theta \mid \hat{\theta}, -h''(\hat{\theta})^{-1}) \, d\theta
-} \\
-&= \hat{\theta}
-\end{align}
-
----
-
-
-
-## Posterior mean
-
-We've just shown that the Laplace approximation to the posterior mean is equal to the posterior mode. 
-
-- This approximation
-is likely to work well when the posterior is unimodal and relatively symmetric around the mode.
-
-
----
-
-
-
-## Posterior mean
-
-**Example**: Poisson data with a Gamma prior. The model is
-
-\begin{align}
-Y|\mu &\sim Poisson(\mu)\\[3mm]
-\mu &\sim Gamma(a, b)
-\end{align}
-
-
-- Let $a = 3$ and $b = 3$
-- Given an observation $y$, the posterior distribution is a Gamma distribution with shape $y+a$ and scale $1 + 1/b$.
-
----
-
-
-
-## Posterior mean
-
-Suppose we observe $y = 2$. Then the posterior looks like:
-
-```{r, echo = FALSE, eval = TRUE, fig.align='center', out.width='50%'}
-make_post <- function(y, shape, scale) {
-function(x) {
-dgamma(x, shape = y + shape,
-scale = 1 / (1 + 1 / scale))
-}
-}
-set.seed(2017-11-29)
-y <- 2
-prior.shape <- 3
-prior.scale <- 3
-p <- make_post(y, prior.shape, prior.scale)
-curve(p, 0, 12, n = 1000, lwd = 3, xlab = expression(mu),
-ylab = expression(paste("p(", mu, " | y)")))
-curve(dgamma(x, shape = prior.shape, scale = prior.scale), add = TRUE,
-lty = 2)
-legend("topright", legend = c("Posterior", "Prior"), lty = c(1, 2), lwd = c(3, 1), bty = "n")
-```
-
-Because the posterior is skewed, the mean and the mode should not match.
-
----
-
-## Posterior mean
-
-\fontsize{10pt}{11pt}\selectfont
-Since this is a Gamma distribution, we can compute the posterior
-mode and mean in closed form.
-
-```{r, eval = TRUE}
-a = 3; b = 3
-pmode = (y + a - 1)*(1/(1 + 1/b))
-pmode
-```
-
-```{r, eval = TRUE}
-pmean = (y + a)*(1/(1 + 1/b))
-pmean
-```
-
----
-
-
-## Posterior mean
-
-Let's plot the Laplace approximation of the posterior. 
-
-```{r echo=FALSE, eval = TRUE, fig.align='center', out.width='90%'}
-knitr::include_graphics("laplace.png")
-```
-
-
----
-
-
-## Posterior mean
-
-In the neighborhood of the mode, the Laplace approximation is reasonable. 
-
-- As we move farther away from the mode, the tail of the Gamma is heavier on the right.
-- We expect the approximation to improve as the sample size increases.
-
----
-
 
 ## Monte Carlo integration
 
@@ -814,6 +646,7 @@ The most generic method  uses the inverse of the cumulative distribution functio
 
 <br>
 **Idea**: $P(F^{-1}(U)\le x) = P(U \le F(x)) = F(x)$
+
 - Requires inversion of $F$, which is not always possible
 
 
@@ -938,6 +771,20 @@ rug(x, col = 4)
 
 ::: notes
 Given what we know about the standard Normal density, most of the samples should be between −3 and +3, except perhaps in very large samples (this is a sample of size 200). From the picture, there are samples in the range of 4–6. In order to transform the $t_2$ samples into $N(0, 1)$ samples, we will need to reject many of the samples out in the tail. On the other hand, there are too few samples in the range of [−2, 2] and so we will have to disproportionaly accept samples in that range until it represents the proper $N(0, 1)$ density.
+:::
+
+---
+
+
+## Rejection sampling algorithm
+
+
+```{r echo=FALSE, eval = TRUE, fig.align='center', out.width='50%'}
+knitr::include_graphics("rejection.png")
+```
+
+::: notes
+More nano-banana... I couldn't help myself
 :::
 
 ---
@@ -1261,4 +1108,185 @@ knitr::include_graphics("legendre2.png")
 ```
 
 ---
+
+
+
+## Posterior mean
+
+
+In Bayesian computations we often want to compute the posterior
+mean of a parameter given the observed data.
+
+- If $y$ represents data we observe, and $y$ comes from the density $f(y|\theta)$ with $\theta \sim \pi(\theta)$, then we usually want to compute the posterior distribution $p(\theta|y)$ and its mean:
+
+$$E_p[\theta] = \int \theta p(\theta|y)d\theta$$
+
+
+::: notes
+We'll talk more about Bayesian data analysis tomorrow
+:::
+
+---
+
+
+
+## Posterior mean
+
+\fontsize{10pt}{11pt}\selectfont
+Note that 
+
+\begin{align}
+\int \theta \, p(\theta \mid y) \, d\theta 
+&= \int \theta \, \frac{f(y \mid \theta) \, \pi(\theta)}{\int f(y \mid \theta) \, \pi(\theta) \, d\theta} \, d\theta \\[3mm]
+&= \int \theta \, \frac{\exp\{\log [f(y \mid \theta) \, \pi(\theta)]\}}{\int \exp\{\log [f(y \mid \theta) \, \pi(\theta)]\} \, d\theta} \, d\theta
+\end{align}
+
+
+- Let $h(\theta) = \log f(y|\theta)\pi(\theta)$
+- Now we can use Laplace approximation for this interval, but need to know where $h(\theta)$ achieves its maximum
+
+::: notes
+In the last step we just did the trick of exponential and log-ging
+:::
+
+---
+
+## Posterior mean
+
+- Let $h(\theta) = \log f(y|\theta)\pi(\theta)$
+- Now we can use Laplace approximation for this interval, but need to know where $h(\theta)$ achieves its maximum
+  - Since $f(y|\theta)\pi(\theta)$ is proportional to the posterior density, it achieves its maximum at the **posterior mode**
+  - Since $h(\cdot)$ is a monotonic transformation of $f(y|\theta)\pi(\theta)$, $h(\theta)$ also achieves its maximum at the posterior mode
+  
+---
+
+## Posterior mean
+
+\fontsize{10pt}{11pt}\selectfont
+- Let $\hat{\theta}$ denote the posterior mode. Then:
+
+\begin{align}
+\int \theta \, p(\theta \mid y) \, d\theta 
+&\approx 
+\frac{
+    \int \theta \exp\left(h(\hat{\theta}) + \tfrac{1}{2} h''(\hat{\theta})(\theta - \hat{\theta})^2\right) d\theta
+}{
+    \int \exp\left(h(\hat{\theta}) + \tfrac{1}{2} h''(\hat{\theta})(\theta - \hat{\theta})^2\right) d\theta
+} \\
+&= 
+\frac{
+    \int \theta \exp\left( \tfrac{1}{2} h''(\hat{\theta})(\theta - \hat{\theta})^2 \right) d\theta
+}{
+    \int \exp\left( \tfrac{1}{2} h''(\hat{\theta})(\theta - \hat{\theta})^2 \right) d\theta
+} \\
+&= 
+\frac{
+    \sqrt{\frac{2\pi}{-h''(\hat{\theta})}} \int \theta \, \phi(\theta \mid \hat{\theta}, -h''(\hat{\theta})^{-1}) \, d\theta
+}{
+    \sqrt{\frac{2\pi}{-h''(\hat{\theta})}} \int \phi(\theta \mid \hat{\theta}, -h''(\hat{\theta})^{-1}) \, d\theta
+} \\
+&= \hat{\theta}
+\end{align}
+
+---
+
+
+
+## Posterior mean
+
+We've just shown that the Laplace approximation to the posterior mean is equal to the posterior mode. 
+
+- This approximation
+is likely to work well when the posterior is unimodal and relatively symmetric around the mode.
+
+
+---
+
+
+
+## Posterior mean
+
+**Example**: Poisson data with a Gamma prior. The model is
+
+\begin{align}
+Y|\mu &\sim Poisson(\mu)\\[3mm]
+\mu &\sim Gamma(a, b)
+\end{align}
+
+
+- Let $a = 3$ and $b = 3$
+- Given an observation $y$, the posterior distribution is a Gamma distribution with shape $y+a$ and scale $1 + 1/b$.
+
+---
+
+
+
+## Posterior mean
+
+Suppose we observe $y = 2$. Then the posterior looks like:
+
+```{r, echo = FALSE, eval = TRUE, fig.align='center', out.width='50%'}
+make_post <- function(y, shape, scale) {
+function(x) {
+dgamma(x, shape = y + shape,
+scale = 1 / (1 + 1 / scale))
+}
+}
+set.seed(2017-11-29)
+y <- 2
+prior.shape <- 3
+prior.scale <- 3
+p <- make_post(y, prior.shape, prior.scale)
+curve(p, 0, 12, n = 1000, lwd = 3, xlab = expression(mu),
+ylab = expression(paste("p(", mu, " | y)")))
+curve(dgamma(x, shape = prior.shape, scale = prior.scale), add = TRUE,
+lty = 2)
+legend("topright", legend = c("Posterior", "Prior"), lty = c(1, 2), lwd = c(3, 1), bty = "n")
+```
+
+Because the posterior is skewed, the mean and the mode should not match.
+
+---
+
+## Posterior mean
+
+\fontsize{10pt}{11pt}\selectfont
+Since this is a Gamma distribution, we can compute the posterior
+mode and mean in closed form.
+
+```{r, eval = TRUE}
+a = 3; b = 3
+pmode = (y + a - 1)*(1/(1 + 1/b))
+pmode
+```
+
+```{r, eval = TRUE}
+pmean = (y + a)*(1/(1 + 1/b))
+pmean
+```
+
+---
+
+
+## Posterior mean
+
+Let's plot the Laplace approximation of the posterior. 
+
+```{r echo=FALSE, eval = TRUE, fig.align='center', out.width='90%'}
+knitr::include_graphics("laplace.png")
+```
+
+
+---
+
+
+## Posterior mean
+
+In the neighborhood of the mode, the Laplace approximation is reasonable. 
+
+- As we move farther away from the mode, the tail of the Gamma is heavier on the right.
+- We expect the approximation to improve as the sample size increases.
+
+---
+
 
