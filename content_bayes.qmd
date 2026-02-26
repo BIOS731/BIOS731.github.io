@@ -37,7 +37,7 @@ In this, we will introduce optimization and methods for gradient descent.
 
 #### **Exercise 1**: Comparing Newton-Cotes integration in R
 
-```{r}
+```{r, echo = TRUE}
 # Trapezoid Rule
 trapezoid = function (f, a, b, n) {
   # numerical integral of f from a to b
@@ -78,7 +78,7 @@ Try out this function.
 - Which samples are accepted and which are a rejected?
 - Make a plot of a histogram of the accepted values against the $N(0,1)$ density. How closely does your sample match?
 
-```{r}
+```{r, echo = TRUE}
 # Target: standard normal
 f <- function(x) {
   dnorm(x)
