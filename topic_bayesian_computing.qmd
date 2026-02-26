@@ -7,7 +7,7 @@ sidebar: false
 Is this module we will cover concepts from Bayesian Computing.
 
 
--   [Numerical Integration and Sampling](content_optimization.qmd)
+-   [Numerical Integration and Sampling](content_bayes.qmd)
 -   [Introduction to MCMC](content_EM.qmd)
 -   [MCMC 2](content_EM.qmd)
 -   [Variational Bayes](tbd.qmd)
