@@ -1,0 +1,880 @@
+---
+title: "MCMC Part 1"
+author: "Julia Wrobel"
+format:
+  beamer:
+    theme: metropolis
+    aspectratio: 169
+    fontsize: 14pt
+    slide-level: 2
+execute:
+  echo: true
+  eval: false
+  warning: false
+  message: false
+header-includes:
+  - \usepackage{xcolor}
+  - \newcommand{\red}[1]{\textcolor{red}{#1}}
+  - \newcommand{\green}[1]{\textcolor{green}{#1}}
+---
+
+
+
+## Overview
+
+```{r, echo = FALSE, eval = TRUE}
+library(tidyverse)
+```
+
+
+Today, we cover:
+
+ 
+- Markov chains
+- MCMC
+- Metropolis-Hastings
+
+Tomorrow:
+
+- Gibb's sampling
+
+
+Resources:
+
+- Peng Advanced Stat Computing Chapter 7
+
+---
+
+
+### Gaussian quadrature 
+
+
+
+---
+
+
+
+## Joint posterior distribution
+
+Our goal is to learn about the joint posterior distribution
+
+$$p(\beta, \sigma^2_y|y, X, hyperparameters)$$
+
+This can be hard!
+
+- Often the joint posterior is analytically intractable
+- For the conjugate priors we use, though, the full conditionals were "easy"
+- If we can't write down the joint posterior, maybe we can sample from it
+
+
+::: notes
+This is the main motivation for MCMC
+:::
+
+---
+
+## MCMC
+
+
+Basic idea:  How do I get a string of values from the posterior when I cannot write the posterior down?
+
+- Markov chain Monte Carlo (MCMC) methods let you sample from complicated [posterior] distributions
+  - a collection of tools used to sample from a target distribution
+
+
+
+- Once you have a sample from the posterior distribution you
+can use summary statistics (mean, variance, quantiles) to
+do posterior inference
+
+
+First we will review Markov chains
+
+::: notes
+Gibbs sampler is a special case of M-H sampler
+You can think about this analogously to bootstrap in some ways- once you have a sample from a distribution, you can learn about that distribution
+:::
+
+---
+
+## Markov chains
+
+\fontsize{10pt}{11pt}\selectfont
+A Markov chain is a stochastic process that evolves over time by transitioning into different states. 
+- The sequence of states is denoted by $\{X_i\}$
+- Transition between states is random and follows the *Markov property*:
+
+$$P(X_t | X_{t-1}, X_{t-2}, \ldots, X_0) = P(X_t|X_{t-1})$$
+
+
+- FYI: this notation is for discrete distributions
+- **Core concept**: The probability of transitioning to a state at time $t$ depends only on the most recent previous state
+
+- *State space*: collection of states that a Markov chain can visit
+- *Transition matrix*: collection of probabilities that we move from one state to another
+
+::: notes
+Another word for random is probabilistic. Using discrete distribution here to get at the general idea, but usually we will be working with continuous distributions.
+- transition matrix also sometimes called transition Kernel
+:::
+
+---
+
+## Markov chain example
+
+
+::: notes
+Draw picture here with three state example, and it's transition matrix
+:::
+
+---
+
+##  Markov chain properties
+
+\fontsize{11pt}{12pt}\selectfont
+$$P = \begin{bmatrix}
+\frac{1}{2} & \frac{1}{2} & 0 \\
+\frac{1}{2} & 0 & \frac{1}{2} \\
+0 & \frac{1}{2} & \frac{1}{2}
+\end{bmatrix}$$
+
+Each entry of $P$ is the probability of going from state $i$ to state $j$, i.e.
+
+$$P(X_{n+1} = j |X_n = i) = P_{ij}$$
+
+- Sum of weights from outgoing arrows = 1
+- Starting with one state and sampling a string of subsequent states is called a **random walk**
+- Goal is to find  probabilities of being in each state
+
+::: notes
+Here is the transition matrix from the previous example
+:::
+
+---
+
+
+##  Markov chain properties
+
+Suppose we start the chain in state 3, with probability 1, so the initial probability distribution over the three states is $\pi_0 = (0,0,1)$.
+
+- What is the probability distribution over the states after one iteration?
+
+
+\vspace{5mm}
+
+- What is the probability distribution over the states after $n$ iterations?
+
+::: notes
+- $\pi_1 = \pi_0P = (0, 1/2, 1/2)$
+- $\pi_n = \pi_0PPP\times \ldots\times P = \pi_0  P^n$
+- As $n$ increases, we expect this to settle into a steady state
+:::
+
+---
+
+##  Markov chain properties
+
+$\pi_*$ is called the stationary distribution. This is the vector of probabilities of being in each state that the chain converges to.
+
+\vspace{15mm}
+
+---
+
+##  Markov chain limit theorem
+
+\fontsize{11pt}{12pt}\selectfont
+Basic limit theorem for Markov chains says 
+
+$$||\pi_*-\pi_n|| \to 0 \mbox{ as } n\to \infty$$
+
+where $||\cdot||$ is the total variation distance between two densities.
+
+- another way of saying this is $\lim_{n\to\infty} \pi^n = \pi_*$ regardless of the starting state
+
+In the long run, the chain "forgets" where it started and settles into a stable distribution over the states. That stable/stationary distribution is $\pi_*$, and the process spends a proportion $\pi_j$ of time in state $j$.
+
+::: notes
+This limit theorem holds under some necessary assumptions
+:::
+
+---
+
+##  Markov chain assumptions
+
+(1) The stationary distribution $\pi_*$ exists.
+
+(2) The chain is **irreducible**: it is possible to reach any state from any other state (eventually)
+
+
+\vspace{5mm}
+
+(3) The chain is **aperiodic**: the chain does not cycle in a fixed period. A chain is aperiodic if it does not make deterministic visits to a subset of the state space.
+
+
+::: notes
+You don't have to be able to reach other states in just one step.
+- periodicity means you can deterministically flip between states. Use pizza on Mondays example
+If these assumptions hold, then Markov chain limit theorem holds and the stationary distribution is unique.
+:::
+
+---
+
+
+## Time-reversible Markov chains
+
+\fontsize{11pt}{12pt}\selectfont
+In a reversible Markov chain, the process looks the same if you run it forward or backward in time.
+
+- At equilibrium (the chain’s long-run steady state), the traffic between any two states is perfectly balanced. For any two states A and B, the probability of transitioning from A to B times the long-run probability of being in A equals the probability of going from B to A times the long-run probability of being in B
+
+MCMC methods use Markov chains to sample from a target probability distribution. The goal is to construct a chain whose stationary distribution is the target distribution we want to sample. Reversibility ensures we have the correct stationary distribution.
+
+
+::: notes
+Why do we care about this for MCMC?
+:::
+
+---
+
+
+
+## Why Reversibility Matters for MCMC
+
+- Ensures correctness: target distribution is the stationary distribution
+- Prevents systematic bias: no net directional drift in sampling
+- Simplifies algorithm design and analysis (e.g., Metropolis-Hastings)
+- Makes it easier to combine steps while preserving invariance
+- Widely used in MCMC due to theoretical guarantees and reliability
+
+---
+
+
+
+## Review: rejection sampling
+
+
+
+::: notes
+What did we learn about this at a high level? What is the point of this?
+- Just draw a picture here
+- Try to provide visual intuition behind this, and why it is inefficient when M is large. Also, because samples are independent we don't learn anything from previous samples about how good they are
+:::
+
+---
+
+
+## MCMC intuition
+
+- Next sample depends on the last sample
+- Samples are no longer independent
+- Eventually Markov chain will simulate draws from target distribution
+- If a Markov chain reaches a stationary distribution, it will stay there
+  - Goal is to design a Markov chain whose stationary distribution is the target distribution
+
+::: notes
+MCMC is a general idea, not an algorithm. 
+- draw picture for this too and connect it to rejection sampling
+:::
+
+---
+
+## MCMC
+
+\fontsize{11pt}{12pt}\selectfont
+Term MCMC encompasses broad array of techniques that have in common a few key ideas:
+
+1. We want to sample form a complicated density or probability mass function $\pi$, often a posterior distribution. Assumption is we can evaluate $\pi$ but not *directly* sample from it
+2. We know that certain stochastic processes called *Markov chains* will converge to a stationary distribution.
+  - Simulating from a Markov chain for long enough will eventually gives us a sample from the chain's stationary distribution
+
+3. Given the functional form of the density $\pi$, we want to construct a Markov chain that has $\pi$ as its stationary distribution
+4. We want to sample values from the MC such that the sequence of values $\{x_n\}$ generated by the chain converges in distribution to $\pi$.
+
+::: notes
+If we can construct a Markov chain whose stationary distribution is our target $\pi$ then we can sample from $\pi$.
+Markov chains converge to their stationary distribution if it exists and specific conditions are satisfied
+- How you design your markov chain differs from method to method
+:::
+
+---
+
+
+
+## Metropolis-Hastings algorithm
+
+Suppose we want to take a sample $x \sim \pi(x)$ using MCMC. 
+
+-Metropolis-Hastings is a popular algorithm (circa 1970) for doing this. 
+
+
+Some terminology:
+
+- **target distribution** is $\pi(x)$, the distribution I want to sample from
+- **proposal distribution** is $q(y|x)$, some probability distribution that is easy to sample from that has the same support as $\pi$
+  - You can equivalently think of this as a transition probability to get from $x$ to the next state $y$
+- **acceptance probability** aka **acceptance ratio**, denoted $\alpha(y|x)$, is the probability of transitioning to a new stage in the Markov chain
+
+
+
+::: notes
+- note that these things were invented a long time a go but it took quite a while for them to take off, until computers got much faster. Hastings didn't even get tenure!
+:::
+
+---
+
+## Steps of Metropolis-Hastings 
+
+\fontsize{11pt}{12pt}\selectfont
+The Metropolis-Hastings procedure is an iterative algorithm where at each iteration, there are three steps. Suppose we are currently in state $x$ and want to know how to move to the next state in the state space (which we will call $y$).
+
+(1) Simulate a *candidate* value $y\sim q(y|x)$ from the proposal distribution, conditional on current state $x$.
+
+(2) Calculate the acceptance ratio, 
+
+$$\alpha(y|x) = \min\left\{\frac{\pi(y)q(x|y)}{\pi(x)q(y|x)}, 1\right\}$$
+(3) Simulate $u\sim Unif(0,1)$. If $u\le \alpha(y|x)$, then the next state is equal to $y$. Otherwise, the next state is still $x$.
+
+::: notes
+Recall our hope is that our Markov chain will, after many simulations, converge to the stationary distribution.
+:::
+
+---
+
+## Simple example
+
+Say we want to sample from the probability distribution $p(x)$ given below:
+
+\begin{align}
+p(x) &= \frac{\exp(-x^2)(2 + \sin(5x) + \sin(2x))}{\int_{-\infty}^{\infty}\exp(-x^2)(2 + \sin(5x) + \sin(2x))dx}\\[3mm]
+&\propto \exp(-x^2)(2 + \sin(5x) + \sin(2x))
+\end{align}
+
+::: notes
+- bit of a contrived example to show how it works but we will do a more complex example next
+Usually problems like this we just call the denominator the normalizing constant
+:::
+
+---
+
+## Simple example
+
+```{r, echo = FALSE,  eval = TRUE, fig.align='center', fig.height = 5, fig.width = 10, warning = FALSE}
+p <- function(x) {
+  exp(-x^2) * (2 + sin(5 * x))
+}
+
+# Compute normalization constant Z ≈ ∫ p(x) dx over [-Inf, Inf]
+Z <- integrate(p, lower = -Inf, upper = Inf)$value
+
+# Normalized density
+f <- function(x) {
+  p(x) / Z
+}
+
+
+x_vals <- seq(-3, 3, length.out = 1000)
+f_vals <- f(x_vals)
+df <- data.frame(x = x_vals, f = f_vals)
+
+ggplot(df, aes(x = x, y = f)) +
+  geom_line(color = "blue", size = 1) +
+  labs(title = expression(p(x) == frac(e^{-x^2}*(2 + sin(5*x)), Z)),
+       y = expression(p(x)), x = "x") +
+  theme_minimal()
+```
+
+
+---
+
+## Simple example
+
+\fontsize{11pt}{12pt}\selectfont
+Domain of $x$ is unrestricted.  Let $x$ be our current value and $y$ the next value in the chain.
+
+- To generate $y$  we will add a $N(0, 1)$ random variable to our current value of $x$
+  - This implies the proposal distribution $q(y|x)$ follows $y \sim N(x, 1)$
+  
+\vspace{5mm}  
+
+The more general idea here is to let $y = x + \epsilon$, where $\epsilon \sim g$ and $g$ is a probability density symmetric about 0.
+
+- Sometimes called a "random walk" Metropolis-Hastings
+- Using a symmetric proposal distribution is also called the Metropolis algorithm
+
+
+::: notes
+Notice that the distribution we sample from depends on the current state of the Markov chain
+:::
+
+---
+
+## Acceptance ratio step
+
+
+$$\alpha(y|x) = \min\left\{\frac{\pi(y)q(x|y)}{\pi(x)q(y|x)}, 1\right\}$$
+
+
+::: notes
+Note here why the normalizing constant will go away, and why the $\alpha$ simplifies
+:::
+
+---
+
+## Acceptance ratio step
+
+$$\alpha(y|x) = \min\left\{\frac{\pi(y)}{\pi(x)}, 1\right\}$$
+First, we calculate this ratio. 
+
+\vspace{5mm}
+
+Then simulate $u\sim Unif(0,1)$. 
+
+- If $u\le \alpha(y|x)$, then the next state is equal to $y$. Otherwise, the next state is still $x$.
+
+---
+
+## Simple example implementation
+
+\fontsize{11pt}{12pt}\selectfont
+```{r, eval = TRUE}
+target = function(x){
+  exp(-x^2) * (2 + sin(5 * x) + sin(2 * x))
+}
+
+metropolis_step = function(x, sigma) {
+  y = rnorm(1, mean = x, sd = sigma)
+  accept_prob <- min(1, target(y) / target(x))
+  u = runif(1)
+  if(u <= accept_prob) {
+    value = y
+    accepted = TRUE
+  } else {
+    value = x
+    accepted = FALSE
+  }
+  
+  tibble(value = value, accepted = accepted)
+  
+}
+```
+
+---
+
+## Simple example implementation
+
+\fontsize{11pt}{12pt}\selectfont    
+```{r, eval = TRUE}
+metropolis_sampler = function(initial_value, 
+                               n = 1000, 
+                               sigma = 1) {
+  
+  results = as.list(rep(NA, n))
+  current_state = initial_value
+  for(i in 1:n) {
+    out = metropolis_step(current_state, sigma)
+    current_state = out$value
+    results[[i]] = out
+  }
+  results = do.call(rbind, results)
+  results
+}
+```
+
+---
+
+## Simple example implementation
+
+\fontsize{11pt}{12pt}\selectfont   
+```{r, eval = TRUE}
+set.seed(34634634)
+chain1 = metropolis_sampler(initial_value = 0, n = 1000)
+
+head(chain1)
+```
+
+::: notes
+Could be helpful to plot rolling acceptance ratio 
+:::
+
+---
+
+
+## Visualizing results
+
+\fontsize{11pt}{12pt}\selectfont   
+```{r, eval = TRUE}
+set.seed(3463)
+chain2 = metropolis_sampler(initial_value = 0, n = 1000)
+chain3 = metropolis_sampler(initial_value = 10, n = 1000)
+chain4 = metropolis_sampler(initial_value = -20, n = 1000)
+```
+
+
+---
+
+## Visualizing results
+
+
+```{r, echo = FALSE,  eval = TRUE, fig.align='center', fig.height = 5, fig.width = 10}
+results1 = bind_rows(mutate(chain1, chain = 1),
+          mutate(chain2, chain = 2),
+          mutate(chain3, chain = 3),
+          mutate(chain4, chain = 4)) 
+
+
+results1 %>%
+  filter(accepted == TRUE) %>%
+  ggplot(aes(value)) +
+  geom_histogram() +
+  facet_wrap(~chain, scales = "free")
+```
+
+
+---
+
+## Acceptance probabilities
+
+```{r, echo = FALSE, eval = TRUE, fig.align='center', fig.height = 5, fig.width = 10, warning = FALSE}
+results1 %>%
+  group_by(chain) %>%
+  mutate(accepted = as.numeric(accepted),
+         prob = zoo::rollmean(accepted, k = 100, fill = NA),
+         observation = row_number()) %>%
+  ungroup() %>%
+  ggplot(aes(observation, prob)) +
+  geom_line() +
+  facet_wrap(~chain, scales = "free")
+```
+
+---
+
+## Some terminology
+
+- **Burn-in**: the initial period of an MCMC simulation discarded to allow the chain to reach its stationary distribution.
+- **Lag**: refers to the number of steps between samples used to reduce autocorrelation and improve the independence of the retained draws.
+- **Mixing rate**:  refers to how quickly an MCMC chain explores the target distribution, with better mixing indicating faster decorrelation between samples.
+ - **Proposal width** is a parameter of the proposal you can vary to tune this
+
+
+::: notes
+We will look at how each of these affect the sampler
+:::
+
+---
+
+
+## Burn-in
+
+Convergence occurs regardless of our starting point (in theory), so we can usually pick any reasonable values in the parameter space for initial value(s).
+
+- The farther away you are from high density regions the longer it will take to reach the stationary distribution (i.e. target distribution $\pi(x)$)
+- Sample you generate early on will probably not follow $\pi(x)$
+- Generally we throw out a certain number of the first draws, known as **burn-in** to make sure our sample is closer to the stationary distribution and less dependent on starting values
+
+
+::: notes
+What is a good starting point for our distribution example?
+- Not always obvious how much burn in to discard, and the decision is fairly arbitrary
+- plots can help
+:::
+
+---
+
+
+## Burn-in: $x_0 = -20$
+
+```{r, cache = TRUE, echo = FALSE, eval = TRUE, fig.align='center', fig.height = 5, fig.width = 10, message = FALSE}
+set.seed(23423)
+chain5 = metropolis_sampler(initial_value = -20, n = 10000)
+chain5 = chain5 %>%
+  filter(accepted == TRUE) %>%
+  mutate(observation = row_number(),
+         quintile = case_when(observation < 2000 ~ 1,
+                              observation < 4000 ~ 2,
+                              observation < 6000 ~ 3,
+                              observation < 8000 ~ 4,
+                              TRUE ~ 5),
+         quintile = factor(quintile, levels = 1:5, labels = c("<2000", "2000-4000", 
+                                                              "4000-6000", "6000-8000", "8000-1000")))
+
+chain5 %>%
+  ggplot(aes(value)) +
+  geom_histogram() +
+  facet_wrap(~quintile, scales = "free", ncol = 1)
+```
+
+---
+
+## Lag
+
+\fontsize{11pt}{12pt}\selectfont   
+This is essentially the number of iterations we run the sampler for between successive samples.
+
+- MCMC samples are not independent! By definition, each sample depends on the previous sample
+  - This means there is a time-dependent autocorrelation
+- One way to reduce correlation in your samples and have draws that are more independent is to allow several iterations of the sampler to elapse in between successive samples. 
+- This is the lag
+- More of a problem when the MCMC cannot make big jumps within the parameter space
+
+
+::: notes
+When can this last point occur?  Small variance of your proposal distribution
+:::
+
+---
+
+
+## Lag: autocorrelation plots
+
+```{r, echo = FALSE, eval = TRUE, fig.align='center', fig.height = 5, fig.width = 10}
+acf_vals <- acf(chain5$value, plot = TRUE)
+
+```
+
+
+---
+
+## Mixing rate
+
+In practice the choice of proposal distribution matters a lot. 
+
+- If it’s too narrow, your sampler will have an extremely high acceptance rate on average, but it will move around extremely slowly, that is, 
+  - i.e. it has a low *mixing rate*. 
+- If it’s too wide, the acceptance rate becomes too low and the chain gets stuck on specific values for long periods of time. 
+
+- Varying the proposal width can affect this
+
+---
+
+
+## Effect of proposal width
+
+\fontsize{11pt}{12pt}\selectfont   
+```{r, eval = TRUE}
+set.seed(34634)
+chain_1 = metropolis_sampler(initial_value = 0, n = 1000, sigma = 1)
+chain_.025 = metropolis_sampler(initial_value = 0, n = 1000, sigma = .025)
+chain_50 = metropolis_sampler(initial_value = 0, n = 1000, sigma = 50)
+
+```
+
+---
+
+
+## Effect of proposal width
+
+
+
+```{r, echo = FALSE,  eval = TRUE, fig.align='center', fig.height = 5, fig.width = 10,message = FALSE}
+results = bind_rows(mutate(chain_1, sigma = 1),
+          mutate(chain_.025, sigma = .025),
+          mutate(chain_50, sigma = 50)) %>%
+  group_by(sigma) %>%
+  mutate(iteration = row_number()) %>%
+  ungroup() %>%
+  mutate(sigma = factor(sigma))
+
+
+results %>%
+  filter(accepted == TRUE) %>%
+  ggplot(aes(value)) +
+  geom_histogram() +
+  facet_wrap(~sigma, labeller = label_both)
+```
+
+---
+
+## Effect of proposal width
+
+```{r, echo = FALSE, eval = TRUE, fig.align='center', fig.height = 5, fig.width = 10, warning = FALSE}
+results %>%
+  group_by(sigma) %>%
+  mutate(accepted = as.numeric(accepted),
+         prob = zoo::rollmean(accepted, k = 100, fill = NA),
+         observation = row_number()) %>%
+  ungroup() %>%
+  ggplot(aes(observation, prob)) +
+    ggtitle("acceptance probabilities") +
+  geom_line(aes(color = sigma))
+```
+
+---
+
+## Convergence
+
+We will not cover the convergence theory behind Metropolis chains in
+detail, but ...
+
+- The Markov process generated under this procedure is ergodic
+(irreducible and aperiodic) and has a unique limiting distribution
+(stationary distribution)
+ergodicity means that the chain can move anywhere at each
+step, which is ensured if $q(y|x)>0$ everywhere
+
+- By construction, Metropolis chains are reversible, so that  $\pi(y|x)$ is the stationary distribution
+
+---
+
+## Convergence diagnostics
+
+\fontsize{11pt}{12pt}\selectfont   
+Convergence diagnostics are used to assess if your chain has converged.
+
+- Cannot guarantee if a chain has converged, but they can indicate that it has not converged
+- Not specific to Metropolis-Hastings, apply to MCMC more generally
+
+\vspace{5mm}
+
+- Trace plot
+- Autocorrelation plot
+- Density plots for multiple chains
+- Effective sample size
+
+---
+
+## Trace plot
+
+Shows sample values of an MCMC parameter over iterations
+
+- Plot the whole chain (both accepted and rejected samples)
+
+\vspace{5mm}
+
+The chain should: 
+
+- fluctuate around a stable mean without visible trends or drifts over time
+- Avoid long streaks of similar values (these indicate high autocorrelation or poor mixing)
+- Explore the full parameter space
+
+
+---
+
+## Trace plot
+
+```{r, echo = FALSE,  eval = TRUE, fig.align='center', fig.height = 5, fig.width = 10, warning = FALSE}
+results %>%
+  ggplot(aes(iteration, value)) +
+  geom_line() +
+  facet_wrap(~sigma, labeller = label_both)
+```
+
+
+---
+
+## Autocorrelation plot
+
+Shows correlation between samples at different lags. Lower autocorrelation means better mixing and more efficient sampling.
+
+```{r, echo = FALSE, eval= TRUE,  fig.align='center', fig.height = 4, fig.width = 10, warning = FALSE}
+acf_df <- function(chain, name) {
+  acf_res <- acf(chain, plot = FALSE)
+  tibble(
+    lag = acf_res$lag[, 1, 1],
+    acf = acf_res$acf[, 1, 1],
+    sigma = name
+  )
+}
+
+acfs = bind_rows(acf_df(chain_1$value, "1"), 
+          acf_df(chain_.025$value, ".025"), 
+          acf_df(chain_50$value, "50"))
+
+acfs %>%
+  ggplot(aes(x = lag, y = acf)) +
+  geom_segment(aes(xend = lag, yend = 0), color = "steelblue") +
+  geom_hline(yintercept = 0) +
+  facet_wrap(~ sigma, nrow = 1, labeller = label_both) +
+  theme_minimal()
+```
+
+
+ 
+---
+
+
+## Density plots
+
+
+
+```{r, echo = FALSE, eval = TRUE, fig.align='center', fig.height = 5, fig.width = 10, warning = FALSE}
+results %>%
+  filter(accepted == TRUE) %>%
+  ggplot(aes(value)) +
+  geom_density() +
+  facet_wrap(~sigma, labeller = label_both)
+```
+
+
+::: notes
+For these just plot accepted samples.
+:::
+
+---
+
+
+## Density plots
+
+
+```{r, echo = FALSE, eval = TRUE, fig.align='center', fig.height = 5, fig.width = 10, warning = FALSE}
+results1 %>%
+  filter(accepted == TRUE) %>%
+  ggplot(aes(value)) +
+  xlim(-5,5) +
+  geom_density() +
+  facet_wrap(~chain, labeller = label_both)
+```
+
+
+---
+
+
+## Effective sample size
+
+\fontsize{11pt}{12pt}\selectfont 
+The effective sample size translates the number of MCMC samples
+$S$ into an equivalent number of independent samples.
+
+$$ESS = \frac{S}{1 + 2\sum_k\rho_k}$$
+
+where $\rho_k$ is the lag $k$ autocorrelation.
+
+- Can calculate ESS using `coda::effectiveSize`.
+
+---
+
+## Effective sample size
+
+
+
+
+```{r, eval = TRUE}
+library(coda)
+
+effectiveSize(chain_.025$value) %>% as.numeric()
+effectiveSize(chain_1$value) %>% as.numeric()
+```
+
+
+---
+
+
+
+## General diagnostic rules
+
+- Run multiple chains with different starting values
+- Discard the first 1000 or so samples (depending on the problem)
+- Check diagnostic plots!
+
+- There are other diagnostic statistics (Gelman-Rubin, Geweke) that we haven't discussed
+
+---
+
+
+
+
+## Resources
+
+- [Cute Markov chain example](https://www.youtube.com/watch?v=i3AkTO9HLXo&ab_channel=NormalizedNerd)
+- [Intro MCMC video](https://www.youtube.com/watch?v=yApmR-c_hKU&ab_channel=ritvikmath)
+
+

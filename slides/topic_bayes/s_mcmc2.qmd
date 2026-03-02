@@ -1,0 +1,328 @@
+---
+title: "MCMC Part 2"
+author: "Julia Wrobel"
+format:
+  beamer:
+    theme: metropolis
+    aspectratio: 169
+    fontsize: 14pt
+    slide-level: 2
+execute:
+  echo: true
+  eval: false
+  warning: false
+  message: false
+header-includes:
+  - \usepackage{xcolor}
+  - \newcommand{\red}[1]{\textcolor{red}{#1}}
+  - \newcommand{\green}[1]{\textcolor{green}{#1}}
+---
+
+
+
+## Overview
+
+```{r, echo = FALSE, eval = TRUE}
+library(tidyverse)
+```
+
+
+Today, we cover:
+
+
+- Gibb's sampling
+
+
+Resources:
+
+- Peng Advanced Stat Computing Chapter 7
+
+---
+
+
+## Single component Metropolis-Hastings
+
+\fontsize{11pt}{12pt}\selectfont
+The standard Metropolis algorithm updates the entire parameter vector at once with a single step. 
+
+- Hence, a $p$-dimensional parameter vector must have a $p$-dimensional proposal distribution $q$. 
+- However, it is sometimes simpler to update individual components of the parameter vector one at a time, in an algorithm known as
+single component Metropolis-Hastings (SCMH).
+
+Let $x^t = (x_1^t, x_2^t, \ldots, x_p^t)$ be a $p$-dimensional vector of parameter values at iteration $t$.
+
+---
+
+## Single component M-H
+
+\fontsize{11pt}{12pt}\selectfont
+The SCMH algorithm updates each parameter in $x$ one at a time. All that is needed to update the $i$th component of $x^t$ is a proposal distribution $q(x_i^*|x_i^t, x^t_{-i})$.  SCMH updates the $i$th component via the following steps: 
+
+
+(1) Sample $x_i^*\sim q(x_i^*|x_i^t, x^t_{-i})$ as a proposal for component $i$.
+(2) Let 
+
+$$\alpha(x_i^*|x^t) =  \min\left\{\frac{\pi(x_i^*|x_{-i}^t)q(x_i^t|x_i^*, x^t_{-i})}{\pi(x_i^t|x_{-i}^t)q(x_i^*|x_i^t, x^t_{-i})}, 1\right\}$$
+
+(3) Accept $x_i^*$ with probability $\alpha(x_i^*|x^t)$
+
+(4) Repeat steps 1-3 $p$ times until each component is updated
+
+---
+
+## Gibb's sampling
+
+- Special case of single component M-H where you always accept the candidate
+- For sampling from multivariate distributions (2 or more parameters)
+  - Relies on ability to calculate full conditionals
+
+
+Useful when:
+
+- Sampling from $\pi(\theta_1, \theta_2, \theta_3)$ is hard
+- Sampling from $\pi(\theta_1|\theta_2, \theta_3)$, $\pi(\theta_2|\theta_1, \theta_3)$ , $\pi(\theta_3|\theta_1, \theta_2)$  is easy
+
+
+
+::: notes
+We will revisit how this is a special case of M-H
+:::
+
+---
+
+## Gibb's sampling algorithm
+
+Steps for each iteration:
+
+1. Sample $\theta_1^{n+1} \sim \pi(\theta_1|\theta_2^n, \theta_3^n)$
+2. Sample $\theta_2^{n+1} \sim \pi(\theta_2|\theta_1^{n+1}, \theta_3^n)$
+3. Sample $\theta_3^{n+1} \sim \pi(\theta_3|\theta_1^{n+1}, \theta_2^{n+1})$
+
+
+\vspace{5mm}
+
+Do this for the desired number of samples, discard burn-in, and voila! You now have a sample from the joint distribution $\pi(\theta_1,\theta_2,\theta_3)$.
+
+---
+
+## Example: Bivariate normal distribution
+
+Suppose we want to simulate $x = (x_1, x_2)$ from a bivariate Normal distribution with mean $\mu = (\mu_1, \mu_2)$ and covariance
+matrix
+
+$$\Sigma = \begin{pmatrix}
+\sigma_1^2 & \rho \\
+\rho & \sigma_2^2
+\end{pmatrix}$$
+
+we can make use of Gibbs sampling to simulate a Markov chain
+that will converge to a bivariate Normal. 
+
+
+::: notes
+From Peng, kind of a dumb example because you can sample from bivariate normal directly. But, useful because you can visualize it.
+:::
+
+---
+
+
+## Bivariate normal distribution
+
+Goal is to simulate from joint distribution $\pi(x_1, x_2 | \mu, \Sigma)$. Complete conditionals are:
+
+- $\pi(x_1|x_2, \mu, \Sigma) = N(\mu_1+\rho\frac{\sigma_1}{\sigma_2}(x_2-\mu_2), \sigma_1^2(1-\rho))$
+- $\pi(x_2|x_1, \mu, \Sigma) = N(\mu_2+\rho\frac{\sigma_2}{\sigma_1}(x_1-\mu_1), \sigma_2^2(1-\rho))$
+
+<br>
+So, we sample 
+
+1. $x_1^{t+1} \sim N(\mu_1+\rho\frac{\sigma_1}{\sigma_2}(x^t_2-\mu_2), \sigma_1^2(1-\rho))$
+2. $x_2^{t+1} \sim N(\mu_2+\rho\frac{\sigma_2}{\sigma_1}(x_1^{t+1}-\mu_1), \sigma_2^2(1-\rho))$
+
+
+---
+
+## Bivariate normal distribution
+
+\fontsize{10pt}{11pt}\selectfont
+```{r, eval = TRUE}
+gibbs_bivariate = function(x0, n = 1000,
+                           mu = c(1, 5), rho = 0.5, 
+                           sigma1 = 1, sigma2 = 2){
+  x1 = x0[1]
+  x2 = x0[2]
+  mu1 = mu[1]
+  mu2 = mu[2]
+  
+  x = matrix(NA, nrow = n, ncol = 2)
+  for(i in 1:n){
+    x[i,] = c(x1,x2)
+    
+    x1 = rnorm(1, mean = mu1 + rho * sigma1/sigma2 * (x2-mu2), 
+               sd = sigma1 * sqrt(1-rho))
+    x2 = rnorm(1, mean = mu2 + rho * sigma2/sigma1 * (x1-mu1), 
+               sd = sigma2 * sqrt(1-rho))
+  }
+  colnames(x) = c("x1", "x2")
+  return(x)
+}
+```
+
+---
+
+## Bivariate normal distribution
+
+\fontsize{11pt}{12pt}\selectfont
+```{r, eval = TRUE}
+set.seed(21433)
+gibbs_x = gibbs_bivariate(c(0,0), n = 10000)
+
+colMeans(gibbs_x[1:100,])
+colMeans(gibbs_x)
+```
+
+---
+
+
+
+## Bivariate normal distribution
+
+
+```{r, echo = FALSE, eval = TRUE, fig.align='center', fig.height = 5, fig.width = 10}
+df = as_tibble(gibbs_x) %>%
+  mutate(iteration = row_number()) %>%
+  filter(iteration >1000) 
+
+
+set.seed(223)
+rho <- 0.5
+mu <- c(1, 5)
+Sigma <- matrix(c(1, rho, rho, 4), 2, 2)
+
+# Create a grid to evaluate the true density
+x_seq <- seq(min(df$x1) - 1, max(df$x1) + 1, length.out = 100)
+y_seq <- seq(min(df$x2) - 1, max(df$x2) + 1, length.out = 100)
+grid <- expand.grid(x = x_seq, y = y_seq)
+
+# Add true bivariate normal density values
+grid$density <- mvtnorm::dmvnorm(grid, mean = mu, sigma = Sigma)
+
+# Plot: real data points + true density contours and fill
+ggplot(df, aes(x = x, y = y)) +
+  geom_point(aes(x = x1, y = x2), alpha = 0.3, color = "blue") +  # real data
+  geom_contour(data = grid, aes(z = density), color = "black") +  # true contours
+  geom_raster(data = grid, aes(x = x, y = y, fill = density), alpha = 0.5, interpolate = TRUE) +
+  scale_fill_viridis_c() +
+  theme_minimal() 
+```
+
+::: notes
+Through away the first 1000 observations, plotted true density on top
+:::
+
+---
+
+## Bivariate normal distribution
+
+
+```{r, echo = FALSE, eval = TRUE, fig.align='center', fig.height = 5, fig.width = 10}
+as_tibble(gibbs_x) %>%
+  mutate(iteration = row_number()) %>%
+  filter(iteration <= 10) %>%
+  ggplot(aes(x = x, y = y)) +
+  geom_point(aes(x = x1, y = x2),  color = "blue", size = 2) +  # real data
+  geom_path(aes(x = x1, y = x2), alpha = 0.3, color = "blue") +  # real data
+  geom_contour(data = grid, aes(z = density), color = "black") +  # true contours
+  theme_minimal() 
+
+```
+
+
+---
+
+
+## Proof: Gibbs sampling as M-H
+
+Gibbs is a special case of single component M-H that always accepts the proposal. Define the following:
+
+- $\pi(\theta_1, \theta_2)$: joint distribution we want to sample from
+- $q(\theta_1^*|\theta_1^t,\theta_2^t)$: proposal distribution for new value of $\theta_1$
+
+- Acceptance ratio:
+
+$$\alpha(\theta_1^*|\theta^t) =  \min\left\{\frac{\pi(\theta_1^*,\theta_2^t)q(\theta_1^t|\theta_1^*, \theta^t_2)}{\pi(\theta_1^t,\theta_2^t)q(\theta_1^*|\theta_1^t, \theta_2^t)}, 1\right\}$$
+
+- Choose full conditional as proposal, i.e.:
+
+$$q(\theta_1^*| \theta_1^t,\theta_2^t) = \pi(\theta^*_1|\theta_2^t)$$
+
+---
+
+
+## Proof: Gibbs sampling as M-H
+
+
+::: notes
+See gibbs_proof.png
+:::
+
+---
+
+
+## Bayesian linear regression
+
+\fontsize{10pt}{11pt}\selectfont
+$$y = X\beta + \epsilon; \epsilon \sim N(0, \sigma^2_yI_n)$$
+
+- Need to make (prior) distributional assumptions about $\beta$, $\sigma^2_y$
+  - $\beta \sim N(0, \sigma^2_bI_p)$
+  - $\sigma^2_y \sim IG(A, B)$
+
+
+- Joint posterior of interest is 
+ 
+$$\pi(\beta, \sigma^2_y|y, x, A, B, \sigma^2_b)$$
+
+- Need full conditionals
+  - $\pi(\beta|\sigma^2_y, y, x, A, B, \sigma^2_b)$
+  - $\pi(\sigma^2_y|\beta, y, x, A, B, \sigma^2_b)$
+
+---
+
+## Full conditionals
+
+\fontsize{11pt}{12pt}\selectfont
+$$\beta \mid \sigma^2_y, y \sim \mathcal{N}(\beta_{\text{post}}, \Sigma_{\text{post}})$$
+
+$$\Sigma_{\text{post}} = \left( \frac{1}{\sigma_y^2} X^\top X + \frac{1}{\sigma_\beta^2} I_p \right)^{-1}$$
+
+$$\beta_{\text{post}} = \left( X^\top X + \frac{\sigma_y^2}{\sigma_\beta^2} I_p \right)^{-1} \left( X^\top y \right)$$
+
+$$\sigma^2_y \mid \beta, y \sim IG\left(A + n/2, B + \frac{1}{2}||y-x\beta||^2\right)$$
+
+
+
+---
+
+## Variations on Gibb's sampling
+
+- **Blocked Gibb's sampling**: update blocks (or groups) of parameters jointly rather than one at a time
+  - Helps improve mixing when variables are highly correlated
+  - We are already doing this for Bayesian linear regression
+- **Collapsed Gibb's sampling**: integrate/marginalize out some variables analytically before sampling
+  - Reduces dimensionality and can improve convergence
+- **Metropolis-within-Gibbs**: Uses Metropolis-Hastings steps for full conditionals that are not easily sampled from.
+  - Commonly used in Bayesian hierarchical models
+
+
+
+
+---
+
+## Gibbs sampler for Bayesian regression
+
+I started implementing this myself... for lab we will go the rest of the way there and compare it to the results of `stan_glm` from the Bayesian Data Analysis lecture.
+
+- My partial Gibb's sampler is in the file `gibbs_blr.R` and the lab file is `lab_gibbs.Rmd`.
+
+
