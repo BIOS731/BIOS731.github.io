@@ -17,6 +17,9 @@ execute:
 
 In this, we will introduce optimization and methods for gradient descent.
 
+```{r}
+library(tidyverse)
+```
 
 ::: {.panel-tabset .panel-pills}
 
@@ -30,7 +33,13 @@ In this, we will introduce optimization and methods for gradient descent.
 
 ***
 
+### Slide Deck: MCMC Part 1
 
+***
+
+### Slide Deck: MCMC Part 2
+
+***
 
 ### Lab: Numerical Integration and Sampling
 
@@ -112,6 +121,117 @@ rejection_sample <- function(n) {
 # Generate samples
 set.seed(43232)
 samples <- rejection_sample(10000)
+
+```
+
+
+***
+
+### Lab: Gibbs Sampler
+
+#### Bayesian linear regression
+
+We're going to fit some linear regression with cannabis data.
+
+```{r}
+cannabis = readRDS(file = here::here("data", "cannabis.rds"))
+cannabis = cannabis %>% dplyr::select(id, use_group, t_mmr1, t_thc, p_fpc1, 
+                               p_change = p_PMC_pctChg, 
+                               i_memory_time34, i_time_outside_reticle) %>%
+  mutate(log_mmr = log1p(t_mmr1)) %>%
+  filter(use_group != "no use")
+
+head(cannabis)
+```
+
+
+#### Model specification
+
+$$log(mmr_i) = \beta_0 + \beta_1 \mbox{p_fpc1}_i + \beta_2 \mbox{i_time_outside_reticle}_i + \beta_3 \mbox{use_group}_i + \epsilon_i$$
+
+Define the likelihood:
+
+- $\epsilon \sim N(0, \sigma^2_yI_n) \implies y\sim N(X\beta, \sigma^2_yI_n)$
+
+Define the priors:
+
+- $\beta \sim N(0, \sigma^2_{\beta}I_{\beta})$
+- $\sigma^2_y \sim IG(A, B)$
+
+Define the hyperparameters
+
+- Let $\sigma^2_{\beta} = 100$
+- Let $A = 2$
+- Let $B = var(y)$
+
+
+
+
+Code below uses the `R` package `rstanarm` to fit a similar model:
+
+```{r, message = FALSE}
+library(rstanarm)
+blr_mod = stan_glm(log_mmr ~ p_fpc1 + i_time_outside_reticle, 
+               data = cannabis,
+               prior_intercept = normal(0, 10),
+               prior = normal(0, 10),
+               prior_aux = exponential(rate = 1))
+```
+
+
+#### Exercise
+
+See function below `gibbs_blr()`. Modify this code to implement a Gibb's sampler for Bayesian linear regression from the lecture notes.  
+
+- Fit this to the cannabis data
+- Do some diagnostics on chains obtained from your sampler
+- Compare to results from `stan_glm`
+
+
+```{r,eval = FALSE}
+# y is a vector
+# xmat is a design matrix
+gibbs_blr = function(y, 
+                     xmat, 
+                     n = 1000,
+                     A = 2, 
+                     B = var(y),
+                     sigma_b = 100){
+
+  # define column of ones for intercept
+  xmat = cbind(1, xmat)
+  p = ncol(xmat)
+  n_subjects = length(y)
+
+  # define initial values for parameters of interest
+  beta = rep(0, p)
+  sigma_y = B/(A-1) # mean of inverse gamma
+
+  params = matrix(NA, nrow = n, ncol = p + 1)
+  for(i in 1:n){
+    params[i,] = c(beta, sigma_y)
+
+    ## sample from beta full conditional
+    beta_post = solve(crossprod(xmat) + sigma_y/sigma_b * diag(p)) %*% crossprod(xmat, y)
+    sigma_post = solve(1/sigma_y * crossprod(xmat) + 1/sigma_b * diag(p))
+
+    beta = mvrnorm(n = 1, beta_post, sigma_post)
+
+
+    ## sample from sigma_y full conditional
+
+    A_post = A + n_subjects/2
+    resid = y- xmat %*% beta
+    B_post = B + 1/2 * crossprod(resid)
+
+    sigma_y = rinvgamma(n = 1, shape = A_post, rate = B_post)
+
+
+  }
+
+  colnames(params) = c(paste0("beta_",0:(p-1)), "sigma_y")
+  return(params)
+}
 
 ```
 

@@ -1,0 +1,35 @@
+---
+title: "Cannabis biomarkers data"
+output:
+  html_document: 
+    toc: true
+    toc_float: true
+---
+
+
+
+## Context
+
+
+This dataset comes from a study conducted by researchers at the University of Colorado who are working to develop roadside tests for detecting driving impairment due to cannabis use.  In this study, researchers measured levels of THC—the main psychoactive ingredient in cannabis—in participants’ blood and then collected other biomarkers and had them complete a series of neurocognitive tests. The goal of the study is to understand the relationship between performance on these neurocognitive tests and the concentration of THC metabolites in the blood. Several papers have been published using this data, [including a paper on interpretable machine learning models for predicting recent cannabis use](https://www.sciencedirect.com/science/article/abs/pii/S0022437526000368).
+
+## Data acquisition and description
+
+The dataset contains the following variables:
+
+* `id`: subject id
+* `use_group`: cannabis use group
+* `t_mmr1`: metabolite molar ratio— a measure of THC metabolites in the blood. 
+* `t_*`: other variables related to THC and THC metabolites
+* `p_*`: variables with the `p_` prefix contain measurements related to pupil response to light. 
+* `i_*`: variables with the `i_` prefix were collected using an iPad and are derived from neurocognitive tests assessing reaction time, judgment, and short-term memory.
+* `h_*`: Variables related to heart rate and blood pressure.
+
+```{r}
+cannabis = readRDS(file = here::here("data", "cannabis.rds"))
+names(cannabis)
+```
+
+
+
+The dataset contains `r nrow(cannabis)` rows and `r ncol(cannabis)` columns.  

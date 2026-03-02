@@ -28,7 +28,7 @@ website:
       - text: Datasets
         menu:
           - text: Cannabis
-            href: dataset_airbnb.qmd
+            href: dataset_cannabis.qmd
           - text: Craniosynothosis
             href: dataset_brfss.qmd
 
