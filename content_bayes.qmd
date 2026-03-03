@@ -33,11 +33,32 @@ library(tidyverse)
 
 ***
 
+### Slide Deck: Introduction to Bayesian Statistics
+
+[![](./slides/topic_bayes/preview_integration.png){width=70%}](./slides/topic_bayes/s_introBayes.pdf)
+
+**Bayesian Statistics**  
+[Download slides (PDF)](./slides/topic_bayes/s_introBayes.pdf)
+
+
+***
+
 ### Slide Deck: MCMC Part 1
+
+[![](./slides/topic_bayes/preview_integration.png){width=70%}](./slides/topic_bayes/s_introBayes.pdf)
+
+**Bayesian Statistics**  
+[Download slides (PDF)](./slides/topic_bayes/s_introBayes.pdf)
+
 
 ***
 
 ### Slide Deck: MCMC Part 2
+
+[![](./slides/topic_bayes/preview_integration.png){width=70%}](./slides/topic_bayes/s_introBayes.pdf)
+
+**Bayesian Statistics**  
+[Download slides (PDF)](./slides/topic_bayes/s_introBayes.pdf)
 
 ***
 
@@ -126,6 +147,11 @@ samples <- rejection_sample(10000)
 
 
 ***
+
+
+### Lab: Intro Bayes
+
+*** 
 
 ### Lab: Gibbs Sampler
 

@@ -46,14 +46,6 @@ Resources:
 ---
 
 
-### Gaussian quadrature 
-
-
-
----
-
-
-
 ## Joint posterior distribution
 
 Our goal is to learn about the joint posterior distribution
