@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Julia Wrobel">
+
+<title>Bayesian data analysis – BIOS731</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-ff63373b1067ca6f91cf1456aa1f00a2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+</head><body class="nav-fixed quarto-light">\usepackage{xcolor}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\green}[1]{\textcolor{green}{#1}}
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">BIOS731</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-topics" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Topics</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-topics">    
+        <li>
+    <a class="dropdown-item" href="../../topic_reproducible_computing.html">
+ <span class="dropdown-text">Reproducible Computing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_simulation.html">
+ <span class="dropdown-text">Simulation and Resampling</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_optimization.html">
+ <span class="dropdown-text">Optimization I</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_bayesian_computing.html">
+ <span class="dropdown-text">Bayesian Computing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_cloud_computing.html">
+ <span class="dropdown-text">Cloud Computing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_R_packages.html">
+ <span class="dropdown-text">R packages</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_optimization_II.html">
+ <span class="dropdown-text">Optimization II</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_other_material.qmd">
+ <span class="dropdown-text">Other Materials</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-datasets" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Datasets</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-datasets">    
+        <li>
+    <a class="dropdown-item" href="../../dataset_cannabis.html">
+ <span class="dropdown-text">Cannabis</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../dataset_brfss.qmd">
+ <span class="dropdown-text">Craniosynothosis</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../syllabus.html"> 
+<span class="menu-text">Syllabus</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/BIOS731/BIOS731.github.io"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="s_introBayes.pdf"><i class="bi bi-file-pdf"></i>Beamer</a></li></ul></div></div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Bayesian data analysis</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Julia Wrobel </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>Today, we cover:</p>
+<ul>
+<li>Revisiting Gaussian Quadrature</li>
+<li>Bayesian data analysis crash course</li>
+<li>Motivation for MCMC</li>
+</ul>
+<p>Tomorrow:</p>
+<ul>
+<li>MCMC</li>
+</ul>
+<hr>
+</section>
+<section id="gaussian-quadrature" class="level2">
+<h2 class="anchored" data-anchor-id="gaussian-quadrature">Gaussian quadrature</h2>
+<p>Gaussian quadrature allows subintervals to be more freely chosen.</p>
+<ul>
+<li>Weights and subintervals are node-specific</li>
+<li>Provides the <strong>exact solution</strong> if <span class="math inline">\(f\)</span> is a polynomial with degree at most <span class="math inline">\(2n-1\)</span></li>
+</ul>
+<p><span class="math display">\[\int_a^b \omega(x)f(x)dx \approx \sum_{j = 1}^n w_j  f(x_j)\]</span></p>
+<ul>
+<li><p><span class="math inline">\(\omega(x)\)</span> is some weight function</p></li>
+<li><p><span class="math inline">\(w_j, j = 1,\ldots,n:\)</span> are specific weights; <span class="math inline">\(x_j\)</span> are nodes</p></li>
+<li><p>If <span class="math inline">\(f\)</span> can be approximated well by a degree <span class="math inline">\(2n-1\)</span> polynomial on <span class="math inline">\([a,b]\)</span>, then Gaussian quadrature provides a good approximation to the integral of interest.</p></li>
+</ul>
+<div class="notes">
+<p>This means it is great for approximating smooth functions</p>
+</div>
+<hr>
+</section>
+<section id="gaussian-quadrature-1" class="level2">
+<h2 class="anchored" data-anchor-id="gaussian-quadrature-1">Gaussian quadrature</h2>
+<p><strong>Question</strong>: How to choose the weights and placement of the nodes?</p>
+<ul>
+<li><p>Gauss-Legendre quadrature: <span class="math inline">\(\int_{-1}^1 f(x)dx\)</span></p></li>
+<li><p>Gauss-Chebyshev: <span class="math inline">\(\int_{-1}^1 \frac{1}{\sqrt{1-x^2}}f(x)dx\)</span></p></li>
+<li><p>Gauss-Laguerre: <span class="math inline">\(\int_0^{\infty}e^{-x}f(x)dx\)</span></p></li>
+<li><p>Gauss-Hermite: <span class="math inline">\(\int_{-\infty}^{\infty}e^{-x^2}f(x)dx\)</span></p></li>
+</ul>
+<hr>
+</section>
+<section id="two-point-gauss-legendre-example" class="level2">
+<h2 class="anchored" data-anchor-id="two-point-gauss-legendre-example">Two-point Gauss-Legendre example</h2>
+<hr>
+</section>
+<section id="two-point-gauss-legendre-example-1" class="level2">
+<h2 class="anchored" data-anchor-id="two-point-gauss-legendre-example-1">Two-point Gauss-Legendre example</h2>
+<hr>
+</section>
+<section id="general-gauss-legendre" class="level2">
+<h2 class="anchored" data-anchor-id="general-gauss-legendre">General Gauss-Legendre</h2>
+<p>The weights for Gauss-Legendre quadrature are given by:</p>
+<p><span class="math display">\[w_i = \frac{2}{(1-x_i^2)[P'_n(x_i)]^2}\]</span></p>
+<p>Where the first few Legendre polynomials are:</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="legendre2.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:60.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="gauss-legendre-nodes-and-weights" class="level2">
+<h2 class="anchored" data-anchor-id="gauss-legendre-nodes-and-weights">Gauss-Legendre nodes and weights</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="legendre3.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:50.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="notes">
+<p>Orthogonal polynomial basis functions come from applying Gram-Schmidt orthogonalization on [-1,1] to monomials 1,x,x<sup>2.x</sup>3 - orthogonal polynomial means each basis function supplies different information</p>
+</div>
+<hr>
+</section>
+<section id="bayesisan-data-analysis-a-simple-motivating-example" class="level2">
+<h2 class="anchored" data-anchor-id="bayesisan-data-analysis-a-simple-motivating-example">Bayesisan data analysis: a simple motivating example</h2>
+<p>Imagine we are interested in the daily number of steps taken by Rollins students. We use accelerometers to collect a random sample of step counts from <span class="math inline">\(n = 10\)</span> students.</p>
+<ul>
+<li>Let <span class="math inline">\(y_i\)</span> represent the step count for the <span class="math inline">\(i\)</span>th student</li>
+<li>Assume <span class="math inline">\(y_i \sim N(\mu, \sigma^2_y)\)</span></li>
+</ul>
+<p>We want to learn about <span class="math inline">\(\mu\)</span>, the average daily number of steps taken by Rollins students.</p>
+<hr>
+</section>
+<section id="the-frequentist-approach" class="level2">
+<h2 class="anchored" data-anchor-id="the-frequentist-approach">The frequentist approach</h2>
+<p>We want to learn about <span class="math inline">\(\mu\)</span>, the average daily number of steps taken by Rollins students.</p>
+<ul>
+<li>Parameter <span class="math inline">\(\mu\)</span> is fixed and unknown</li>
+<li>The data <span class="math inline">\(y\)</span> is random</li>
+<li>The sample mean <span class="math inline">\(\hat{\mu} = \bar{y}\)</span> is a statistic, and a frequentist estimator of the population mean <span class="math inline">\(\mu\)</span>.</li>
+<li>Base inference on p-values and confidence intervals</li>
+</ul>
+<hr>
+</section>
+<section id="frequentist-inference-about-mu" class="level2">
+<h2 class="anchored" data-anchor-id="frequentist-inference-about-mu">Frequentist inference about <span class="math inline">\(\mu\)</span></h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(steps)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  9732  9270 10446 10699 10336 10326</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(steps)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 9999.2</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="frequentist-inference-about-mu-1" class="level2">
+<h2 class="anchored" data-anchor-id="frequentist-inference-about-mu-1">Frequentist inference about <span class="math inline">\(\mu\)</span></h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="s_introBayes_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="notes">
+<p>Frequentist inference would say we are 95% confidence that the true number of steps taken by Rollins students lies between 9722 and 10,276 steps.</p>
+</div>
+<hr>
+</section>
+<section id="the-bayesian-approach" class="level2">
+<h2 class="anchored" data-anchor-id="the-bayesian-approach">The Bayesian approach</h2>
+<ul>
+<li><p>Bayesians treat the parameter <span class="math inline">\(\mu\)</span> as random</p></li>
+<li><p>Express uncertainty about <span class="math inline">\(\mu\)</span> using probability distributions</p></li>
+<li><p>The distribution before observing the data is called the <strong>prior distribution</strong></p>
+<ul>
+<li>Allows incorporation of previous knowledge</li>
+</ul></li>
+<li><p>Distribution after observing the data is the <strong>posterior distribution</strong></p></li>
+<li><p>Inference is conditional on the data we observe</p></li>
+</ul>
+<hr>
+</section>
+<section id="the-bayesian-approach-1" class="level2">
+<h2 class="anchored" data-anchor-id="the-bayesian-approach-1">The Bayesian approach</h2>
+<p>What do I think I know?</p>
+<ul>
+<li><span class="math inline">\(y_i|\mu \sim N(\mu, \sigma^2_y)\)</span></li>
+<li><span class="math inline">\(\mu \sim N(\mu_0, \sigma^2_{\mu})\)</span></li>
+</ul>
+<p>What do I want to learn?</p>
+<ul>
+<li><span class="math inline">\(\mu|y_i \sim \mbox{ ???}\)</span></li>
+</ul>
+<p>This is a <strong>one sample Normal-Normal</strong> model</p>
+<div class="notes">
+<p>What is a one sample Normal-normal model?</p>
+</div>
+<hr>
+</section>
+<section id="the-bayesian-approach-2" class="level2">
+<h2 class="anchored" data-anchor-id="the-bayesian-approach-2">The Bayesian approach</h2>
+<p>Relate prior, likelihood, and posterior through Bayes’ formula:</p>
+<p><span class="math display">\[\begin{align}
+p(\mu \mid y_i)
+&amp;= \frac{p(y_i \mid \mu)\, p(\mu)}{p(y_i)} \\[3mm]
+&amp;= \frac{p(y_i \mid \mu)\, p(\mu)}{\int_\mu p(y_i \mid \mu)\, p(\mu)\, d\mu}\\[3mm]
+&amp;\propto p(y_i \mid \mu)\, p(\mu)
+\end{align}\]</span></p>
+<p>For the Normal likelihood with a Normal prior for <span class="math inline">\(\mu\)</span>, the posterior is also Normal:</p>
+<p><span class="math display">\[\mu|y_i \sim N\left(\frac{\sigma^2_{\mu}}{\sigma^2_y/n+ \sigma^2_{\mu}}\bar{y} + \frac{\sigma^2_y/n}{\sigma^2_y/n+ \sigma^2_{\mu}}\mu_0, \frac{\sigma^2_y\sigma^2_{\mu}/n}{\sigma^2_y/n+ \sigma^2_{\mu}} \right)\]</span></p>
+<div class="notes">
+<p>Worth convincing yourself that the last statement is true - Next year might want to actually go through the math for this</p>
+</div>
+<hr>
+</section>
+<section id="choosing-the-prior-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="choosing-the-prior-distribution">Choosing the prior distribution</h2>
+<p>A study in <em>Medicine &amp; Science in Sports &amp; Exercise</em> reports that Americans take an average <span class="math inline">\(4000\)</span> steps per day with a standard deviation of <span class="math inline">\(200\)</span> steps. We come up with three different priors:</p>
+<ul>
+<li><strong>Informative prior</strong>: Maybe we really believe the previous study
+<ul>
+<li><span class="math inline">\(\mu \sim N(4000, 200^2)\)</span></li>
+</ul></li>
+<li><strong>Weakly informative prior</strong>: Or maybe we believe it a little bit
+<ul>
+<li><span class="math inline">\(\mu \sim N(4000, 800^2)\)</span></li>
+</ul></li>
+<li><strong>Uninformative or diffuse prior</strong>: Maybe we don’t have any scientific information at all
+<ul>
+<li><span class="math inline">\(\mu \sim N(0, 5000^2)\)</span></li>
+</ul></li>
+</ul>
+<hr>
+</section>
+<section id="effect-of-informative-prior" class="level2">
+<h2 class="anchored" data-anchor-id="effect-of-informative-prior">Effect of informative prior</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="s_introBayes_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="effect-of-weakly-informative-prior" class="level2">
+<h2 class="anchored" data-anchor-id="effect-of-weakly-informative-prior">Effect of weakly informative prior</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="s_introBayes_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="effect-of-uninformative-prior" class="level2">
+<h2 class="anchored" data-anchor-id="effect-of-uninformative-prior">Effect of uninformative prior</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="s_introBayes_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="bayesian-inference-about-mu" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-inference-about-mu">Bayesian inference about <span class="math inline">\(\mu\)</span></h2>
+<p>We decide to go with the uninformative prior.</p>
+<ul>
+<li>Posterior mean: <span class="math inline">\(\mu|y = 9984\)</span> steps</li>
+<li>Posterior 95% <strong>credible interval</strong> is the (2.5%, 97.5%) quantile of the posterior distribution</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qnorm</span>(<span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.927</span>), mu_post, sigma_post)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  9673.945 10213.288</code></pre>
+</div>
+</div>
+<p>A <strong>Bayesian credible interval</strong> for a parameter <span class="math inline">\(\theta\)</span> is an interval <span class="math inline">\([a,b]\)</span> s.t.</p>
+<p><span class="math display">\[P(\theta \in [a,b]|y) = 1-\alpha\]</span></p>
+<ul>
+<li>Given the data, there is a 95% probability that the true number of steps for Rollins students lies within <span class="math inline">\([9673, 10213]\)</span></li>
+</ul>
+<hr>
+</section>
+<section id="bayesian-inference-about-mu-1" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-inference-about-mu-1">Bayesian inference about <span class="math inline">\(\mu\)</span></h2>
+<ul>
+<li>Posterior probability that <span class="math inline">\(\mu &lt; 10000\)</span> given <span class="math inline">\(y\)</span></li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pnorm</span>(<span class="dv">10000</span>, mu_post, sigma_post)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5413359</code></pre>
+</div>
+</div>
+<p>Bayesian inference allows us to make probability statements about <span class="math inline">\(\mu\)</span> given the data.</p>
+<hr>
+</section>
+<section id="linear-regression--frequentist" class="level2">
+<h2 class="anchored" data-anchor-id="linear-regression--frequentist">Linear regression- frequentist</h2>
+<p>Frequentist approach: estimate <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\sigma^2\)</span></p>
+<ul>
+<li><span class="math inline">\(\hat{\beta} = (X^TX)^{-1}X^Ty\)</span></li>
+<li>Compute residuals using <span class="math inline">\(\hat{\beta}\)</span>, then from residuals estimate <span class="math inline">\(\sigma^2\)</span></li>
+</ul>
+<div class="notes">
+<p>As a simple motivating example we are going to do Bayesian linear regression Write out frequentist regression assumptions Induces normal likelihood <span class="math inline">\(y \sim N(X\beta, \sigma^2I)\)</span></p>
+</div>
+<hr>
+</section>
+<section id="steps-for-a-bayesian-linear-regression" class="level2">
+<h2 class="anchored" data-anchor-id="steps-for-a-bayesian-linear-regression">Steps for a Bayesian linear regression</h2>
+<ul>
+<li>Assign priors to the parameters of interest
+<ul>
+<li>Normal prior for <span class="math inline">\(\beta\)</span></li>
+<li>Inverse gamma for <span class="math inline">\(\sigma^2\)</span></li>
+</ul></li>
+<li>Choose hyper-parameters
+<ul>
+<li>Prior mean and variance for <span class="math inline">\(\beta\)</span></li>
+<li>Shape and scale for <span class="math inline">\(\sigma^2\)</span></li>
+</ul></li>
+<li>Obtain joint posterior distribution, and base inference on this</li>
+</ul>
+<div class="notes">
+<p>Bayesian approach is slightly different</p>
+</div>
+<hr>
+</section>
+<section id="bayesian-linear-regression-known-variance" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-linear-regression-known-variance">Bayesian linear regression (known variance)</h2>
+<p>We want a Bayesian framework for the regression model</p>
+<p><span class="math display">\[y = X\beta + \epsilon; \epsilon \sim N(0, \sigma^2_yI_n)\]</span></p>
+<ul>
+<li>Need to make distributional assumptions about <span class="math inline">\(\beta\)</span>
+<ul>
+<li><span class="math inline">\(\beta \sim N(0, \sigma^2_bI_p)\)</span></li>
+</ul></li>
+</ul>
+<div class="notes">
+<p>Here <span class="math inline">\(p\)</span> includes the intercept</p>
+</div>
+<hr>
+</section>
+<section id="bayesian-regression-known-variance" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-regression-known-variance">Bayesian regression (known variance)</h2>
+<p>We want to obtain the posterior</p>
+<p><span class="math display">\[p(\beta|y, X) \propto p(y|\beta, X)p(\beta)\]</span></p>
+<hr>
+</section>
+<section id="bayesian-regression-known-variance-1" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-regression-known-variance-1">Bayesian regression (known variance)</h2>
+<p><span class="math display">\[\beta \mid y \sim \mathcal{N}(\beta_{\text{post}}, \Sigma_{\text{post}})\]</span></p>
+<p><span class="math display">\[\Sigma_{\text{post}} = \left( \frac{1}{\sigma_y^2} X^\top X + \frac{1}{\sigma_\beta^2} I_p \right)^{-1}\]</span></p>
+<p><span class="math display">\[\begin{align}
+\beta_{\text{post}} &amp;= \Sigma_{\text{post}} \left( \frac{1}{\sigma_y^2} X^\top y + \frac{1}{\sigma_\beta^2} \beta_0 \right)\\[3mm]
+&amp;= \left( X^\top X + \frac{\sigma_y^2}{\sigma_\beta^2} I_p \right)^{-1} \left( X^\top y \right)
+\end{align}\]</span></p>
+<div class="notes">
+<p>Closed form solution when variance is assumed known… not usually the case otherwise - when is this going to look like regular linear regression?</p>
+</div>
+<hr>
+</section>
+<section id="about-the-variances" class="level2">
+<h2 class="anchored" data-anchor-id="about-the-variances">About the variances</h2>
+<p>Throughout all of this we have implicitly conditioned on the variances <span class="math inline">\(\sigma^2_y\)</span> and <span class="math inline">\(\sigma^2_{\beta}\)</span></p>
+</section>
+<section id="how-do-we-choose-the-variance-terms" class="level2">
+<h2 class="anchored" data-anchor-id="how-do-we-choose-the-variance-terms">How do we “choose” the variance terms?</h2>
+</section>
+<section id="prior-variance" class="level2">
+<h2 class="anchored" data-anchor-id="prior-variance">Prior variance</h2>
+<p>The prior variance <span class="math inline">\(\sigma^2_{\beta}\)</span> is often pre-selected to indicate the amount of prior knowledge</p>
+<ul>
+<li><p>Typically this is chosen very large to indicate a lack of knowledge</p></li>
+<li><p>This is considered a hyperparameter</p></li>
+<li><p>Basically this means that your prior will be dominated by the data and likelihood</p></li>
+</ul>
+<div class="notes">
+<p>As this goes to infinity beta estimates go to OLS</p>
+</div>
+<hr>
+</section>
+<section id="outcome-variance" class="level2">
+<h2 class="anchored" data-anchor-id="outcome-variance">Outcome variance</h2>
+<p>The outcome variance <span class="math inline">\(\sigma^2_y\)</span> is a quantity of interest.</p>
+<ul>
+<li>Ideally, we’d like to estimate this using the observed data</li>
+<li>Since we’re already being Bayesians, why not assign a prior distribution and try to find a posterior?</li>
+</ul>
+<p>The inverse-gamma distribution works pretty well</p>
+<p><span class="math display">\[p(\sigma^2_y |A, B) = \frac{B^A}{\Gamma(A)}(\sigma^2_y)^{-A-1}\exp(-\frac{B}{\sigma^2_y})\]</span></p>
+<ul>
+<li>Support of <span class="math inline">\(\sigma^2_y\)</span>:</li>
+</ul>
+<div class="notes">
+<p>Why do we typically choose inverse Gamma? - Conjugate prior, meaning the posterior will be inverse Gamma (computationlly easier) - Same support as the parameter of interest - Can sometimes be too informative if A, B &lt; 1</p>
+</div>
+<hr>
+</section>
+<section id="outcome-variance-posterior" class="level2">
+<h2 class="anchored" data-anchor-id="outcome-variance-posterior">Outcome variance posterior</h2>
+<p>We want to find</p>
+<p><span class="math display">\[p(\sigma_y^2|y,X,\beta) \propto p(y|\beta, \sigma^2_y, X)p(\sigma^2_y)\]</span></p>
+<p>It turns out that the posterior outcome variance is also inverse Gamma… this is an example of a <strong>conjugate prior</strong>.</p>
+<hr>
+</section>
+<section id="some-bayesian-language" class="level2">
+<h2 class="anchored" data-anchor-id="some-bayesian-language">Some Bayesian language</h2>
+<ul>
+<li>Parameters of interest are <span class="math inline">\(\beta\)</span>, <span class="math inline">\(\sigma^2_y\)</span></li>
+<li>The priors we’ve used are called <strong>conjugate priors</strong></li>
+<li>The hyperparameters we’ve chosen are <span class="math inline">\(\sigma^2_b, A, B\)</span></li>
+<li>The distributions we’ve calculated are <span class="math inline">\(p(\sigma^2_y|y,X, \beta)\)</span> and <span class="math inline">\(p(\beta|y, X, \sigma^2_y)\)</span>
+<ul>
+<li>These are called <strong>full conditionals</strong></li>
+</ul></li>
+<li>The posterior distribution of interest is <span class="math inline">\(p(\beta, \sigma^2_y|y, X)\)</span>, which is called the <strong>joint posterior</strong></li>
+</ul>
+<div class="notes">
+<p>Why do we care about full conditionals?</p>
+</div>
+<hr>
+</section>
+<section id="conjugate-priors" class="level2">
+<h2 class="anchored" data-anchor-id="conjugate-priors">Conjugate priors</h2>
+<p>A prior is <strong>conjugate</strong> if the posterior is a member of the same parametric family. Some examples are:</p>
+<ul>
+<li><strong>beta-binomial</strong> model: if the response is binomial and we use a beta prior, the posterior is beta</li>
+<li><strong>gamma-Poisson</strong>: Poisson reponse + gamma prior = gamma posterior</li>
+<li><strong>normal-normal</strong> model: normal response + normal prior = normal posterior</li>
+</ul>
+<p>Advantage of a conjugate prior is that the posterior is available in closed form</p>
+<div class="notes">
+<p>Mention other advantages of conjugate priors. Which posterior is available in closed form?</p>
+</div>
+<hr>
+</section>
+<section id="back-to-the-joint-posterior-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="back-to-the-joint-posterior-distribution">Back to the joint posterior distribution</h2>
+<p>Our goal is to learn about the joint posterior distribution</p>
+<p><span class="math display">\[p(\beta, \sigma^2_y|y, X, hyperparameters)\]</span></p>
+<p>We can calculate this from the full conditionals using the law of conditional probability:</p>
+<p><span class="math display">\[\begin{align}
+p(\beta, \sigma^2_y|y, X, h) &amp;= p(\beta| \sigma^2_y,y,X,h)p(\sigma_y^2, X, h)\\[3mm]
+&amp;= p(\beta| \sigma^2_y,y,X,h)\int_{\beta}p(\sigma^2_y|\beta,y,X,h)d\beta
+\end{align}\]</span></p>
+<div class="notes">
+<p>Why do we need to learn about the joint posterior distribution? - often people are lazy and just leave out hyperparameters when they write this down. This both bothers me and I’m gonna do it sometimes.</p>
+</div>
+<hr>
+</section>
+<section id="joint-posterior-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="joint-posterior-distribution">Joint posterior distribution</h2>
+<p>Our goal is to learn about the joint posterior distribution</p>
+<p><span class="math display">\[p(\beta, \sigma^2_y|y, X, hyperparameters)\]</span></p>
+<p>This can be hard!</p>
+<ul>
+<li>Often the joint posterior is analytically intractable</li>
+<li>For the conjugate priors we use, though, the full conditionals were “easy”</li>
+<li>If we can’t write down the joint posterior, maybe we can sample from it</li>
+</ul>
+<div class="notes">
+<p>This is the main motivation for MCMC</p>
+</div>
+<hr>
+</section>
+<section id="mcmc" class="level2">
+<h2 class="anchored" data-anchor-id="mcmc">MCMC</h2>
+<p>Basic idea: How do I get a string of values from the posterior when I cannot write the posterior down?</p>
+<ul>
+<li>Markov chain Monte Carlo (MCMC) methods let you sample from complicated [posterior] distributions
+<ul>
+<li>a collection of tools used to sample from a target distribution</li>
+</ul></li>
+<li>Once you have a sample from the posterior distribution you can use summary statistics (mean, variance, quantiles) to do posterior inference</li>
+</ul>
+<p>There are lots of MCMC methods-</p>
+<ul>
+<li>We’re going to talk about a couple of the simpler ones.
+<ul>
+<li>Metropolis-Hastings</li>
+<li>Gibbs sampler</li>
+</ul></li>
+</ul>
+<div class="notes">
+<p>Gibbs sampler is a special case of M-H sampler You can think about this analogously to bootstrap in some ways- once you have a sample from a distribution, you can learn about that distribution</p>
+</div>
+<hr>
+</section>
+<section id="steps-for-a-bayesian-regression" class="level2">
+<h2 class="anchored" data-anchor-id="steps-for-a-bayesian-regression">Steps for a Bayesian regression</h2>
+<ul>
+<li><p>Assign priors to the parameters of interest <span class="math inline">\(\beta, \sigma^2_y\)</span></p></li>
+<li><p>Choose hyper-parameters</p>
+<ul>
+<li>Prior mean and variance for <span class="math inline">\(\beta\)</span></li>
+<li>Distributional parameters for <span class="math inline">\(\sigma^2_y\)</span></li>
+</ul></li>
+<li><p>Obtain joint posterior distribution, and base inference on this</p></li>
+</ul>
+<p>We’re going to do this using the cannabis data</p>
+<hr>
+</section>
+<section id="cannabis-data" class="level2">
+<h2 class="anchored" data-anchor-id="cannabis-data">Cannabis data</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>cannabis <span class="ot">=</span> <span class="fu">readRDS</span>(<span class="at">file =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"cannabis.rds"</span>))</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>cannabis <span class="ot">=</span> cannabis <span class="sc">%&gt;%</span> <span class="fu">select</span>(id, use_group, t_mmr1, t_thc, p_fpc1, <span class="at">p_change =</span> p_PMC_pctChg, </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                               i_memory_time34, i_time_outside_reticle) <span class="sc">%&gt;%</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">log_mmr =</span> <span class="fu">log1p</span>(t_mmr1))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(cannabis)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       id use_group t_mmr1    t_thc     p_fpc1 p_change i_memory_time34
+1 003-001 daily use 0.6108 146.5474  38.987583 -38.4050        3.096037
+2 003-003 daily use 0.5093  57.0107 161.109915 -27.0250        3.591851
+3 003-004 daily use 1.5778  22.0922 -77.269994 -47.1130        4.523515
+4 003-005 daily use 0.6864  81.7211  37.433740 -36.7350        4.338389
+5 003-006 daily use 0.4474  14.3114  58.375202 -37.6325        2.802600
+6 003-007 daily use 0.5221   9.9674   5.019542 -44.9335        4.706120
+  i_time_outside_reticle   log_mmr
+1                70.9271 0.4767309
+2                66.1071 0.4116460
+3                73.2271 0.9469363
+4                59.6271 0.5225961
+5                56.2471 0.3697688
+6                73.2271 0.4200910</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="cannabis-data-1" class="level2">
+<h2 class="anchored" data-anchor-id="cannabis-data-1">Cannabis data</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="s_introBayes_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="cannabis-data-2" class="level2">
+<h2 class="anchored" data-anchor-id="cannabis-data-2">Cannabis data</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="s_introBayes_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="cannabis-data-3" class="level2">
+<h2 class="anchored" data-anchor-id="cannabis-data-3">Cannabis data</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="s_introBayes_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="cannabis-data-4" class="level2">
+<h2 class="anchored" data-anchor-id="cannabis-data-4">Cannabis data</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="s_introBayes_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="cannabis-data-5" class="level2">
+<h2 class="anchored" data-anchor-id="cannabis-data-5">Cannabis data</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="s_introBayes_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="notes">
+<p>Going to filter out the no-use people for this analysis.</p>
+</div>
+<hr>
+</section>
+<section id="model-specification" class="level2">
+<h2 class="anchored" data-anchor-id="model-specification">Model specification</h2>
+<p><span class="math display">\[log(mmr_i) = \beta_0 + \beta_1 \mbox{pupil}_i + \beta_2 \mbox{iPad}_i + \epsilon_i\]</span></p>
+<p>Define the likelihood:</p>
+<ul>
+<li><span class="math inline">\(\epsilon \sim N(0, \sigma^2_yI_n) \implies y\sim N(X\beta, \sigma^2_yI_n)\)</span></li>
+</ul>
+<p>Define the priors:</p>
+<ul>
+<li><span class="math inline">\(\beta \sim N(0, \sigma^2_{\beta}I_{\beta})\)</span></li>
+<li><span class="math inline">\(\sigma^2_y \sim Exp(\lambda)\)</span></li>
+</ul>
+<p>Define the hyperparameters</p>
+<ul>
+<li>Let <span class="math inline">\(\sigma^2_{\beta} = 100\)</span></li>
+<li>Let <span class="math inline">\(\lambda = 1\)</span></li>
+</ul>
+<hr>
+</section>
+<section id="fitting-the-model" class="level2">
+<h2 class="anchored" data-anchor-id="fitting-the-model">Fitting the model</h2>
+<p>We will use the <code>R</code> package <code>rstanarm</code></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>blr_mod <span class="ot">=</span> <span class="fu">stan_glm</span>(log_mmr <span class="sc">~</span> p_fpc1 <span class="sc">+</span> i_time_outside_reticle <span class="sc">+</span> use_group, </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> cannabis,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">prior_intercept =</span> <span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">10</span>),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">prior =</span> <span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">10</span>),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">prior_aux =</span> <span class="fu">exponential</span>(<span class="at">rate =</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+SAMPLING FOR MODEL 'continuous' NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 0.001 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 10 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 1.077 seconds (Warm-up)
+Chain 1:                0.615 seconds (Sampling)
+Chain 1:                1.692 seconds (Total)
+Chain 1: 
+
+SAMPLING FOR MODEL 'continuous' NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 7e-06 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.07 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 0.964 seconds (Warm-up)
+Chain 2:                0.554 seconds (Sampling)
+Chain 2:                1.518 seconds (Total)
+Chain 2: 
+
+SAMPLING FOR MODEL 'continuous' NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 6e-06 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.06 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 1.089 seconds (Warm-up)
+Chain 3:                0.477 seconds (Sampling)
+Chain 3:                1.566 seconds (Total)
+Chain 3: 
+
+SAMPLING FOR MODEL 'continuous' NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 8e-06 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.08 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 0.906 seconds (Warm-up)
+Chain 4:                0.567 seconds (Sampling)
+Chain 4:                1.473 seconds (Total)
+Chain 4: </code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="model-summary" class="level2">
+<h2 class="anchored" data-anchor-id="model-summary">Model summary</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(blr_mod)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Model Info:
+ function:     stan_glm
+ family:       gaussian [identity]
+ formula:      log_mmr ~ p_fpc1 + i_time_outside_reticle + use_group
+ algorithm:    sampling
+ sample:       4000 (posterior sample size)
+ priors:       see help('prior_summary')
+ observations: 94
+ predictors:   4
+
+Estimates:
+                         mean   sd   10%   50%   90%
+(Intercept)             1.0    0.1  0.8   1.0   1.2 
+p_fpc1                  0.0    0.0  0.0   0.0   0.0 
+i_time_outside_reticle  0.0    0.0  0.0   0.0   0.0 
+use_groupdaily use     -0.2    0.1 -0.2  -0.2  -0.1 
+sigma                   0.2    0.0  0.2   0.2   0.3 
+
+Fit Diagnostics:
+           mean   sd   10%   50%   90%
+mean_PPD 0.6    0.0  0.6   0.6   0.7  
+
+The mean_ppd is the sample average posterior predictive distribution of the outcome variable (for details see help('summary.stanreg')).
+
+MCMC diagnostics
+                       mcse Rhat n_eff
+(Intercept)            0.0  1.0  3109 
+p_fpc1                 0.0  1.0  4726 
+i_time_outside_reticle 0.0  1.0  3601 
+use_groupdaily use     0.0  1.0  1834 
+sigma                  0.0  1.0  1638 
+mean_PPD               0.0  1.0  2481 
+log-posterior          0.0  1.0  1269 
+
+For each parameter, mcse is Monte Carlo standard error, n_eff is a crude measure of effective sample size, and Rhat is the potential scale reduction factor on split chains (at convergence Rhat=1).</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="fitting-the-model--diffuse-r-priors" class="level2">
+<h2 class="anchored" data-anchor-id="fitting-the-model--diffuse-r-priors">Fitting the model- diffuse-r priors</h2>
+<p>This fitting was substantially slower than the previous model.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>blr_mod2 <span class="ot">=</span> <span class="fu">stan_glm</span>(log_mmr <span class="sc">~</span> p_fpc1 <span class="sc">+</span> i_time_outside_reticle <span class="sc">+</span> use_group, </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> cannabis,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">prior_intercept =</span> <span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">1000</span>),</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">prior =</span> <span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">1000</span>),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">prior_aux =</span> <span class="fu">exponential</span>(<span class="at">rate =</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+SAMPLING FOR MODEL 'continuous' NOW (CHAIN 1).
+Chain 1: 
+Chain 1: Gradient evaluation took 1.6e-05 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.16 seconds.
+Chain 1: Adjust your expectations accordingly!
+Chain 1: 
+Chain 1: 
+Chain 1: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 1: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 1: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 1: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 1: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 1: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 1: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 1: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 1: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 1: 
+Chain 1:  Elapsed Time: 6.959 seconds (Warm-up)
+Chain 1:                20.706 seconds (Sampling)
+Chain 1:                27.665 seconds (Total)
+Chain 1: 
+
+SAMPLING FOR MODEL 'continuous' NOW (CHAIN 2).
+Chain 2: 
+Chain 2: Gradient evaluation took 1e-05 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.1 seconds.
+Chain 2: Adjust your expectations accordingly!
+Chain 2: 
+Chain 2: 
+Chain 2: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 2: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 2: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 2: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 2: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 2: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 2: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 2: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 2: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 2: 
+Chain 2:  Elapsed Time: 3.864 seconds (Warm-up)
+Chain 2:                13.603 seconds (Sampling)
+Chain 2:                17.467 seconds (Total)
+Chain 2: 
+
+SAMPLING FOR MODEL 'continuous' NOW (CHAIN 3).
+Chain 3: 
+Chain 3: Gradient evaluation took 6e-06 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.06 seconds.
+Chain 3: Adjust your expectations accordingly!
+Chain 3: 
+Chain 3: 
+Chain 3: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 3: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 3: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 3: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 3: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 3: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 3: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 3: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 3: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 3: 
+Chain 3:  Elapsed Time: 24.436 seconds (Warm-up)
+Chain 3:                28.079 seconds (Sampling)
+Chain 3:                52.515 seconds (Total)
+Chain 3: 
+
+SAMPLING FOR MODEL 'continuous' NOW (CHAIN 4).
+Chain 4: 
+Chain 4: Gradient evaluation took 6e-06 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.06 seconds.
+Chain 4: Adjust your expectations accordingly!
+Chain 4: 
+Chain 4: 
+Chain 4: Iteration:    1 / 2000 [  0%]  (Warmup)
+Chain 4: Iteration:  200 / 2000 [ 10%]  (Warmup)
+Chain 4: Iteration:  400 / 2000 [ 20%]  (Warmup)
+Chain 4: Iteration:  600 / 2000 [ 30%]  (Warmup)
+Chain 4: Iteration:  800 / 2000 [ 40%]  (Warmup)
+Chain 4: Iteration: 1000 / 2000 [ 50%]  (Warmup)
+Chain 4: Iteration: 1001 / 2000 [ 50%]  (Sampling)
+Chain 4: Iteration: 1200 / 2000 [ 60%]  (Sampling)
+Chain 4: Iteration: 1400 / 2000 [ 70%]  (Sampling)
+Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
+Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
+Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
+Chain 4: 
+Chain 4:  Elapsed Time: 7.664 seconds (Warm-up)
+Chain 4:                30.666 seconds (Sampling)
+Chain 4:                38.33 seconds (Total)
+Chain 4: </code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="model-summary-1" class="level2">
+<h2 class="anchored" data-anchor-id="model-summary-1">Model summary</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(blr_mod2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Model Info:
+ function:     stan_glm
+ family:       gaussian [identity]
+ formula:      log_mmr ~ p_fpc1 + i_time_outside_reticle + use_group
+ algorithm:    sampling
+ sample:       4000 (posterior sample size)
+ priors:       see help('prior_summary')
+ observations: 94
+ predictors:   4
+
+Estimates:
+                         mean   sd   10%   50%   90%
+(Intercept)             1.0    0.1  0.8   1.0   1.2 
+p_fpc1                  0.0    0.0  0.0   0.0   0.0 
+i_time_outside_reticle  0.0    0.0  0.0   0.0   0.0 
+use_groupdaily use     -0.2    0.1 -0.2  -0.2  -0.1 
+sigma                   0.2    0.0  0.2   0.2   0.3 
+
+Fit Diagnostics:
+           mean   sd   10%   50%   90%
+mean_PPD 0.6    0.0  0.6   0.6   0.7  
+
+The mean_ppd is the sample average posterior predictive distribution of the outcome variable (for details see help('summary.stanreg')).
+
+MCMC diagnostics
+                       mcse Rhat n_eff
+(Intercept)            0.0  1.0  3395 
+p_fpc1                 0.0  1.0  3713 
+i_time_outside_reticle 0.0  1.0  3820 
+use_groupdaily use     0.0  1.0  2207 
+sigma                  0.0  1.0   838 
+mean_PPD               0.0  1.0  1315 
+log-posterior          0.1  1.0   757 
+
+For each parameter, mcse is Monte Carlo standard error, n_eff is a crude measure of effective sample size, and Rhat is the potential scale reduction factor on split chains (at convergence Rhat=1).</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="ols" class="level2">
+<h2 class="anchored" data-anchor-id="ols">OLS</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="do">##### compare with least squares</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>mod_lm <span class="ot">=</span> <span class="fu">lm</span>(log_mmr <span class="sc">~</span> p_fpc1 <span class="sc">+</span> i_time_outside_reticle <span class="sc">+</span> use_group, <span class="at">data =</span> cannabis)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod_lm)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = log_mmr ~ p_fpc1 + i_time_outside_reticle + use_group, 
+    data = cannabis)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.47538 -0.16440 -0.05425  0.12442  0.90746 
+
+Coefficients:
+                         Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)             0.9921595  0.1298175   7.643 2.21e-11 ***
+p_fpc1                 -0.0001831  0.0004189  -0.437  0.66300    
+i_time_outside_reticle -0.0033046  0.0017121  -1.930  0.05673 .  
+use_groupdaily use     -0.1651633  0.0551611  -2.994  0.00355 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.2441 on 90 degrees of freedom
+Multiple R-squared:  0.121, Adjusted R-squared:  0.09173 
+F-statistic: 4.131 on 3 and 90 DF,  p-value: 0.008587</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="regression-coefficients" class="level2">
+<h2 class="anchored" data-anchor-id="regression-coefficients">Regression coefficients</h2>
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 31%">
+<col style="width: 12%">
+<col style="width: 13%">
+<col style="width: 12%">
+<col style="width: 13%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">term</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">std.error</th>
+<th style="text-align: right;">conf.low</th>
+<th style="text-align: right;">conf.high</th>
+<th style="text-align: left;">model</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">0.9856</td>
+<td style="text-align: right;">0.1291</td>
+<td style="text-align: right;">0.7801</td>
+<td style="text-align: right;">1.2099</td>
+<td style="text-align: left;">blr</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">0.9922</td>
+<td style="text-align: right;">0.1298</td>
+<td style="text-align: right;">0.7343</td>
+<td style="text-align: right;">1.2501</td>
+<td style="text-align: left;">lm</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">0.9942</td>
+<td style="text-align: right;">0.1326</td>
+<td style="text-align: right;">0.7779</td>
+<td style="text-align: right;">1.2141</td>
+<td style="text-align: left;">blr_diffuse</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">i_time_outside_reticle</td>
+<td style="text-align: right;">-0.0032</td>
+<td style="text-align: right;">0.0017</td>
+<td style="text-align: right;">-0.0061</td>
+<td style="text-align: right;">-0.0005</td>
+<td style="text-align: left;">blr</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">i_time_outside_reticle</td>
+<td style="text-align: right;">-0.0033</td>
+<td style="text-align: right;">0.0017</td>
+<td style="text-align: right;">-0.0067</td>
+<td style="text-align: right;">0.0001</td>
+<td style="text-align: left;">lm</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">i_time_outside_reticle</td>
+<td style="text-align: right;">-0.0033</td>
+<td style="text-align: right;">0.0018</td>
+<td style="text-align: right;">-0.0062</td>
+<td style="text-align: right;">-0.0004</td>
+<td style="text-align: left;">blr_diffuse</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">p_fpc1</td>
+<td style="text-align: right;">-0.0002</td>
+<td style="text-align: right;">0.0004</td>
+<td style="text-align: right;">-0.0008</td>
+<td style="text-align: right;">0.0005</td>
+<td style="text-align: left;">blr</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">p_fpc1</td>
+<td style="text-align: right;">-0.0002</td>
+<td style="text-align: right;">0.0004</td>
+<td style="text-align: right;">-0.0010</td>
+<td style="text-align: right;">0.0006</td>
+<td style="text-align: left;">lm</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">p_fpc1</td>
+<td style="text-align: right;">-0.0002</td>
+<td style="text-align: right;">0.0004</td>
+<td style="text-align: right;">-0.0009</td>
+<td style="text-align: right;">0.0005</td>
+<td style="text-align: left;">blr_diffuse</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">use_groupdaily use</td>
+<td style="text-align: right;">-0.1645</td>
+<td style="text-align: right;">0.0555</td>
+<td style="text-align: right;">-0.2578</td>
+<td style="text-align: right;">-0.0743</td>
+<td style="text-align: left;">blr</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">use_groupdaily use</td>
+<td style="text-align: right;">-0.1652</td>
+<td style="text-align: right;">0.0552</td>
+<td style="text-align: right;">-0.2748</td>
+<td style="text-align: right;">-0.0556</td>
+<td style="text-align: left;">lm</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">use_groupdaily use</td>
+<td style="text-align: right;">-0.1649</td>
+<td style="text-align: right;">0.0569</td>
+<td style="text-align: right;">-0.2616</td>
+<td style="text-align: right;">-0.0740</td>
+<td style="text-align: left;">blr_diffuse</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<hr>
+</section>
+<section id="bayesian-regression-diagnostics" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-regression-diagnostics">Bayesian regression diagnostics</h2>
+<p>The package <code>rstanarm</code> uses MCMC to draw samples from the posterior distribution. There are standard checks to ensure that your results come from independent draws of the posterior distribution.</p>
+<ul>
+<li>We will come back to these after we talk more about MCMC</li>
+<li><code>stan_glm</code> has <a href="https://mc-stan.org/rstanarm/articles/">lots of nice tutorials</a></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
