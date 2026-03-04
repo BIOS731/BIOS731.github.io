@@ -29,7 +29,7 @@ library(rstanarm)
 library(broom.mixed)
 ```
 
-
+\fontsize{11pt}{12pt}\selectfont
 Today, we cover:
 
 - Revisiting Gaussian Quadrature 
@@ -40,6 +40,11 @@ Tomorrow:
 
 - MCMC
 
+Announcements:
+
+- Cloud computing (Keven Haynes) moved to March 26
+  - Should be getting emails from Keven, please respond
+- We will finish up Bayesian computing after break
 
 
 
@@ -130,7 +135,7 @@ Orthogonal polynomial basis functions come from applying Gram-Schmidt orthogonal
 ---
 
 
-## Bayesisan data analysis: a simple motivating example
+## The Bayesisan philosophy : a simple motivating example
 
 Imagine we are interested in the daily number of steps taken by Rollins students. We use accelerometers to collect a random sample of step counts from $n = 10$ students.
 
@@ -164,21 +169,13 @@ We want to learn about $\mu$, the average daily number of steps taken by Rollins
 ```{r, echo = FALSE, eval = TRUE, warning = FALSE}
 set.seed(232324)
 sigma_y = (500)^2 # treat population variance as known
-mu = 10000
+mu_true = 10000
 n = 10 # number of students in the random sample
-steps = round(rnorm(n, mu, sd = sqrt(sigma_y)))
+steps = round(rnorm(n, mu_true, sd = sqrt(sigma_y)))
 
 
 # frequentist estimate of mu
 ybar = mean(steps)
-ci_minus = ybar - 1.96 * sd(steps) / sqrt(n)
-ci_plus = ybar + 1.96 * sd(steps) / sqrt(n)
-
-sample_hist = data.frame(steps = steps) %>%
-  ggplot(aes(steps)) + geom_histogram(bins = 5, fill = "grey66") +
-  geom_vline(xintercept = mean(steps), color = "blue", linewidth = 2, linetype = 3) +
-  geom_vline(xintercept = ci_minus, color = "indianred", linewidth = 2) +
-  geom_vline(xintercept = ci_plus, color = "indianred", linewidth = 2)
 
 ```
 
@@ -188,6 +185,11 @@ sample_hist = data.frame(steps = steps) %>%
 head(steps)
 mean(steps)
 
+ci_minus = ybar - 1.96 * sd(steps) / sqrt(n)
+ci_plus = ybar + 1.96 * sd(steps) / sqrt(n)
+ci_minus   
+ci_plus
+range(steps)
 ```
 
 ---
@@ -195,12 +197,16 @@ mean(steps)
 ## Frequentist inference about $\mu$
 
 ```{r, echo = FALSE, eval = TRUE, fig.align="center", fig.height = 3, fig.width = 7}
-sample_hist
+data.frame(steps = steps) %>%
+  ggplot(aes(steps)) + geom_histogram(bins = 5, fill = "grey66") +
+  geom_vline(xintercept = mean(steps), color = "blue", linewidth = 2, linetype = 3) +
+  geom_vline(xintercept = ci_minus, color = "indianred", linewidth = 2) +
+  geom_vline(xintercept = ci_plus, color = "indianred", linewidth = 2)
 ```
 
 
 ::: notes
-Frequentist inference would say we are 95% confidence that the true number of steps taken by Rollins students lies between 9722 and 10,276 steps.
+Frequentist inference would say we are 95% confident that the true number of steps taken by Rollins students lies between 9722 and 10,276 steps.
 :::
 
 ---
@@ -211,10 +217,12 @@ Frequentist inference would say we are 95% confidence that the true number of st
 - Bayesians treat the parameter $\mu$ as random
 - Express uncertainty about $\mu$ using probability distributions
 
+\vspace{5mm}
 
 - The distribution before observing the data is called the **prior distribution**
   - Allows incorporation of previous knowledge
   
+\vspace{5mm}
 
 - Distribution after observing the data is the **posterior distribution**
 - Inference is conditional on the data we observe
@@ -299,7 +307,7 @@ sigma2_post = sigma_y/n * sigma2_prior / (sigma_y/n + sigma2_prior)
 densities_df = tibble(
   steps = seq(2000, 13000, length.out = 1000),
   prior = dnorm(steps, mu_prior, sd = sqrt(sigma2_prior)),
-  likelihood = dnorm(steps, ybar, sd = sqrt(sigma_y)),
+  likelihood = dnorm(steps, mu_true, sd = sqrt(sigma_y)),
   posterior = dnorm(steps, mu_post, sd = sqrt(sigma2_post))
 ) %>%
   pivot_longer(prior:posterior, names_to = "distribution", values_to = "value")
@@ -330,7 +338,7 @@ sigma2_post = sigma_y/n * sigma2_prior / (sigma_y/n + sigma2_prior)
 densities_df = tibble(
   steps = seq(2000, 13000, length.out = 1000),
   prior = dnorm(steps, mu_prior, sd = sqrt(sigma2_prior)),
-  likelihood = dnorm(steps, ybar, sd = sqrt(sigma_y)),
+  likelihood = dnorm(steps, mu_true, sd = sqrt(sigma_y)),
   posterior = dnorm(steps, mu_post, sd = sqrt(sigma2_post))
 ) %>%
   pivot_longer(prior:posterior, names_to = "distribution", values_to = "value")
@@ -360,7 +368,7 @@ sigma_post = sqrt(sigma2_post)
 densities_df = tibble(
   steps = seq(-5000, 12000, length.out = 1000),
   prior = dnorm(steps, mu_prior, sd = sqrt(sigma2_prior)),
-  likelihood = dnorm(steps, ybar, sd = sqrt(sigma_y)),
+  likelihood = dnorm(steps, mu_true, sd = sqrt(sigma_y)),
   posterior = dnorm(steps, mu_post, sd = sqrt(sigma2_post))
 )  %>%
   pivot_longer(prior:posterior, names_to = "distribution", values_to = "value")
@@ -418,7 +426,7 @@ Bayesian inference allows us to make probability statements about $\mu$ given th
 Frequentist approach: estimate $\beta$ and $\sigma^2$
 
 
-
+\vspace{10mm}
 
 - $\hat{\beta} = (X^TX)^{-1}X^Ty$
 - Compute residuals using $\hat{\beta}$, then from residuals estimate $\sigma^2$ 
@@ -471,6 +479,11 @@ We want to obtain the posterior
 
 $$p(\beta|y, X) \propto p(y|\beta, X)p(\beta)$$
 
+\vspace{20mm}
+---
+
+## Bayesian regression (known variance)
+
 ---
 
 ## Bayesian regression (known variance)
@@ -499,6 +512,13 @@ Throughout all of this we have implicitly conditioned on the variances $\sigma^2
 
 
 How do we "choose" the variance terms?
+
+::: notes
+Hyperparameters are parameters of the prior distribution.
+
+They determine how the parameters themselves are distributed.
+:::
+
 ---
 
 ## Prior variance
@@ -547,7 +567,7 @@ Why do we typically choose inverse Gamma?
 
 We want to find
 
-$$p(\sigma_y^2|y,X,\beta) \propto p(y|\beta, \sigma^2_y, X)p(\sigma^2_y)$$
+$$p(\sigma_y^2|y,X,\beta) \propto p(y|\beta, \sigma^2_y, X)p(\sigma^2_y|A,B)$$
 
 
 
@@ -673,7 +693,7 @@ You can think about this analogously to bootstrap in some ways- once you have a 
 - Obtain joint posterior distribution, and base inference on this  
 
 
-We're going to do this using the cannabis data
+We're going to do this using data from a cannabis consumption and driving study in Colorado.
 
 
 ---
@@ -761,7 +781,7 @@ cannabis %>%
 
 
 
-```{r,  echo = FALSE, fig.align='center', message = FALSE, fig.width = 8, fig.height = 5}
+```{r,  echo = FALSE, fig.align='center', message = FALSE, fig.width = 8, fig.height = 4}
 cannabis %>%
   filter(t_mmr1 > 0) %>%
   pivot_longer(p_fpc1:i_time_outside_reticle, names_to = "variable", values_to = "value") %>%
@@ -810,7 +830,7 @@ Define the priors:
 
 Define the hyperparameters
 
-- Let $\sigma^2_{\beta} = 100$
+- Let $\sigma^2_{\beta} = 10, 1000$
 - Let $\lambda = 1$
 
 ---
@@ -832,7 +852,7 @@ blr_mod = stan_glm(log_mmr ~ p_fpc1 + i_time_outside_reticle + use_group,
 
 ## Model summary
 
-\fontsize{9pt}{10pt}\selectfont
+\fontsize{8pt}{9pt}\selectfont
 ```{r}
 summary(blr_mod)
 ```
@@ -857,7 +877,7 @@ blr_mod2 = stan_glm(log_mmr ~ p_fpc1 + i_time_outside_reticle + use_group,
 
 ## Model summary
 
-\fontsize{9pt}{10pt}\selectfont
+\fontsize{8pt}{9pt}\selectfont
 ```{r}
 summary(blr_mod2)
 ```
@@ -866,7 +886,7 @@ summary(blr_mod2)
 
 ## OLS
 
-\fontsize{9pt}{10pt}\selectfont
+\fontsize{8pt}{9pt}\selectfont
 ```{r}
 ##### compare with least squares
 mod_lm = lm(log_mmr ~ p_fpc1 + i_time_outside_reticle + use_group, data = cannabis)
