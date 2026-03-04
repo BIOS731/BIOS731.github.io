@@ -22,6 +22,7 @@ header-includes:
 
 ## Overview
 
+\fontsize{10pt}{11pt}\selectfont
 ```{r, echo = FALSE, eval = TRUE}
 library(tidyverse)
 ```
@@ -34,9 +35,12 @@ Today, we cover:
 - MCMC
 - Metropolis-Hastings
 
-Tomorrow:
+Announcements:
 
-- Gibb's sampling
+- Next week spring break!
+- No class Wednesday, 3/18 (ENAR)
+- Resume Bayesian Computing on 3/19
+- Look out for email from Keven Haynes about the cluster
 
 
 Resources:
@@ -93,6 +97,7 @@ You can think about this analogously to bootstrap in some ways- once you have a 
 
 \fontsize{10pt}{11pt}\selectfont
 A Markov chain is a stochastic process that evolves over time by transitioning into different states. 
+
 - The sequence of states is denoted by $\{X_i\}$
 - Transition between states is random and follows the *Markov property*:
 
@@ -294,9 +299,10 @@ Markov chains converge to their stationary distribution if it exists and specifi
 
 ## Metropolis-Hastings algorithm
 
+\fontsize{10pt}{11pt}\selectfont
 Suppose we want to take a sample $x \sim \pi(x)$ using MCMC. 
 
--Metropolis-Hastings is a popular algorithm (circa 1970) for doing this. 
+- Metropolis-Hastings is a popular algorithm (circa 1970) for doing this. 
 
 
 Some terminology:
