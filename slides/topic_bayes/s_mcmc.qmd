@@ -56,6 +56,8 @@ Our goal is to learn about the joint posterior distribution
 
 $$p(\beta, \sigma^2_y|y, X, hyperparameters)$$
 
+\vspace{5mm}
+      
 This can be hard!
 
 - Often the joint posterior is analytically intractable
@@ -98,13 +100,25 @@ You can think about this analogously to bootstrap in some ways- once you have a 
 \fontsize{10pt}{11pt}\selectfont
 A Markov chain is a stochastic process that evolves over time by transitioning into different states. 
 
-- The sequence of states is denoted by $\{X_i\}$
+- The sequence of states is denoted by $X_i$
 - Transition between states is random and follows the *Markov property*:
 
 $$P(X_t | X_{t-1}, X_{t-2}, \ldots, X_0) = P(X_t|X_{t-1})$$
 
 
-- FYI: this notation is for discrete distributions
+\vspace{10mm}
+
+FYI: this notation is for discrete distributions
+
+::: notes
+Another word for random is probabilistic. Using discrete distribution here to get at the general idea, but usually we will be working with continuous distributions.
+- transition matrix also sometimes called transition Kernel
+:::
+
+---
+
+## Markov chains
+
 - **Core concept**: The probability of transitioning to a state at time $t$ depends only on the most recent previous state
 
 - *State space*: collection of states that a Markov chain can visit
@@ -161,6 +175,11 @@ Suppose we start the chain in state 3, with probability 1, so the initial probab
 
 - What is the probability distribution over the states after $n$ iterations?
 
+\vspace{10mm}
+
+$\pi_*$ is called the stationary distribution. This is the vector of probabilities of being in each state that the chain converges to.
+
+
 ::: notes
 - $\pi_1 = \pi_0P = (0, 1/2, 1/2)$
 - $\pi_n = \pi_0PPP\times \ldots\times P = \pi_0  P^n$
@@ -169,14 +188,7 @@ Suppose we start the chain in state 3, with probability 1, so the initial probab
 
 ---
 
-##  Markov chain properties
-
-$\pi_*$ is called the stationary distribution. This is the vector of probabilities of being in each state that the chain converges to.
-
-\vspace{15mm}
-
----
-
+##
 ##  Markov chain limit theorem
 
 \fontsize{11pt}{12pt}\selectfont
@@ -203,7 +215,7 @@ This limit theorem holds under some necessary assumptions
 (2) The chain is **irreducible**: it is possible to reach any state from any other state (eventually)
 
 
-\vspace{5mm}
+\vspace{15mm}
 
 (3) The chain is **aperiodic**: the chain does not cycle in a fixed period. A chain is aperiodic if it does not make deterministic visits to a subset of the state space.
 
@@ -224,8 +236,6 @@ In a reversible Markov chain, the process looks the same if you run it forward o
 
 - At equilibrium (the chain’s long-run steady state), the traffic between any two states is perfectly balanced. For any two states A and B, the probability of transitioning from A to B times the long-run probability of being in A equals the probability of going from B to A times the long-run probability of being in B
 
-MCMC methods use Markov chains to sample from a target probability distribution. The goal is to construct a chain whose stationary distribution is the target distribution we want to sample. Reversibility ensures we have the correct stationary distribution.
-
 
 ::: notes
 Why do we care about this for MCMC?
@@ -234,6 +244,23 @@ Why do we care about this for MCMC?
 ---
 
 
+
+## Why Reversibility Matters for MCMC
+
+You want samples from $p(\theta|y) = $ complicated posterior distribution. Sampling directly is hard. Instead:
+
+1. Build a Markov chain
+2. Ensure stationary distribution = target distribution
+3. Run the chain for a while.
+4. Visited states become samples from the target.
+
+
+MCMC methods use Markov chains to sample from a target probability distribution. The goal is to construct a chain whose stationary distribution is the target distribution we want to sample. Reversibility ensures we have the correct stationary distribution.
+
+
+---
+
+  
 
 ## Why Reversibility Matters for MCMC
 
@@ -358,7 +385,7 @@ Usually problems like this we just call the denominator the normalizing constant
 
 ```{r, echo = FALSE,  eval = TRUE, fig.align='center', fig.height = 5, fig.width = 10, warning = FALSE}
 p <- function(x) {
-  exp(-x^2) * (2 + sin(5 * x))
+  exp(-x^2) * (2 + sin(5 * x) + sin(2 * x))
 }
 
 # Compute normalization constant Z ≈ ∫ p(x) dx over [-Inf, Inf]
@@ -376,7 +403,7 @@ df <- data.frame(x = x_vals, f = f_vals)
 
 ggplot(df, aes(x = x, y = f)) +
   geom_line(color = "blue", size = 1) +
-  labs(title = expression(p(x) == frac(e^{-x^2}*(2 + sin(5*x)), Z)),
+  labs(title = expression(p(x) == frac(e^{-x^2}*(2 + sin(5*x) + sin(2*x)), Z)),
        y = expression(p(x)), x = "x") +
   theme_minimal()
 ```
@@ -412,6 +439,8 @@ Notice that the distribution we sample from depends on the current state of the 
 $$\alpha(y|x) = \min\left\{\frac{\pi(y)q(x|y)}{\pi(x)q(y|x)}, 1\right\}$$
 
 
+\vspace{20mm}
+
 ::: notes
 Note here why the normalizing constant will go away, and why the $\alpha$ simplifies
 :::
@@ -431,6 +460,36 @@ Then simulate $u\sim Unif(0,1)$.
 
 ---
 
+## Simple example
+
+```{r, echo = FALSE,  eval = TRUE, fig.align='center', fig.height = 5, fig.width = 10, warning = FALSE}
+p <- function(x) {
+  exp(-x^2) * (2 + sin(5 * x) + sin(2 * x))
+}
+
+# Compute normalization constant Z ≈ ∫ p(x) dx over [-Inf, Inf]
+Z <- integrate(p, lower = -Inf, upper = Inf)$value
+
+# Normalized density
+f <- function(x) {
+  p(x) / Z
+}
+
+
+x_vals <- seq(-3, 3, length.out = 1000)
+f_vals <- f(x_vals)
+df <- data.frame(x = x_vals, f = f_vals)
+
+ggplot(df, aes(x = x, y = f)) +
+  geom_line(color = "blue", size = 1) +
+  labs(title = expression(p(x) == frac(e^{-x^2}*(2 + sin(5*x) + sin(2*x)), Z)),
+       y = expression(p(x)), x = "x") +
+  theme_minimal()
+```
+
+
+---
+  
 ## Simple example implementation
 
 \fontsize{11pt}{12pt}\selectfont
@@ -536,12 +595,12 @@ results1 %>%
 results1 %>%
   group_by(chain) %>%
   mutate(accepted = as.numeric(accepted),
-         prob = zoo::rollmean(accepted, k = 100, fill = NA),
+         prob = zoo::rollmean(accepted, k = 20, fill = NA),
          observation = row_number()) %>%
   ungroup() %>%
   ggplot(aes(observation, prob)) +
   geom_line() +
-  facet_wrap(~chain, scales = "free")
+  facet_wrap(~chain)
 ```
 
 ---
@@ -566,7 +625,7 @@ We will look at how each of these affect the sampler
 Convergence occurs regardless of our starting point (in theory), so we can usually pick any reasonable values in the parameter space for initial value(s).
 
 - The farther away you are from high density regions the longer it will take to reach the stationary distribution (i.e. target distribution $\pi(x)$)
-- Sample you generate early on will probably not follow $\pi(x)$
+- Samples      you generate early on will probably not follow $\pi(x)$
 - Generally we throw out a certain number of the first draws, known as **burn-in** to make sure our sample is closer to the stationary distribution and less dependent on starting values
 
 
@@ -581,7 +640,7 @@ What is a good starting point for our distribution example?
 
 ## Burn-in: $x_0 = -20$
 
-```{r, cache = TRUE, echo = FALSE, eval = TRUE, fig.align='center', fig.height = 5, fig.width = 10, message = FALSE}
+```{r, cache = TRUE, echo = FALSE, eval = TRUE, fig.align='center', fig.height = 5, fig.width = 9, message = FALSE}
 set.seed(23423)
 chain5 = metropolis_sampler(initial_value = -20, n = 10000)
 chain5 = chain5 %>%
@@ -688,7 +747,7 @@ results %>%
 results %>%
   group_by(sigma) %>%
   mutate(accepted = as.numeric(accepted),
-         prob = zoo::rollmean(accepted, k = 100, fill = NA),
+         prob = zoo::rollmean(accepted, k = 20, fill = NA),
          observation = row_number()) %>%
   ungroup() %>%
   ggplot(aes(observation, prob)) +
@@ -705,8 +764,8 @@ detail, but ...
 
 - The Markov process generated under this procedure is ergodic
 (irreducible and aperiodic) and has a unique limiting distribution
-(stationary distribution)
-ergodicity means that the chain can move anywhere at each
+(stationary distribution).
+- E rgodicity means that the chain can move anywhere at each
 step, which is ensured if $q(y|x)>0$ everywhere
 
 - By construction, Metropolis chains are reversible, so that  $\pi(y|x)$ is the stationary distribution
@@ -850,6 +909,7 @@ library(coda)
 
 effectiveSize(chain_.025$value) %>% as.numeric()
 effectiveSize(chain_1$value) %>% as.numeric()
+effectiveSize(chain_50$value) %>% as.numeric()
 ```
 
 
