@@ -17,7 +17,7 @@ execute:
 
 In this, we will introduce methods for Bayesian Computing.
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 library(tidyverse)
 ```
 
@@ -57,7 +57,7 @@ library(tidyverse)
 
 [![](./slides/topic_bayes/preview_mcmc2.png){width=70%}](./slides/topic_bayes/s_mcmc2
 
-**Bayesian Statistics**  
+**Gibbs Sampling**  
 [Download slides (PDF)](./slides/topic_bayes/s_mcmc2.pdf)
 
 ***
@@ -213,7 +213,11 @@ See function below `gibbs_blr()`. Modify this code to implement a Gibb's sampler
 
 - Fit this to the cannabis data
 - Do some diagnostics on chains obtained from your sampler
-- Compare to results from `stan_glm`
+- Compare to results from `stan_glm`. Specifically, compare:
+
+1. Mean and SD parameter estimates from the joint posterior
+2. Effective sample size from Stan and Gibb's
+3. Diagnostic plots for both MCMC methods
 
 
 ```{r,eval = FALSE}

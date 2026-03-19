@@ -31,13 +31,17 @@ Today, we cover:
 
 
 - Gibb's sampling
+- Hamiltonian MC (briefly)
 
 
 Resources:
 
 - Peng Advanced Stat Computing Chapter 7
+- [Book chapter on Hamiltonian MC](https://arxiv.org/pdf/1206.1901)
 
 ---
+
+
 
 
 ## Single component Metropolis-Hastings
@@ -144,7 +148,7 @@ So, we sample
 
 ## Bivariate normal distribution
 
-\fontsize{10pt}{11pt}\selectfont
+\fontsize{8pt}{9pt}\selectfont
 ```{r, eval = TRUE}
 gibbs_bivariate = function(x0, n = 1000,
                            mu = c(1, 5), rho = 0.5, 
@@ -304,6 +308,22 @@ $$\sigma^2_y \mid \beta, y \sim IG\left(A + n/2, B + \frac{1}{2}||y-x\beta||^2\r
 
 ---
 
+## Drawbacks of Gibbs and Random walk MH
+
+- Tend to get stuck in small regions of the posterior for a long time 
+  - Especially for large number of parameters 
+  - I.E. slow mixing for correlated parameters 
+  - Potentially low effective sample size
+- Requires closed-form full conditionals
+
+- Random walk Metropolis-Hastings can be slow because it slowly explores the state space
+
+::: notes
+If you don't have closed form you can use metropolis-within gibbs
+:::
+
+---
+
 ## Variations on Gibb's sampling
 
 - **Blocked Gibb's sampling**: update blocks (or groups) of parameters jointly rather than one at a time
@@ -315,14 +335,99 @@ $$\sigma^2_y \mid \beta, y \sim IG\left(A + n/2, B + \frac{1}{2}||y-x\beta||^2\r
   - Commonly used in Bayesian hierarchical models
 
 
+---
 
+## Hamiltonian Monte Carlo
+
+> Though originating in physics, Hamiltonian dynamics can be applied to most problems with continuous state spaces by simply introducing fictitious “momentum” variables.
+
+
+> HMC alternates updates for momentum variables with Metropolis updates in which a new state is proposed by computing a trajectory according to Hamiltonian dynamics. A state proposed in this way can be
+distant from the current state but nevertheless have a high probability of acceptance.
+
+::: notes
+quote from hamiltonian MC book chapter
+::: 
 
 ---
+
+## Hamiltonian Monte Carlo
+
+- The first step is to define a Hamiltonian function in
+terms of the probability distribution we wish to sample from. 
+- Parameters of interest are called "position" variables
+- Also introduce auxiliary "momentum" variables
+
+---
+
+## Hamiltonian dynamics
+
+\fontsize{11pt}{12pt}\selectfont
+> Hamiltonian dynamics has a physical interpretation that can provide useful intuitions. In two dimensions, we can visualize the dynamics as that of a frictionless puck that slides over a surface of varying height The state of this system consists of the position of the puck, given
+by a 2D vector $q$, and the momentum of the puck (its mass times its velocity), given by a 2D vector $p$. The potential energy, $U(q)$, of the puck is proportional to the height of the surface
+at its current position, and its kinetic energy, $K(p)$, is equal to $|p|
+^2/(2m)$, where $m$ is the
+mass of the puck. On a level part of the surface, the puck moves at a constant velocity, equal
+to $p/m$. If it encounters a rising slope, the puck’s momentum allows it to continue, with its
+kinetic energy decreasing and its potential energy increasing, until the kinetic energy (and hence $p$) is zero, at which point it will slide back down (with kinetic energy increasing and
+potential energy decreasing).
+
+---
+
+## Hamiltonian dynamics
+
+$$H(q,p) = U(q) + K(p)$$
+
+- U(q): potential energy
+- K(p): kinetic energy
+  - Usually defined as $p^TM^{-1}p/2$, where $M$ is a "mass matrix"
+  
+::: notes
+mass matrix is often a scalar multiple of the identity
+:::
+---
+
+
+## Hamiltonian dynamics
+
+The partial derivatives of the Hamiltonian determine how $q$ and $p$ change over time $t$, according to Hamilton's equations:
+
+$$\frac{dq_i}{dt} = \frac{\partial H}{\partial p_i}$$
+
+$$\frac{dp_i}{dt} = -\frac{\partial H}{\partial q_i}$$
+
+---
+
+## Hamiltonian dynamics in statistics
+
+- **position** corresponds to parameters of interest
+- **potential energy U(q)** is the (joint) log probability density of interest 
+- **kinetic energy K(p)** is usually defined as $p^TM^{-1}p/2$, where $M$ is a "mass matrix"
+  - Corresponds to zero-mean Gaussian with covariance $M$
+
+Can be used to construct MCMC updates.
+
+::: notes
+leapfrog method is used to approximate the differential equations and choose step size
+:::
+---
+
+
 
 ## Gibbs sampler for Bayesian regression
 
 I started implementing this myself... for lab we will go the rest of the way there and compare it to the results of `stan_glm` from the Bayesian Data Analysis lecture.
 
 - My partial Gibb's sampler is in the file `gibbs_blr.R` and the lab file is `lab_gibbs.Rmd`.
+- Compare effective sample size for your Gibb's sampler and for Stan's HMC algorithm
+- Compare diagnostic plots as well
 
+---
+
+## Resources
+
+- [Book chapter on Hamiltonian MC](https://arxiv.org/pdf/1206.1901)
+- [Stan manual](https://mc-stan.org/docs/2_19/reference-manual/convergence.html)
+- [No U-Turn Sampler (NUTS)](https://www.jmlr.org/papers/volume15/hoffman14a/hoffman14a.pdf)
+---
 
