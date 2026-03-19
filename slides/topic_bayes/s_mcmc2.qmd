@@ -182,7 +182,7 @@ set.seed(21433)
 gibbs_x = gibbs_bivariate(c(0,0), n = 10000)
 
 colMeans(gibbs_x[1:100,])
-colMeans(gibbs_x)
+colMeans(gibbs_x[101:1000,])
 ```
 
 ---
@@ -221,7 +221,7 @@ ggplot(df, aes(x = x, y = y)) +
 ```
 
 ::: notes
-Through away the first 1000 observations, plotted true density on top
+Throw away the first 1000 observations, plotted true density on top
 :::
 
 ---
@@ -241,6 +241,13 @@ as_tibble(gibbs_x) %>%
 
 ```
 
+
+---
+
+
+## Bivariate normal distribution
+
+Brief lab- holding the true mean values fixed, try out the Gibbs bivariate normal sampler when $\rho = 0.05$ and $\rho = 0.95$.  Compare results, especially effective sample size and autocorrelation plots.
 
 ---
 
@@ -426,6 +433,7 @@ I started implementing this myself... for lab we will go the rest of the way the
 
 ## Resources
 
+- [Original Gibb's sampling paper](https://www.dam.brown.edu/people/geman/Homepage/Image%20processing,%20image%20analysis,%20Markov%20random%20fields,%20and%20MCMC/stochastic%20relaxation.pdf)
 - [Book chapter on Hamiltonian MC](https://arxiv.org/pdf/1206.1901)
 - [Stan manual](https://mc-stan.org/docs/2_19/reference-manual/convergence.html)
 - [No U-Turn Sampler (NUTS)](https://www.jmlr.org/papers/volume15/hoffman14a/hoffman14a.pdf)
