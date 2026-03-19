@@ -250,7 +250,7 @@ See function below `gibbs_blr()`. Modify this code to implement a Gibb's sampler
 3. Diagnostic plots for both MCMC methods
 
 
-```{r,eval = FALSE}
+```{r,eval = FALSE, echo = TRUE}
 # y is a vector
 # xmat is a design matrix
 gibbs_blr = function(y, 

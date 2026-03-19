@@ -446,8 +446,8 @@ window.Quarto = {
 <pre><code>
 SAMPLING FOR MODEL 'continuous' NOW (CHAIN 1).
 Chain 1: 
-Chain 1: Gradient evaluation took 0.000221 seconds
-Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 2.21 seconds.
+Chain 1: Gradient evaluation took 0.000226 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 2.26 seconds.
 Chain 1: Adjust your expectations accordingly!
 Chain 1: 
 Chain 1: 
@@ -464,15 +464,15 @@ Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 1: 
-Chain 1:  Elapsed Time: 0.797 seconds (Warm-up)
-Chain 1:                0.372 seconds (Sampling)
-Chain 1:                1.169 seconds (Total)
+Chain 1:  Elapsed Time: 0.812 seconds (Warm-up)
+Chain 1:                0.373 seconds (Sampling)
+Chain 1:                1.185 seconds (Total)
 Chain 1: 
 
 SAMPLING FOR MODEL 'continuous' NOW (CHAIN 2).
 Chain 2: 
-Chain 2: Gradient evaluation took 1.1e-05 seconds
-Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.
+Chain 2: Gradient evaluation took 6e-06 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.06 seconds.
 Chain 2: Adjust your expectations accordingly!
 Chain 2: 
 Chain 2: 
@@ -489,15 +489,15 @@ Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 2: 
-Chain 2:  Elapsed Time: 0.796 seconds (Warm-up)
-Chain 2:                0.333 seconds (Sampling)
-Chain 2:                1.129 seconds (Total)
+Chain 2:  Elapsed Time: 0.814 seconds (Warm-up)
+Chain 2:                0.342 seconds (Sampling)
+Chain 2:                1.156 seconds (Total)
 Chain 2: 
 
 SAMPLING FOR MODEL 'continuous' NOW (CHAIN 3).
 Chain 3: 
-Chain 3: Gradient evaluation took 8e-06 seconds
-Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.08 seconds.
+Chain 3: Gradient evaluation took 1e-05 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.1 seconds.
 Chain 3: Adjust your expectations accordingly!
 Chain 3: 
 Chain 3: 
@@ -514,15 +514,15 @@ Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 3: 
-Chain 3:  Elapsed Time: 0.843 seconds (Warm-up)
-Chain 3:                0.393 seconds (Sampling)
-Chain 3:                1.236 seconds (Total)
+Chain 3:  Elapsed Time: 0.835 seconds (Warm-up)
+Chain 3:                0.392 seconds (Sampling)
+Chain 3:                1.227 seconds (Total)
 Chain 3: 
 
 SAMPLING FOR MODEL 'continuous' NOW (CHAIN 4).
 Chain 4: 
-Chain 4: Gradient evaluation took 1.1e-05 seconds
-Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.
+Chain 4: Gradient evaluation took 1.7e-05 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.17 seconds.
 Chain 4: Adjust your expectations accordingly!
 Chain 4: 
 Chain 4: 
@@ -539,9 +539,9 @@ Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 4: 
-Chain 4:  Elapsed Time: 0.627 seconds (Warm-up)
+Chain 4:  Elapsed Time: 0.612 seconds (Warm-up)
 Chain 4:                0.357 seconds (Sampling)
-Chain 4:                0.984 seconds (Total)
+Chain 4:                0.969 seconds (Total)
 Chain 4: </code></pre>
 </div>
 </div>
@@ -559,6 +559,50 @@ Chain 4: </code></pre>
 <li>Effective sample size from Stan and Gibb’s</li>
 <li>Diagnostic plots for both MCMC methods</li>
 </ol>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># y is a vector</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># xmat is a design matrix</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>gibbs_blr <span class="ot">=</span> <span class="cf">function</span>(y, </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                     xmat, </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">n =</span> <span class="dv">1000</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">A =</span> <span class="dv">2</span>, </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">B =</span> <span class="fu">var</span>(y),</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">sigma_b =</span> <span class="dv">100</span>){</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># define column of ones for intercept</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  xmat <span class="ot">=</span> <span class="fu">cbind</span>(<span class="dv">1</span>, xmat)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">=</span> <span class="fu">ncol</span>(xmat)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  n_subjects <span class="ot">=</span> <span class="fu">length</span>(y)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># define initial values for parameters of interest</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  beta <span class="ot">=</span> <span class="fu">rep</span>(<span class="dv">0</span>, p)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  sigma_y <span class="ot">=</span> B<span class="sc">/</span>(A<span class="dv">-1</span>) <span class="co"># mean of inverse gamma</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  params <span class="ot">=</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">nrow =</span> n, <span class="at">ncol =</span> p <span class="sc">+</span> <span class="dv">1</span>)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n){</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    params[i,] <span class="ot">=</span> <span class="fu">c</span>(beta, sigma_y)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="do">## sample from beta full conditional</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    beta_post <span class="ot">=</span> <span class="fu">solve</span>(<span class="fu">crossprod</span>(xmat) <span class="sc">+</span> sigma_y<span class="sc">/</span>sigma_b <span class="sc">*</span> <span class="fu">diag</span>(p)) <span class="sc">%*%</span> <span class="fu">crossprod</span>(xmat, y)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    sigma_post <span class="ot">=</span> <span class="fu">solve</span>(<span class="dv">1</span><span class="sc">/</span>sigma_y <span class="sc">*</span> <span class="fu">crossprod</span>(xmat) <span class="sc">+</span> <span class="dv">1</span><span class="sc">/</span>sigma_b <span class="sc">*</span> <span class="fu">diag</span>(p))</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    beta <span class="ot">=</span> <span class="fu">mvrnorm</span>(<span class="at">n =</span> <span class="dv">1</span>, beta_post, sigma_post)</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    <span class="do">## sample from sigma_y full conditional</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    A_post <span class="ot">=</span> A <span class="sc">+</span> n_subjects<span class="sc">/</span><span class="dv">2</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    resid <span class="ot">=</span> y<span class="sc">-</span> xmat <span class="sc">%*%</span> beta</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    B_post <span class="ot">=</span> B <span class="sc">+</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span> <span class="sc">*</span> <span class="fu">crossprod</span>(resid)</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>    sigma_y <span class="ot">=</span> <span class="fu">rinvgamma</span>(<span class="at">n =</span> <span class="dv">1</span>, <span class="at">shape =</span> A_post, <span class="at">rate =</span> B_post)</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">colnames</span>(params) <span class="ot">=</span> <span class="fu">c</span>(<span class="fu">paste0</span>(<span class="st">"beta_"</span>,<span class="dv">0</span><span class="sc">:</span>(p<span class="dv">-1</span>)), <span class="st">"sigma_y"</span>)</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(params)</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 </section>
 </div>
 </div>
