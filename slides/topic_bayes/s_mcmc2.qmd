@@ -250,7 +250,7 @@ Throw away the first 1000 observations, plotted true density on top
 
 ## Bivariate normal distribution
 
-Lab- holding the true mean values fixed, try out the Gibbs bivariate normal sampler when $\rho = 0.05$ and $\rho = 0.95$.  Compare results, especially effective sample size and autocorrelation plots.
+Lab-  try out the Gibbs bivariate normal sampler when $\rho = 0.05$ and $\rho = 0.95$.  Compare results, especially effective sample size and autocorrelation plots.
 
 ---
 
