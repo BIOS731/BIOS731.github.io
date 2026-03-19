@@ -187,8 +187,6 @@ colMeans(gibbs_x[101:1000,])
 
 ---
 
-
-
 ## Bivariate normal distribution
 
 
@@ -197,12 +195,10 @@ df = as_tibble(gibbs_x) %>%
   mutate(iteration = row_number()) %>%
   filter(iteration >1000) 
 
-
 set.seed(223)
 rho <- 0.5
 mu <- c(1, 5)
 Sigma <- matrix(c(1, rho, rho, 4), 2, 2)
-
 # Create a grid to evaluate the true density
 x_seq <- seq(min(df$x1) - 1, max(df$x1) + 1, length.out = 100)
 y_seq <- seq(min(df$x2) - 1, max(df$x2) + 1, length.out = 100)
@@ -210,6 +206,30 @@ grid <- expand.grid(x = x_seq, y = y_seq)
 
 # Add true bivariate normal density values
 grid$density <- mvtnorm::dmvnorm(grid, mean = mu, sigma = Sigma)
+
+as_tibble(gibbs_x) %>%
+  mutate(iteration = row_number()) %>%
+  filter(iteration <= 10) %>%
+  ggplot(aes(x = x, y = y)) +
+  geom_point(aes(x = x1, y = x2),  color = "blue", size = 2) +  # real data
+  geom_path(aes(x = x1, y = x2), alpha = 0.3, color = "blue") +  # real data
+  geom_contour(data = grid, aes(z = density), color = "black") +  # true contours
+  theme_minimal() 
+
+```
+
+
+---
+
+
+
+## Bivariate normal distribution
+
+
+```{r, echo = FALSE, eval = TRUE, fig.align='center', fig.height = 5, fig.width = 10}
+
+
+
 
 # Plot: real data points + true density contours and fill
 ggplot(df, aes(x = x, y = y)) +
@@ -226,34 +246,18 @@ Throw away the first 1000 observations, plotted true density on top
 
 ---
 
-## Bivariate normal distribution
-
-
-```{r, echo = FALSE, eval = TRUE, fig.align='center', fig.height = 5, fig.width = 10}
-as_tibble(gibbs_x) %>%
-  mutate(iteration = row_number()) %>%
-  filter(iteration <= 10) %>%
-  ggplot(aes(x = x, y = y)) +
-  geom_point(aes(x = x1, y = x2),  color = "blue", size = 2) +  # real data
-  geom_path(aes(x = x1, y = x2), alpha = 0.3, color = "blue") +  # real data
-  geom_contour(data = grid, aes(z = density), color = "black") +  # true contours
-  theme_minimal() 
-
-```
-
-
----
 
 
 ## Bivariate normal distribution
 
-Brief lab- holding the true mean values fixed, try out the Gibbs bivariate normal sampler when $\rho = 0.05$ and $\rho = 0.95$.  Compare results, especially effective sample size and autocorrelation plots.
+Lab- holding the true mean values fixed, try out the Gibbs bivariate normal sampler when $\rho = 0.05$ and $\rho = 0.95$.  Compare results, especially effective sample size and autocorrelation plots.
 
 ---
 
 
 ## Proof: Gibbs sampling as M-H
 
+\fontsize{10pt}{11pt}\selectfont
 Gibbs is a special case of single component M-H that always accepts the proposal. Define the following:
 
 - $\pi(\theta_1, \theta_2)$: joint distribution we want to sample from
@@ -315,6 +319,22 @@ $$\sigma^2_y \mid \beta, y \sim IG\left(A + n/2, B + \frac{1}{2}||y-x\beta||^2\r
 
 ---
 
+
+
+## Variations on Gibb's sampling
+
+- **Blocked Gibb's sampling**: update blocks (or groups) of parameters jointly rather than one at a time
+  - Helps improve mixing when variables are highly correlated
+  - We are already doing this for Bayesian linear regression
+- **Collapsed Gibb's sampling**: integrate/marginalize out some variables analytically before sampling
+  - Reduces dimensionality and can improve convergence
+- **Metropolis-within-Gibbs**: Uses Metropolis-Hastings steps for full conditionals that are not easily sampled from.
+  - Commonly used in Bayesian hierarchical models
+
+
+---
+
+
 ## Drawbacks of Gibbs and Random walk MH
 
 - Tend to get stuck in small regions of the posterior for a long time 
@@ -331,18 +351,6 @@ If you don't have closed form you can use metropolis-within gibbs
 
 ---
 
-## Variations on Gibb's sampling
-
-- **Blocked Gibb's sampling**: update blocks (or groups) of parameters jointly rather than one at a time
-  - Helps improve mixing when variables are highly correlated
-  - We are already doing this for Bayesian linear regression
-- **Collapsed Gibb's sampling**: integrate/marginalize out some variables analytically before sampling
-  - Reduces dimensionality and can improve convergence
-- **Metropolis-within-Gibbs**: Uses Metropolis-Hastings steps for full conditionals that are not easily sampled from.
-  - Commonly used in Bayesian hierarchical models
-
-
----
 
 ## Hamiltonian Monte Carlo
 
@@ -437,5 +445,6 @@ I started implementing this myself... for lab we will go the rest of the way the
 - [Book chapter on Hamiltonian MC](https://arxiv.org/pdf/1206.1901)
 - [Stan manual](https://mc-stan.org/docs/2_19/reference-manual/convergence.html)
 - [No U-Turn Sampler (NUTS)](https://www.jmlr.org/papers/volume15/hoffman14a/hoffman14a.pdf)
+- [A conceptual introduction to Hamiltonian MC](https://arxiv.org/abs/1701.02434)
 ---
 
