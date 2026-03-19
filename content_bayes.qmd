@@ -227,7 +227,7 @@ Define the hyperparameters
 
 Code below uses the `R` package `rstanarm` to fit a similar model:
 
-```{r, message = FALSE}
+```{r, message = FALSE, echo = TRUE}
 library(rstanarm)
 blr_mod = stan_glm(log_mmr ~ p_fpc1 + i_time_outside_reticle, 
                data = cannabis,
