@@ -19,6 +19,9 @@ In this, we will introduce methods for Bayesian Computing.
 
 ```{r, message = FALSE, warning = FALSE}
 library(tidyverse)
+library(invgamma)
+library(MASS)
+library(coda)
 ```
 
 ::: {.panel-tabset .panel-pills}
@@ -234,6 +237,14 @@ blr_mod = stan_glm(log_mmr ~ p_fpc1 + i_time_outside_reticle,
                prior_intercept = normal(0, 10),
                prior = normal(0, 10),
                prior_aux = exponential(rate = 1))
+
+blr_stan2 = stan_glm(log_mmr ~ p_fpc1 + i_time_outside_reticle + 
+                     i_memory_time34 +
+                     p_change, 
+               data = cannabis,
+               prior_intercept = normal(0, 10),
+               prior = normal(0, 10),
+               prior_aux = exponential(rate = 1))
 ```
 
 
@@ -298,4 +309,101 @@ gibbs_blr = function(y,
 ```
 
 
+```{r, echo = FALSE, eval = FALSE}
+### solution
+x = cannabis %>% dplyr::select(p_fpc1, p_fpc1, i_time_outside_reticle,
+                        p_change) %>% as.matrix()
+
+set.seed(2323)
+chain1 = gibbs_blr(cannabis$log_mmr,
+                      xmat = x, 
+                      n = 2000)
+
+chain2 = gibbs_blr(cannabis$log_mmr,
+                      xmat = x, 
+                      n = 2000)
+
+
+```
+
+
+
+Check posterior means after discarding burn-in
+
+```{r}
+colMeans(chain1[-c(1:1000),])
+colMeans(chain2[-c(1:1000),])
+
+effectiveSize(chain1)
+```
+
+Compare results with stan
+
+```{r}
+coefficients(blr_mod)
+
+df_stan = summary(blr_mod)
+
+effect
+```
+
+
+diagnostics- trace plots
+
+```{r}
+as_tibble(chain1) %>%
+  mutate(iteration = row_number()) %>%
+  pivot_longer(beta_0:sigma_y, names_to = "param", values_to = "value") %>%
+  ggplot(aes(iteration, value)) +
+  geom_line() +
+  facet_wrap(~param, labeller = label_both, scales = "free")
+```
+
+
+
+```{r}
+library(bayesplot)
+
+posterior = as.array(blr_mod)
+
+mcmc_acf(blr_mod)
+```
+
+
+ACF plots
+
+
+
+```{r}
+mcmc_acf(posterior)
+```
+
+```{r}
+
+acf_df <- function(chain, name) {
+  acf_res <- acf(chain, plot = FALSE)
+  tibble(
+    lag = acf_res$lag[, 1, 1],
+    acf = acf_res$acf[, 1, 1],
+    rho = name
+  )
+}
+
+acfs = bind_rows(acf_df(chain1[, "beta_2"], "chain1 beta1"))
+
+
+acfs %>%
+  ggplot(aes(x = lag, y = acf)) +
+  geom_segment(aes(xend = lag, yend = 0), color = "steelblue") +
+  geom_hline(yintercept = 0) +
+  theme_minimal()
+
+```
+
+```{r}
+
+```
+
+ 
+ 
 :::
