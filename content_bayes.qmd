@@ -65,6 +65,15 @@ library(coda)
 
 ***
 
+### Slide Deck: Variational Inference
+
+[![](./slides/topic_bayes/preview_vi.png){width=70%}](./slides/topic_bayes/s_variational_inference.pdf
+
+**Variational Inference**  
+[Download slides (PDF)](./slides/topic_bayes/s_variational_inference.pdf)
+
+***
+
 ### Lab: Numerical Integration and Sampling
 
 
@@ -327,83 +336,6 @@ chain2 = gibbs_blr(cannabis$log_mmr,
 ```
 
 
+### Lab: Variational Inference
 
-Check posterior means after discarding burn-in
-
-```{r}
-colMeans(chain1[-c(1:1000),])
-colMeans(chain2[-c(1:1000),])
-
-effectiveSize(chain1)
-```
-
-Compare results with stan
-
-```{r}
-coefficients(blr_mod)
-
-df_stan = summary(blr_mod)
-
-effect
-```
-
-
-diagnostics- trace plots
-
-```{r}
-as_tibble(chain1) %>%
-  mutate(iteration = row_number()) %>%
-  pivot_longer(beta_0:sigma_y, names_to = "param", values_to = "value") %>%
-  ggplot(aes(iteration, value)) +
-  geom_line() +
-  facet_wrap(~param, labeller = label_both, scales = "free")
-```
-
-
-
-```{r}
-library(bayesplot)
-
-posterior = as.array(blr_mod)
-
-mcmc_acf(blr_mod)
-```
-
-
-ACF plots
-
-
-
-```{r}
-mcmc_acf(posterior)
-```
-
-```{r}
-
-acf_df <- function(chain, name) {
-  acf_res <- acf(chain, plot = FALSE)
-  tibble(
-    lag = acf_res$lag[, 1, 1],
-    acf = acf_res$acf[, 1, 1],
-    rho = name
-  )
-}
-
-acfs = bind_rows(acf_df(chain1[, "beta_2"], "chain1 beta1"))
-
-
-acfs %>%
-  ggplot(aes(x = lag, y = acf)) +
-  geom_segment(aes(xend = lag, yend = 0), color = "steelblue") +
-  geom_hline(yintercept = 0) +
-  theme_minimal()
-
-```
-
-```{r}
-
-```
-
- 
- 
 :::

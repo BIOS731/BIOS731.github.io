@@ -1,0 +1,476 @@
+---
+title: "Variational inference"
+author: "Julia Wrobel"
+format:
+  beamer:
+    theme: metropolis
+    aspectratio: 169
+    fontsize: 14pt
+    slide-level: 2
+execute:
+  echo: true
+  eval: false
+  warning: false
+  message: false
+header-includes:
+  - \usepackage{xcolor}
+  - \newcommand{\red}[1]{\textcolor{red}{#1}}
+  - \newcommand{\green}[1]{\textcolor{green}{#1}}
+---
+
+
+
+## Overview
+
+```{r, echo = FALSE, eval = TRUE}
+library(tidyverse)
+```
+
+
+Today, we cover:
+
+
+- Variational inference
+- Touch on INLA
+- Example with linear regression, mixture modeling
+
+Resources:
+
+- [Variational Inference: A Review for Statisticians by David Blei](https://www.tandfonline.com/doi/full/10.1080/01621459.2017.1285773)
+
+Announcements:
+
+- Final Project proposal due 3/31 at 10AM
+- Homework 4 and 5 will be combined, posted by Friday
+
+---
+
+
+## Class tomorrow
+
+- load VPN and try logging into the cluster
+- try getting into my partition
+
+---
+
+## Final project proposal
+
+
+---
+
+
+## Joint posterior distribution
+
+Our goal is to learn about the joint posterior distribution
+
+$$p(\beta, \sigma^2_y|y, X, hyperparameters)$$
+
+\vspace{5mm}
+      
+This can be hard!
+
+- Often the joint posterior is analytically intractable
+- MCMC: sample from it by constructing a Markov chain whose stationary distribution is the posterior
+  - Can be very slow to converge
+  - High computational cost
+
+
+::: notes
+This is the main motivation for MCMC. Also motivation for variational inference
+:::
+
+---
+
+## Variational inference motivation
+
+Our goal is to learn about the joint posterior distribution
+
+$$p(\beta, \sigma^2_y|y, X, hyperparameters)$$
+
+\vspace{5mm}
+
+- Variational inference turns this from a sampling problem into an **optimization** problem
+
+- Uses a surrogate distribution to approximate the joint density of interest and maximizes the surrogate instead
+- Scales much better to large datasets
+
+---
+
+
+
+
+## Two-part Gaussian mixture model
+
+
+\fontsize{10pt}{11pt}\selectfont
+- $Y_1,\ldots,Y_n$ are sampled independently from a mixture of two Normal distributions with density
+
+$$p(y|\theta) = \lambda \mathcal{N}(y|\mu_1,\sigma_1^2) + (1-\lambda)\mathcal{N}(y|\mu_2, \sigma^2_2)$$
+
+- $\theta = (\mu_1, \mu_2, \sigma_1^2, \sigma_2^2, \lambda)$
+- $c_1, \ldots, c_n$: labels identifying which observation came from which population
+  - $c_i = 1$ if $Y_i$ from $\mathcal{N}(y|\mu_1,\sigma_1^2)$; $c_i = 0$ otherwise
+
+$$c_i \sim Bernoulli(\lambda)$$
+
+
+::: notes
+lambda is mixing component, probability of being density one or density two
+
+Art of EM is coming up with a useful complete data model
+:::
+
+---
+
+## Two-part Gaussian mixture model
+
+Joint density of observed and missing data (i.e. complete data density) is then
+
+$$p(y,c|\theta) = \left[\lambda \mathcal{N}(y|\mu_1,\sigma_1^2)\right]^c\left[(1-\lambda)\mathcal{N}(y|\mu_2, \sigma^2_2)\right]^{1-c}$$
+
+
+
+
+---
+
+
+
+## Bayesian Gaussian mixture model
+
+\fontsize{10pt}{11pt}\selectfont
+$$y_i \sim \sum_{k = 1}^K \lambda_k p_k(y_i|\theta_k)$$
+
+Data generating model is
+
+$$\mu_i \sim N(0, \sigma^2)$$
+$$c_i \sim Cat(\lambda); \sum_{k=1}^K\lambda_k = 1$$
+
+$$y_i \sim N(\mu_{c_i}, 1)$$
+
+
+---
+
+
+## Bayesian Gaussian mixture model
+
+Posterior PDF (ignoring hyperparameters) is
+
+$$p(\mu, \textbf{c}|\mathbf{y}) = \frac{\prod_k p(\mu_k)\prod_i p(c_i)p(y_i|c_i, \mu)}{\int_\mu \sum_c\prod_k p(\mu_k)\prod_i p(c_i)p(y_i|c_i, \mathbf{\mu})}$$
+
+- Because of denominator integral cannot be computed easily analytically
+
+::: notes
+see slide 10 of variational slides 3
+:::
+
+---
+
+## Bayesian linear regression
+
+\fontsize{10pt}{11pt}\selectfont
+$$y = X\beta + \epsilon$$
+
+\begin{align*}
+\epsilon &\sim N(0, \sigma^2_y)\\
+\beta &\sim N(0, \sigma^2_b)\\
+\sigma_y^2 &\sim IG(A, B)
+\end{align*}
+ 
+Joint posterior we want to estimate is 
+
+$$p(\beta, \sigma^2_y|y, X, h)$$
+
+
+::: notes
+Mention which things are priors and what likelihood is induced
+:::
+---
+
+## General setup for variational inference
+
+Consider a joint density of latent variables $\textbf{z} = z_{1:m}$ and observations $\textbf{y} = y_{1:n}$:
+
+$$p(\textbf{z}, \textbf{y}) = p(\textbf{z})p(\textbf{y}|\textbf{z})$$
+
+Latent variables here could mean latent in the E-M algorithm sense, or just parameters we want to estimate.
+
+- Bayesian mixture models:
+- Bayesian linear regression:
+
+::: notes
+This notation is mostly borrowed from the Blei tutorial with some modificaitons.
+:::
+
+---
+
+## Main idea behind variational Bayes
+
+\fontsize{10pt}{11pt}\selectfont
+Choose a family of approximate densities, $\mathcal{Q}$ over the latent variables $z$. Then, find a specific member of that family $q(z|\nu) \in \mathcal{Q}$ that minimizes the **Kullback-Leibler (KL) divergence** to the exact posterior, $p(z|y)$. Here, $\nu$ is a variational factor we find the optimal value of.
+
+
+
+$$KL(q \parallel p) = \int_z q(z)\log\frac{q(z)}{p(z|y)}dz = E_q\left[\log\frac{q(z)}{p(z|y)}\right]$$
+
+- Goal is to minimize $KL(q \parallel p)$
+- Then, we approximate the posterior with the optimized member of the family $q^*(\cdot)$
+
+::: notes
+- explain what we mean by family of distributions
+KL divergence of q from p where q is the distribution being evaluated and p is the target distribution
+
+- value is nonnegative
+- If q is high and p is high, then we are happy (i.e. low KL divergence).
+- If q is high and p is low then we pay a price (i.e. high KL divergence).
+- If q is low then we don’t care (i.e. also low KL divergence, regardless of p).
+- why do we care about the exact conditional here rather than the joint distribution?
+:::
+
+---
+
+## The evidence lower bound
+
+- Can't actually minimize $KL(q \parallel p)$ directly, but can optimize a function that is equal to it up to a constant.
+- Called **evidence lower bound (ELBO)**
+
+- In this setting, "evidence" is a term for the marginal likelihood of observed data, $p(y)$.
+
+
+::: notes
+Show why you can't minimize KL directly later
+:::
+
+---
+
+
+## The evidence lower bound
+
+\begin{align*}
+KL(q \parallel p) &=  E_q\left[\log\frac{q(z)}{p(z|y)}\right]\\
+&= E[\log q(z)] - E[\log p(z, y)] + \log p(y)
+\end{align*}
+
+ELBO is 
+
+$$ELBO(q) = E[\log p(z, y)] - E[\log q(z)]$$
+
+- Maximizing $ELBO(q)$ is equivalent to minimizing $KL(q \parallel p)$.
+
+
+::: notes
+More precisely, finding an approximation $q$ that maximizes the
+ELBO is equivalent to finding the $q$ that minimizes the KL
+divergence to the posterior!
+:::
+
+---
+
+## The evidence lower bound
+
+\fontsize{10pt}{11pt}\selectfont
+Why is it called the evidence lower bound? Serves as a lower bound for $p(y)$ by Jensen's Inequality:
+
+\begin{align*}
+\log p(y) &= \log \int_z p(y, z)dz\\
+&= \log \int_z p(y,z)\frac{q(z)}{q(z)}\\
+&= \log \left( E_q\left[\frac{p(y,z)}{q(z)}\right]\right)\\
+&\ge E[\log p(y,z)] - E[\log q(z)]
+\end{align*}
+
+::: notes
+ELBO is less than or equal to the evidence 
+- optimize this over densities q(z) to find optimal approximation
+:::
+
+---
+
+## The evidence lower bound
+
+- Optimize this over densities $q(z)$ to find optimal approximation
+- We choose a family of variational distributions (i.e. a family of
+approximations) such that these two expectations can be
+computed
+- In variational inference, we find settings of the variational
+density that maximize the ELBO, which is equivalent to
+minimizing the KL divergence.
+
+\vspace{5mm}
+
+- How to choose the family of densities?
+
+---
+
+## Mean field variational inference
+
+Mean field makes the strong simplifying assumption that the latent variables are independent in the approximation:
+
+$$q(\mathbf{z}) = \prod_{j = 1}^mq_j(z_j)$$
+
+- The variational family is not a model of the observed data!  Instead, it is the ELBO and the corresponding KL minimization problem which connexts the fitted variational density to the data.
+
+::: notes
+Assumes latent variables are mutually independent
+- easier to optimize over a simple family
+- data doesn't appear in this equation
+:::
+---
+
+## Mean field variational inference
+
+In principle, $q_j$ can take on any parametric form appropriate to the corresponding variable $z_j$.
+
+- For example, continuous variable might have a Gaussian factor
+- Categorical variable might have a categorical factor
+
+\vspace{5mm}
+
+- Allows for optimization of each $z_j$ independently
+
+---
+
+
+## Coordinate Ascent Variational Inference (CAVI)
+
+- Iterative algorithm for solving this optimization problem 
+- CAVI iteratively optimizes each factor of the mean-field variational density while holding the others fixed
+- Climbs ELBO to a **local** optimum
+- *Complete conditional* of jth latent variable $z_j$ is $p(z_j|\mathbf{z}_{-j}, \mathbf{y})$.
+ 
+ 
+Optimal $q_j(z_j)$ is 
+
+$$q_j^*(z_j) = \exp\left\{E_{-j }\left[\log p(z_j|\textbf{z}_{-j}, \mathbf{y}) \right]\right\}$$
+where expectation is taken W.R.T. $q_{-j}(\textbf{z}_{-j}) = \prod_{l \ne j}q_l(z_l)$.
+
+::: notes
+What is the optimization problem we are trying to solve?
+- Maximize ELBO, which finds q closest to our posterior of interest
+- ELBO isn't guaranteed to be convex
+:::
+
+---
+
+
+## Coordinate Ascent Variational Inference (CAVI)
+
+```{r echo=FALSE, eval = TRUE, fig.align='center', out.width='80%'}
+knitr::include_graphics("cavi.png")
+```
+
+
+
+::: notes
+Algorithm 1 from Blei tutorial
+:::
+---
+
+## Derivation of CAVI updates
+
+
+
+---
+
+## Bayesian linear regression
+
+
+---
+
+
+
+
+## Bayesian Gaussian mixture model
+
+
+::: notes
+slides 2 page 50 has good slides on this
+:::
+---
+
+
+## Variational inference with exponential families
+
+In the example above we used exponential families for priors- this allows for easier derivation of CAVI updates that have a closed form.
+
+There are a wide range of models that can use this approach:
+- Matrix factorization, regression, stochastic block models of networks, and more
+- For this class of models, generic updates for the exponential family distributions have been derived (see 4.1, Blei)
+
+---
+
+
+
+
+
+
+## Drawbacks 
+
+
+
+```{r echo=FALSE, eval = TRUE, fig.align='center', out.width='60%'}
+knitr::include_graphics("mean_field.png")
+```
+
+
+::: notes
+
+exact posterior has positive correlation between x1 and x2. In other words, the posterior covariance matrix has non-zero off-diagonal entries.
+- mean field cannot capture correlation between variables
+- also underestimates marginal variances
+- means look good though
+:::
+
+---
+
+## Drawbacks
+
+eExact posterior has positive correlation between x1 and x2. In other words, the posterior covariance matrix has non-zero off-diagonal entries.
+
+- Mean field cannot capture correlation between variables
+- Also underestimates marginal variances
+- Means look good though
+
+This is fine if all you want is point estimates! But if you care about uncertainty quantification, it's not that great.
+
+---
+
+## Variational inference outside of mean field assumption
+
+In principal, you can choose any $q$ explicitly rather than have it fall out of the math:
+
+- Pick a parametric family and optimize it's parameters (maximize the ELBO with respect to it's parameters using gradient ascent)
+- Variational autoendcoders
+- Structured variational inference
+
+::: notes
+These are beyond the scope of what i'm going to cover 
+:::
+---
+
+## Connection to the EM Algorithm
+
+Let's say we have latent variables $z$, parameters $\theta$, and data $y$.  Fundamental problem is that the marginal likelihood of the data, $p(y|\theta) = \int_zp(y,z|\theta)dz$, is intractable.
+
+
+- EM goal: maximize $p(y|\theta)$, the marginal likelihood
+- VI goal: compute posterior $p(z, \theta|y)$
+
+::: notes
+EM can be viewed as a special case of VI
+- EM treats parameters theta as fixed 
+:::
+---
+
+## INLA
+
+
+---
+
+## Connection to Gibb's sampling
+
+---
+
+## Lab
+
+Implement Bayesian regression
+---
+
