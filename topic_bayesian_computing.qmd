@@ -11,5 +11,5 @@ Is this module we will cover concepts from Bayesian Computing.
 -   [Introduction to Bayes](content_bayes.qmd)
 -   [Introduction to MCMC](content_bayes.qmd)
 -   [MCMC 2](content_bayes.qmd)
--   [Variational Bayes](tbd.qmd)
+-   [Variational Bayes](content_bayes.qmd)
 
