@@ -198,6 +198,15 @@ Mention which things are priors and what likelihood is induced
 
 ## General setup for variational inference
 
+We have a posterior distribution / other probability distribution with an intractiable integral that makes it challen ging to evaluate.
+
+- **MCMC**: sample from it
+- **VI**: turn it into a tractable optimization problem
+
+---
+
+## General setup for variational inference
+
 Consider a joint density of latent variables $\textbf{z} = z_{1:m}$ and observations $\textbf{y} = y_{1:n}$:
 
 $$p(\textbf{z}, \textbf{y}) = p(\textbf{z})p(\textbf{y}|\textbf{z})$$
@@ -208,7 +217,7 @@ Latent variables here could mean latent in the E-M algorithm sense, or just para
 - Bayesian linear regression:
 
 ::: notes
-This notation is mostly borrowed from the Blei tutorial with some modificaitons.
+This notation is mostly borrowed from the Blei tutorial with some modifications.
 :::
 
 ---
@@ -232,8 +241,7 @@ KL divergence of q from p where q is the distribution being evaluated and p is t
 - value is nonnegative
 - If q is high and p is high, then we are happy (i.e. low KL divergence).
 - If q is high and p is low then we pay a price (i.e. high KL divergence).
-- If q is low then we don’t care (i.e. also low KL divergence, regardless of p).
-- why do we care about the exact conditional here rather than the joint distribution?
+- If q is low then we don’t care (i.e. also low KL divergence, regardless of p).  
 :::
 
 ---
@@ -281,6 +289,7 @@ divergence to the posterior!
 \fontsize{10pt}{11pt}\selectfont
 Why is it called the evidence lower bound? Serves as a lower bound for $p(y)$ by Jensen's Inequality:
 
+\vspace{25mm}
 
 ::: notes
 ELBO is less than or equal to the evidence 
@@ -312,12 +321,11 @@ ELBO is less than or equal to the evidence
 ## The evidence lower bound
 
 - Optimize this over densities $q(z)$ to find optimal approximation
-- We choose a family of variational distributions (i.e. a family of
-approximations) such that these two expectations can be
-computed
 - In variational inference, we find settings of the variational
 density that maximize the ELBO, which is equivalent to
 minimizing the KL divergence.
+- We choose a family of variational distributions such that these two expectations can be
+  computed
 
 \vspace{5mm}
 
@@ -331,7 +339,7 @@ Mean field makes the strong simplifying assumption that the latent variables are
 
 $$q(\textbf{z}) = \prod_{j = 1}^mq_j(z_j)$$
 
-- The variational family is not a model of the observed data!  Instead, it is the ELBO and the corresponding KL minimization problem which connexts the fitted variational density to the data.
+- The variational family is not a model of the observed data!  Instead, it is the ELBO and the corresponding KL minimization problem which connects the fitted variational density to the data.
 
 ::: notes
 Assumes latent variables are mutually independent
@@ -391,25 +399,94 @@ Algorithm 1 from Blei tutorial
 
 ## Derivation of CAVI updates
 
+Goal is to find $q(z)$ that maximizes ELBO. First, some useful results.
 
+- by probability chain rule:
+
+$$p(\textbf{y}, z) = p(\textbf{y}) \prod_{j = 1}^m p(z_j | \textbf{z}_{-j}, \textbf{y})$$
+
+- using mean field approximation $q(\textbf{z}) = \prod_{j = 1}^mq_j(z_j)$:
+
+$$E_q[\log q(\textbf{z})] = \sum_{j = 1}^m E_{q_j}[\log q_j(z_j)]$$
 
 ---
 
 ## Bayesian linear regression
 
+\fontsize{10pt}{11pt}\selectfont
+$$y = X\beta + \epsilon$$
+
+\begin{align*}
+\epsilon &\sim N(0, \sigma^2_y)\\
+\beta &\sim N(0, \sigma^2_b)\\
+\sigma_y^2 &\sim IG(A, B)
+\end{align*}
+ 
+- Posterior is $p(\beta, \sigma^2_y | y, x)$
+- Approximate with $q$
+
+
 
 ---
 
 
 ## Bayesian linear regression
 
+\fontsize{10pt}{11pt}\selectfont
+From mean field assumption, 
+
+$$q(\beta, \sigma^2_y) = q(\beta)q(\sigma^2_y)$$ 
+
+
+
+$$ELBO(q) = E_q[\log p (y, \beta, \sigma^2_y)] - E_q[\log q(\beta)] - E_q[\log q(\sigma^2_y)]$$
+
+
+\begin{align*}
+\log q^*(\beta) &\propto E_{q(\sigma^2_y)}[\log p(y, \beta, \sigma^2_y)]\\
+\log q^*(\sigma^2) &\propto E_{q(\beta)}[\log p(y, \beta, \sigma^2_y)]
+\end{align*}
+
+Solve these expectations to get updates for $\beta$, $\sigma^2$
 
 ---
 
 
+## Bayesian linear regression
+
+\fontsize{10pt}{11pt}\selectfont
+Update for $\beta$  is
+
+$$q^*(\beta) = N(m, S)$$
+$$S = (\frac{1}{\sigma^2_y}x^Tx + \frac{1}{\sigma^2_b}I)^{-1}$$
+
+$$m = S(\frac{1}{\sigma^2_y}x^Ty)$$
+
+--- 
+
+
+## Bayesian linear regression
+
+\fontsize{10pt}{11pt}\selectfont
+Update for $\sigma^2_y$  is
+
+$$q^*(\sigma^2_y) = IG(A_{post}, B_{post})$$
+$$A_{post} = A_0 + n/2$$
+$$B_{post} = B_0 + 1/2E_{q(\beta)}[(y - x\beta)^2] = B_0 + 1/2\left((y-xm)^2 + tr(x^tx S)\right)$$
+
+--- 
+
+## BLR CAVI Algorithnm:
+
+1. Initialize $\sigma^2_y$
+2. Repeat until ELBO converges:
+- Update q(\beta) by computing S and m using current $1/\sigma^2_y$
+- Update q(\sigma^2) by computing $A_{post}$ and $B_{post}$
+3. Return m, S, $A_{post}$, $B_{post}$
 
 ## Bayesian Gaussian mixture model
 
+For homework.
 
 ::: notes
 slides 2 page 50 has good slides on this
@@ -417,13 +494,6 @@ slides 2 page 50 has good slides on this
 ---
 
 
-## Bayesian Gaussian mixture model
-
-
-::: notes
-slides 2 page 50 has good slides on this
-:::
----
 
 
 ## Variational inference with exponential families
