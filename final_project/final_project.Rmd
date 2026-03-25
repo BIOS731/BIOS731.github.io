@@ -1,0 +1,75 @@
+---
+title: 'Final project'
+header-includes:
+  - \usepackage{multirow}
+output:
+  pdf_document: default
+urlcolor: blue
+---
+
+```{r, include=FALSE}
+
+library(tidyverse)
+knitr::opts_chunk$set(tidy = FALSE)
+```
+
+
+## Due dates and submission
+
+- Final project proposal will be due March 31 at 10:00AM
+- Final project presentations will be April 22 and 23
+- Final project is due May 1st at Midnight
+
+## Project guidelines
+
+The goal of the final project is to take concepts learned in this course, apply them to your own research, and effectively communicate the results. It is ok and even ideal if the project moves your dissertation work forward! If you are not yet involved in research, you may pick a computational method from the last 5 years, *implement it yourself*, use it to analyze a dataset, and present the method and results.
+
+Examples of appropriate projects include:
+
+- Creating an R package that uses good coding packages
+- Implementing an optimization algorithm using efficient (fast) code for your own method or from a recent paper from a statistical journal
+- Running a simulation study to compare several methods relevant to a research problem of your interest
+
+These are just a few potential examples. Other types of projects may be appropriate as well. Please set up a time to talk with me if you want to discuss potential project ideas.
+
+## Project proposal (10%)
+
+Due **April 1**!
+
+Your final project proposal should be one page or less and clearly outline your plans for your final project. This document will help ensure your project is well-defined and feasible.
+
+Your proposal should include the following elements:
+
+1. **Project Title**
+2. **Objective**:  Clearly state the main goal of your project. What problem are you addressing, or what question are you trying to answer?
+3. **Background & Motivation**: Provide brief context on why this project is important or interesting. Why did you choose this topic?
+4. **Approach**: Explain how you plan to complete the project, specifically highlighting concepts, techniques, or tools from class that you will use.
+
+
+## In-class presentation (40%)
+
+Each of you will give a 15 minute presentation on your project in the style of a conference talk. Your presentation will be evaluated based on the following criteria:
+
+- **Time Management** 
+  - Presentation should be 15 minutes or less
+  - Practice to ensure you stay within the allotted time
+- **Clarity**
+  - Clearly define the problem your project addresses.
+  - Provide background context to help the audience understand its importance.
+  - Explain your approach and methodology in a structured manner.
+  - Present your results and discuss their significance.
+- **Engagement** 
+  - Active participation is expected
+  - You will be required to ask at least one question about each of your fellow students' presentations
+
+## Written report (50%)
+
+This will be a 5-page write-up in the style of a brief research report. You will be limited to four tables/ figures, and do not go over the page limit.  However, an appendix may be included to show extra equations and derivations if you would like. A link to a GitHub repo with well organized code for the project should also be provided.
+
+
+
+
+
+
+
+

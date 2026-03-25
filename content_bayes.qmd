@@ -338,4 +338,6 @@ chain2 = gibbs_blr(cannabis$log_mmr,
 
 ### Lab: Variational Inference
 
+Implement a variational inference algorithm for Bayesian linear regression, and compare it with your Gibbs sampler.
+
 :::

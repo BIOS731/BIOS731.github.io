@@ -31,7 +31,6 @@ Today, we cover:
 
 
 - Variational inference
-- Touch on INLA
 - Example with linear regression, mixture modeling
 
 Resources:
@@ -40,20 +39,32 @@ Resources:
 
 Announcements:
 
-- Final Project proposal due 3/31 at 10AM
+- Final Project proposal due 4/1 at 10AM
 - Homework 4 and 5 will be combined, posted by Friday
 
 ---
 
 
-## Class tomorrow
+## For class tomorrow
 
-- load VPN and try logging into the cluster
-- try getting into my partition
+- Install VPN and try logging into the cluster
+- Try getting into my partition
 
 ---
 
 ## Final project proposal
+
+\fontsize{10pt}{11pt}\selectfont
+Due **April 1**!
+
+Your final project proposal should be one page or less and clearly outline your plans for your final project. This document will help ensure your project is well-defined and feasible.
+
+Your proposal should include the following elements:
+
+1. **Project Title**
+2. **Objective**:  Clearly state the main goal of your project. What problem are you addressing, or what question are you trying to answer?
+3. **Background & Motivation**: Provide brief context on why this project is important or interesting. Why did you choose this topic?
+4. **Approach**: Explain how you plan to complete the project, specifically highlighting concepts, techniques, or tools from class that you will use.
 
 
 ---
@@ -61,7 +72,8 @@ Announcements:
 
 ## Joint posterior distribution
 
-Our goal is to learn about the joint posterior distribution
+\fontsize{10pt}{11pt}\selectfont
+In Bayesian settings our goal is to learn about the joint posterior distribution, i.e.
 
 $$p(\beta, \sigma^2_y|y, X, hyperparameters)$$
 
@@ -83,7 +95,7 @@ This is the main motivation for MCMC. Also motivation for variational inference
 
 ## Variational inference motivation
 
-Our goal is to learn about the joint posterior distribution
+Our goal is still to learn about the joint posterior distribution
 
 $$p(\beta, \sigma^2_y|y, X, hyperparameters)$$
 
@@ -135,17 +147,15 @@ $$p(y,c|\theta) = \left[\lambda \mathcal{N}(y|\mu_1,\sigma_1^2)\right]^c\left[(1
 
 
 
-## Bayesian Gaussian mixture model
+## Bayesian Gaussian K-mixture model
 
-\fontsize{10pt}{11pt}\selectfont
-$$y_i \sim \sum_{k = 1}^K \lambda_k p_k(y_i|\theta_k)$$
 
 Data generating model is
 
-$$\mu_i \sim N(0, \sigma^2)$$
+$$\mu \sim N(0, \sigma^2)$$
 $$c_i \sim Cat(\lambda); \sum_{k=1}^K\lambda_k = 1$$
 
-$$y_i \sim N(\mu_{c_i}, 1)$$
+$$y_i|c_i, \mu \sim N(\mu_{c_i}, 1)$$
 
 
 ---
@@ -155,7 +165,7 @@ $$y_i \sim N(\mu_{c_i}, 1)$$
 
 Posterior PDF (ignoring hyperparameters) is
 
-$$p(\mu, \textbf{c}|\mathbf{y}) = \frac{\prod_k p(\mu_k)\prod_i p(c_i)p(y_i|c_i, \mu)}{\int_\mu \sum_c\prod_k p(\mu_k)\prod_i p(c_i)p(y_i|c_i, \mathbf{\mu})}$$
+$$p(\mu, \textbf{c}|\mathbf{y}) = \frac{\prod_k p(\mu_k)\prod_i p(c_i)p(y_i|c_i, \mu)}{\int_\mu \sum_c\prod_k p(\mu_k)\prod_i p(c_i)p(y_i|c_i, \mu)}$$
 
 - Because of denominator integral cannot be computed easily analytically
 
@@ -178,7 +188,7 @@ $$y = X\beta + \epsilon$$
  
 Joint posterior we want to estimate is 
 
-$$p(\beta, \sigma^2_y|y, X, h)$$
+$$p(\beta, \sigma^2_y|y, X, h) = \frac{p(\beta)p(\sigma^2)\prod_ip(y|\beta, \sigma^2_y)}{\int_{\beta}\int_{\sigma^2_y}p(\beta)p(\sigma^2)\prod_ip(y|\beta, \sigma^2_y)d\beta d\sigma^2_y}$$
 
 
 ::: notes
@@ -205,7 +215,7 @@ This notation is mostly borrowed from the Blei tutorial with some modificaitons.
 
 ## Main idea behind variational Bayes
 
-\fontsize{10pt}{11pt}\selectfont
+\fontsize{11pt}{12pt}\selectfont
 Choose a family of approximate densities, $\mathcal{Q}$ over the latent variables $z$. Then, find a specific member of that family $q(z|\nu) \in \mathcal{Q}$ that minimizes the **Kullback-Leibler (KL) divergence** to the exact posterior, $p(z|y)$. Here, $\nu$ is a variational factor we find the optimal value of.
 
 
@@ -265,6 +275,21 @@ divergence to the posterior!
 
 ---
 
+
+## The evidence lower bound
+
+\fontsize{10pt}{11pt}\selectfont
+Why is it called the evidence lower bound? Serves as a lower bound for $p(y)$ by Jensen's Inequality:
+
+
+::: notes
+ELBO is less than or equal to the evidence 
+- optimize this over densities q(z) to find optimal approximation
+:::
+
+---
+
+
 ## The evidence lower bound
 
 \fontsize{10pt}{11pt}\selectfont
@@ -304,7 +329,7 @@ minimizing the KL divergence.
 
 Mean field makes the strong simplifying assumption that the latent variables are independent in the approximation:
 
-$$q(\mathbf{z}) = \prod_{j = 1}^mq_j(z_j)$$
+$$q(\textbf{z}) = \prod_{j = 1}^mq_j(z_j)$$
 
 - The variational family is not a model of the observed data!  Instead, it is the ELBO and the corresponding KL minimization problem which connexts the fitted variational density to the data.
 
@@ -376,6 +401,20 @@ Algorithm 1 from Blei tutorial
 ---
 
 
+## Bayesian linear regression
+
+
+---
+
+
+
+## Bayesian Gaussian mixture model
+
+
+::: notes
+slides 2 page 50 has good slides on this
+:::
+---
 
 
 ## Bayesian Gaussian mixture model
@@ -392,6 +431,7 @@ slides 2 page 50 has good slides on this
 In the example above we used exponential families for priors- this allows for easier derivation of CAVI updates that have a closed form.
 
 There are a wide range of models that can use this approach:
+
 - Matrix factorization, regression, stochastic block models of networks, and more
 - For this class of models, generic updates for the exponential family distributions have been derived (see 4.1, Blei)
 
@@ -406,7 +446,7 @@ There are a wide range of models that can use this approach:
 
 
 
-```{r echo=FALSE, eval = TRUE, fig.align='center', out.width='60%'}
+```{r echo=FALSE, eval = TRUE, fig.align='center', out.width='80%'}
 knitr::include_graphics("mean_field.png")
 ```
 
@@ -423,7 +463,7 @@ exact posterior has positive correlation between x1 and x2. In other words, the 
 
 ## Drawbacks
 
-eExact posterior has positive correlation between x1 and x2. In other words, the posterior covariance matrix has non-zero off-diagonal entries.
+Exact posterior has positive correlation between x1 and x2. In other words, the posterior covariance matrix has non-zero off-diagonal entries.
 
 - Mean field cannot capture correlation between variables
 - Also underestimates marginal variances
@@ -438,7 +478,7 @@ This is fine if all you want is point estimates! But if you care about uncertain
 In principal, you can choose any $q$ explicitly rather than have it fall out of the math:
 
 - Pick a parametric family and optimize it's parameters (maximize the ELBO with respect to it's parameters using gradient ascent)
-- Variational autoendcoders
+- Variational autoencoders
 - Structured variational inference
 
 ::: notes
@@ -462,15 +502,22 @@ EM can be viewed as a special case of VI
 
 ## INLA
 
+Performs approximate Bayesian inference in latent Gaussian models
 
+- Also underestimate posterior variance
+- Used often in spatial statistics
+
+::: notes
+Have emily guest lecture on this next year 
+:::
 ---
 
-## Connection to Gibb's sampling
 
----
+
 
 ## Lab
 
 Implement Bayesian regression
----
+
+
 

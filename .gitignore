@@ -9,6 +9,7 @@
 /.quarto/
 **/*.quarto_ipynb
 homework*
+final_project*
 
 *solution*
 *flat*
