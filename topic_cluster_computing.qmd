@@ -1,0 +1,21 @@
+---
+title: "Cluster Computing"
+toc: true
+sidebar: false
+---
+
+
+Is this module we will learn how to use a SLURM cluster.
+
+
+- [Using the HPC](content_cluster.qmd)
+- [Project organization on the cluster](content_cluster.qmd)
+
+
+```{r, eval = FALSE, echo = FALSE}
+- [Using the HPC](what_is_ds_ii.qmd)
+- [Project organization on the cluster](what_is_ds_ii.qmd)
+
+
+```
+

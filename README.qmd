@@ -31,7 +31,9 @@ Versions of software used in the course materials are below.
 ```{r, echo = FALSE, message = FALSE}
 library(tidyverse)
 library(rstanarm)
-
+library(invgamma)
+library(MASS)
+library(coda)
 ```
 
 

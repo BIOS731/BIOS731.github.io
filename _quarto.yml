@@ -16,8 +16,8 @@ website:
             href: topic_optimization.qmd
           - text: Bayesian Computing
             href: topic_bayesian_computing.qmd
-          - text: Cloud Computing
-            href: topic_cloud_computing.qmd
+          - text: Cluster Computing
+            href: topic_cluster_computing.qmd
           - text: R packages
             href: topic_R_packages.qmd
           - text: Optimization II

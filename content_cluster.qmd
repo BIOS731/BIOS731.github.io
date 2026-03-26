@@ -1,0 +1,49 @@
+---
+title: "Cluster Computing"
+format:
+  html:
+    toc: true
+    toc-location: right
+execute:
+  echo: false
+  fig-width: 6
+  fig-asp: 0.6
+  out-width: "90%"
+---
+
+
+
+## Overview
+
+In this, we will introduce methods for Cluster Computing.
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+
+```
+
+::: {.panel-tabset .panel-pills}
+
+### Slide Deck: Using the HPC
+
+[![](./slides/topic_cluster/preview_cluster.png){width=70%}](./slides/topic_cluster/s_intro.pdf)
+
+**Guest lecture, Keven Haynes**  
+[Download slides (PDF)](./slides/topic_cluster/s_intro.pdf)
+
+
+***
+
+### Slide Deck: Project organization on the cluster
+
+
+
+
+***
+
+
+
+***
+
+
+:::
