@@ -41,10 +41,79 @@ Announcements:
   - To give time for final project
   - Will have discussion post at least
 
+::: notes
+I expect today's class to be very interactive. Please try to follow along.
+:::
+
 ---
 
-## Lab first
 
+## Vim
+
+\fontsize{10pt}{11pt}\selectfont
+Vim is a minimalistic text editor that is built into Unix and is often the default text editor within the terminal.
+
+Key Features:
+
+1. Modal Editing:
+  * Normal Mode: Navigate and manipulate text.
+  * Insert Mode: Insert and edit text.
+  * Visual Mode: Select and highlight text.
+
+2. Commands
+  * Performs complex text manipulations with minimal keystrokes.
+  * Examples: `dd` (delete line), `yy` (yank/copy line), `p` (paste).
+
+
+::: notes
+Vim is pretty old school but knowing a couple of commands can help you out in some case (for example with merge conflicts, which we will get to when we talk about git).
+:::
+
+---
+
+## Brief exercise
+
+Write bash code that executes each of the following.
+
+1. Write a sentence or two about Atlanta, or anything you'd like, and store it in a file called "atlanta.txt" within a folder called "atlanta".
+2. Use vim to edit this file in some way (e.g. add some more text).
+3. Save the results and exit vim.
+
+
+---
+
+## Basic vim commands
+
+__Opening and exiting vim__
+
+* `vim filename`: open a file in vim
+* `:w`: save changes
+* `:q`: quit vim
+* `:wq`: save changes and quit
+
+---
+
+## Basic vim commands
+
+__Navigating in vim__
+
+* `h`, `j`, `k`, `l`: move left, down, up, and right
+* `gg`: go to the beginning of the file
+* `G`: go to the end of the file
+
+__Editing text__
+
+* `i`: enter Insert mode before the cursor
+* `a`: enter Insert mode after the cursor
+
+---
+
+## Lab 
+
+Next we will do the lab on power simulations on the cluster. We will walk through it together.  Download the following files:
+
+- [power_sim.R](./labs/power_sim.R )
+- [power_sim.sh](./labs/power_sim.sh)
 
 ---
 
@@ -312,7 +381,6 @@ We parallelize by sbatch on the cluster
 
 - Don't try to parallelize the way we did it locally. I'm not even sure you can.
 
----
 
-## Cluster commands cheat sheet
+
 

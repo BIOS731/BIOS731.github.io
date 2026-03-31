@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Julia Wrobel">
 
-<title>Cluster Computing – BIOS731</title>
+<title>Project organization on the cluster – BIOS731</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -58,24 +59,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-ff63373b1067ca6f91cf1456aa1f00a2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-ff63373b1067ca6f91cf1456aa1f00a2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -103,20 +104,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+</head><body class="nav-fixed quarto-light">\usepackage{xcolor}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\green}[1]{\textcolor{green}{#1}}
 
 
-</head>
 
-<body class="nav-fixed quarto-light">
+
+
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
     </a>
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">BIOS731</span>
     </a>
   </div>
@@ -132,35 +136,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-topics">    
         <li>
-    <a class="dropdown-item" href="./topic_reproducible_computing.html">
+    <a class="dropdown-item" href="../../topic_reproducible_computing.html">
  <span class="dropdown-text">Reproducible Computing</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./topic_simulation.html">
+    <a class="dropdown-item" href="../../topic_simulation.html">
  <span class="dropdown-text">Simulation and Resampling</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./topic_optimization.html">
+    <a class="dropdown-item" href="../../topic_optimization.html">
  <span class="dropdown-text">Optimization I</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./topic_bayesian_computing.html">
+    <a class="dropdown-item" href="../../topic_bayesian_computing.html">
  <span class="dropdown-text">Bayesian Computing</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./topic_cluster_computing.html">
+    <a class="dropdown-item" href="../../topic_cluster_computing.html">
  <span class="dropdown-text">Cluster Computing</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./topic_R_packages.html">
+    <a class="dropdown-item" href="../../topic_R_packages.html">
  <span class="dropdown-text">R packages</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./topic_optimization_II.html">
+    <a class="dropdown-item" href="../../topic_optimization_II.html">
  <span class="dropdown-text">Optimization II</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./topic_other_material.qmd">
+    <a class="dropdown-item" href="../../topic_other_material.qmd">
  <span class="dropdown-text">Other Materials</span></a>
   </li>  
     </ul>
@@ -171,17 +175,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-datasets">    
         <li>
-    <a class="dropdown-item" href="./dataset_cannabis.html">
+    <a class="dropdown-item" href="../../dataset_cannabis.html">
  <span class="dropdown-text">Cannabis</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./dataset_brfss.qmd">
+    <a class="dropdown-item" href="../../dataset_brfss.qmd">
  <span class="dropdown-text">Craniosynothosis</span></a>
   </li>  
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="./syllabus.html"> 
+    <a class="nav-link" href="../../syllabus.html"> 
 <span class="menu-text">Syllabus</span></a>
   </li>  
   <li class="nav-item compact">
@@ -201,26 +205,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
-  </ul>
-</nav>
-    </div>
+        
+    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="s_cluster_org.pdf"><i class="bi bi-file-pdf"></i>Beamer</a></li></ul></div></div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Cluster Computing</h1>
+<h1 class="title">Project organization on the cluster</h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Julia Wrobel </p>
+          </div>
+  </div>
     
   
     
@@ -233,73 +237,320 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="overview" class="level2">
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
-<p>In this, we will introduce methods for Cluster Computing.</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset panel-pills">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Slide Deck: Using the HPC</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Slide Deck: Project organization on the cluster</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Lab: Power simulation on the cluster</a></li></ul>
-<div class="tab-content panel-pills">
-<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
-<p><a href="./slides/topic_cluster/s_intro.pdf"><img src="./slides/topic_cluster/preview_cluster.png" class="img-fluid" style="width:70.0%"></a></p>
-<p><strong>Guest lecture, Keven Haynes</strong><br>
-<a href="./slides/topic_cluster/s_intro.pdf">Download slides (PDF)</a></p>
-<hr>
-</div>
-<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
-<p><a href="./slides/topic_cluster/s_cluster_org.pdf"><img src="./slides/topic_cluster/preview_cluster_org.png" class="img-fluid" style="width:70.0%"></a></p>
-<p><strong>Project organization</strong><br>
-<a href="./slides/topic_cluster/s_cluster_org.pdf">Download slides (PDF)</a></p>
+<p>Today, we cover:</p>
 <ul>
-<li><a href="./slides/topic_cluster/s_cluster_org.pdf">Download cluster_project.zip</a></li>
+<li>Project organization on the cluster</li>
+<li>Some added details about variational inference</li>
+</ul>
+<p>Announcements:</p>
+<ul>
+<li>Final Project proposal due 4/1 at 10AM</li>
+<li>Homework 4 is last homework, extend due date
+<ul>
+<li>To give time for final project</li>
+<li>Will have discussion post at least</li>
+</ul></li>
+</ul>
+<div class="notes">
+<p>I expect today’s class to be very interactive. Please try to follow along.</p>
+</div>
+<hr>
+</section>
+<section id="vim" class="level2">
+<h2 class="anchored" data-anchor-id="vim">Vim</h2>
+<p>Vim is a minimalistic text editor that is built into Unix and is often the default text editor within the terminal.</p>
+<p>Key Features:</p>
+<ol type="1">
+<li>Modal Editing:</li>
+</ol>
+<ul>
+<li>Normal Mode: Navigate and manipulate text.</li>
+<li>Insert Mode: Insert and edit text.</li>
+<li>Visual Mode: Select and highlight text.</li>
+</ul>
+<ol start="2" type="1">
+<li>Commands</li>
+</ol>
+<ul>
+<li>Performs complex text manipulations with minimal keystrokes.</li>
+<li>Examples: <code>dd</code> (delete line), <code>yy</code> (yank/copy line), <code>p</code> (paste).</li>
+</ul>
+<div class="notes">
+<p>Vim is pretty old school but knowing a couple of commands can help you out in some case (for example with merge conflicts, which we will get to when we talk about git).</p>
+</div>
+<hr>
+</section>
+<section id="brief-exercise" class="level2">
+<h2 class="anchored" data-anchor-id="brief-exercise">Brief exercise</h2>
+<p>Write bash code that executes each of the following.</p>
+<ol type="1">
+<li>Write a sentence or two about Atlanta, or anything you’d like, and store it in a file called “atlanta.txt” within a folder called “atlanta”.</li>
+<li>Use vim to edit this file in some way (e.g.&nbsp;add some more text).</li>
+<li>Save the results and exit vim.</li>
+</ol>
+<hr>
+</section>
+<section id="basic-vim-commands" class="level2">
+<h2 class="anchored" data-anchor-id="basic-vim-commands">Basic vim commands</h2>
+<p><strong>Opening and exiting vim</strong></p>
+<ul>
+<li><code>vim filename</code>: open a file in vim</li>
+<li><code>:w</code>: save changes</li>
+<li><code>:q</code>: quit vim</li>
+<li><code>:wq</code>: save changes and quit</li>
 </ul>
 <hr>
-</div>
-<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
-<p>You have two files: <code>power_sim.R</code> (estimates t-test power via simulation across four sample sizes) and <code>power_sim.sh</code> (submits it to the cluster). The <code>doLocal</code> flag in <code>power_sim.R</code> runs scenario 1 locally; on the cluster the scenario is passed as a command-line argument.</p>
-<section id="part-0-run-locally" class="level4">
-<h4 class="anchored" data-anchor-id="part-0-run-locally">Part 0: Run locally</h4>
-<p>Run <code>power_sim.R</code> in RStudio and confirm it completes without errors and writes a <code>.RDA</code> file to <code>results/</code>.</p>
+</section>
+<section id="basic-vim-commands-1" class="level2">
+<h2 class="anchored" data-anchor-id="basic-vim-commands-1">Basic vim commands</h2>
+<p><strong>Navigating in vim</strong></p>
+<ul>
+<li><code>h</code>, <code>j</code>, <code>k</code>, <code>l</code>: move left, down, up, and right</li>
+<li><code>gg</code>: go to the beginning of the file</li>
+<li><code>G</code>: go to the end of the file</li>
+</ul>
+<p><strong>Editing text</strong></p>
+<ul>
+<li><code>i</code>: enter Insert mode before the cursor</li>
+<li><code>a</code>: enter Insert mode after the cursor</li>
+</ul>
 <hr>
 </section>
-<section id="part-1-transfer-and-submit-a-single-job" class="level4">
-<h4 class="anchored" data-anchor-id="part-1-transfer-and-submit-a-single-job">Part 1: Transfer and submit a single job</h4>
-<p>Copy the files to your scratch directory, then log in:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scp</span> power_sim.R power_sim.sh <span class="op">&lt;</span>user<span class="op">&gt;</span>@clogin01.sph.emory.edu:/scratch/BIOS731/<span class="op">&lt;</span>your_folder<span class="op">&gt;</span>/</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh</span> <span class="op">&lt;</span>user<span class="op">&gt;</span>@clogin01.sph.emory.edu</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../../scratch/BIOS731/<span class="op">&lt;</span>your_folder<span class="op">&gt;</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> results</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Submit and monitor:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">sbatch</span> power_sim.sh</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">squeue</span> <span class="at">-u</span> <span class="op">&lt;</span>user<span class="op">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Check <code>power_sim.out</code> for the expected message and <code>power_sim.err</code> for errors.</p>
+<section id="lab-first" class="level2">
+<h2 class="anchored" data-anchor-id="lab-first">Lab first</h2>
 <hr>
 </section>
-<section id="part-2-convert-to-a-job-array" class="level4">
-<h4 class="anchored" data-anchor-id="part-2-convert-to-a-job-array">Part 2: Convert to a job array</h4>
-<p>Use <code>vim</code> to edit <code>power_sim.sh</code>. Make two changes: add <code>--array=1-4</code> and replace the hard-coded <code>JOBID=1</code> with <code>$SLURM_ARRAY_TASK_ID</code>.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --array=1-4</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --job-name=power_sim</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --partition=wrobel</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --output=power_sim_%a.out</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --error=power_sim_%a.err</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">module</span> purge</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="ex">module</span> load R</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="va">JOBID</span><span class="op">=</span><span class="va">$SLURM_ARRAY_TASK_ID</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> power_sim.R <span class="va">$JOBID</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Submit and verify that four <code>.RDA</code> files appear in <code>results/</code>.</p>
+<section id="project-organization-on-the-cluster" class="level2">
+<h2 class="anchored" data-anchor-id="project-organization-on-the-cluster">Project organization on the cluster</h2>
+<ul>
+<li>Can move files back and forth from local computer to cluster using <code>scp</code></li>
+</ul>
+<ul>
+<li><strong>This is not ideal!</strong></li>
+</ul>
 <hr>
 </section>
-<section id="part-3-modify-the-simulation" class="level4">
-<h4 class="anchored" data-anchor-id="part-3-modify-the-simulation">Part 3: Modify the simulation</h4>
-<p>Use <code>vim power_sim.R</code> to make one of the following changes, then resubmit the array.</p>
-<p><strong>Option A</strong> — change <code>nsim</code> from 1000 to 2000. Do estimates change?</p>
-<p><strong>Option B</strong> — change <code>alpha</code> from 0.05 to 0.01. How does power change?</p>
+<section id="project-organization-on-the-cluster-1" class="level2">
+<h2 class="anchored" data-anchor-id="project-organization-on-the-cluster-1">Project organization on the cluster</h2>
+<ul>
+<li>Can move files back and forth from local computer to cluster using <code>scp</code></li>
+</ul>
+<ul>
+<li><strong>This is not ideal!</strong>
+<ul>
+<li>Probably won’t get the code right the first (or second, or even third time) and doing <code>scp</code> gets cumbersome quick</li>
+<li>Hard to keep track of what code is local and what code is on the cluster</li>
+<li>Poor version control</li>
+</ul></li>
+</ul>
+<div class="notes">
+<p>This is what I did as a grad student so I know first hand that it can be super annoying</p>
+</div>
 <hr>
 </section>
+<section id="project-organization-on-the-cluster-2" class="level2">
+<h2 class="anchored" data-anchor-id="project-organization-on-the-cluster-2">Project organization on the cluster</h2>
+<p><strong>Solution</strong>: create an organized file structure and put it on GitHub!</p>
+<p>You can then commit changes locally, push them to GitHub, and pull them down in the cluster</p>
+<ul>
+<li>Easier than <code>scp</code></li>
+<li>More reproducible</li>
+<li>Version control as a byproduct</li>
+</ul>
+<hr>
+</section>
+<section id="project-organization-on-the-cluster-3" class="level2">
+<h2 class="anchored" data-anchor-id="project-organization-on-the-cluster-3">Project organization on the cluster</h2>
+<p>Let’s take a look at the <code>cluster_project</code> folder…</p>
+<ul>
+<li>File structure</li>
+<li><code>run_sim.R</code>
+<ul>
+<li>Local vs.&nbsp;remote behavior</li>
+<li>Script runs on simulation scenario at a time</li>
+<li>Where does stuff save?</li>
+</ul></li>
+<li><code>run_sim.sh</code>
+<ul>
+<li>Shell script</li>
+</ul></li>
+</ul>
+<div class="notes">
+<p>Make sure to look at each of these elements</p>
 </div>
+<hr>
+</section>
+<section id="short-vs.-long-term-cluster-storage" class="level2">
+<h2 class="anchored" data-anchor-id="short-vs.-long-term-cluster-storage">Short vs.&nbsp;long term cluster storage</h2>
+<p>Short term storage happens in your <code>scratch</code> directory.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span>  ../../scratch/BIOS731</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p>Longer term storage happens in your <code>project</code> directory.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span>  ../../projects/wrobel</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<hr>
+</section>
+<section id="short-vs.-long-term-cluster-storage-1" class="level2">
+<h2 class="anchored" data-anchor-id="short-vs.-long-term-cluster-storage-1">Short vs.&nbsp;long term cluster storage</h2>
+<p>Typically I will work just in my project directory.</p>
+<p>For this class, we will work in <code>scratch</code>. However, I’ll show you my project directory so you can see what it looks like…</p>
+<hr>
+</section>
+<section id="steps-for-starting-a-cluster-project" class="level2">
+<h2 class="anchored" data-anchor-id="steps-for-starting-a-cluster-project">Steps for starting a cluster project</h2>
+<p>Once you have code in a well structured directory that <strong>works the way you expect it to work</strong>, do the following:</p>
+<ul>
+<li>Initialize local repo with desired structure</li>
+<li>Create <code>.gitignore</code> file
+<ul>
+<li>Should contain types of files you <strong>don’t</strong> want to push back and forth between local computer and GitHub</li>
+</ul></li>
+<li>Create empty remote repo of same name <strong>on GitHub</strong></li>
+<li>Link remote repo to local repo and push local contents</li>
+<li>Log into cluster and clone the remote repo</li>
+</ul>
+<div class="notes">
+<p>For local repo test your code very thoroughly to make sure it’s doing what you expect before you start this process Also, I really only push in one direction here</p>
+</div>
+<hr>
+</section>
+<section id="steps-for-starting-a-cluster-project-1" class="level2">
+<h2 class="anchored" data-anchor-id="steps-for-starting-a-cluster-project-1">Steps for starting a cluster project</h2>
+<p>Let’s go ahead and follow these steps and put <code>cluster_project</code> on the cluster.</p>
+<ul>
+<li>I’m going to create a directory called <code>jwrobel</code> in <code>scratch/BIOS731</code> and store my project there.</li>
+</ul>
+<hr>
+</section>
+<section id="running-batch-jobs" class="level2">
+<h2 class="anchored" data-anchor-id="running-batch-jobs">Running batch jobs</h2>
+<p>Assuming we have already connected to the cluster and connected our code on GitHub to the directory we want it to live in on the cluster:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> <span class="op">&lt;</span>path_to_directory_with_sh<span class="op">&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> pull</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">sbatch</span> <span class="op">&lt;</span>file_name<span class="op">&gt;</span>.sh</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="running-batch-jobs-1" class="level2">
+<h2 class="anchored" data-anchor-id="running-batch-jobs-1">Running batch jobs</h2>
+<p>Using <code>cluster_project</code> as an example, let’s run the script <code>run_sim.sh</code> to execute our simulation study on the cluster.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh</span> jwrobe8@clogin01.sph.emory.edu</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../../scratch/BIOS731/jwrobel/cluster_project</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> pull</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> simulations</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">sbatch</span> run_sim.sh</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Note that your file path will look a little different from mine.</p>
+<hr>
+</section>
+<section id="running-batch-jobs-2" class="level2">
+<h2 class="anchored" data-anchor-id="running-batch-jobs-2">Running batch jobs</h2>
+<p>Should have output results for each simulation scenario to the <code>results</code> folder (let’s check).</p>
+<hr>
+</section>
+<section id="running-an-interactive-job" class="level2">
+<h2 class="anchored" data-anchor-id="running-an-interactive-job">Running an interactive job</h2>
+<p>I do this primarily to:</p>
+<ol type="1">
+<li>Install <code>R</code> packages I need for an analysis</li>
+<li>Test code that isn’t working on the cluster, <em>assuming I have already tested it locally and it works there</em></li>
+</ol>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># command for interactive session</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">srun</span> <span class="at">-p</span> interactive-cpu <span class="at">--pty</span> bash</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># then run</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">module</span> load R</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="ex">R</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="aggregating-results" class="level2">
+<h2 class="anchored" data-anchor-id="aggregating-results">Aggregating results</h2>
+<p>I usually do this locally, but if your files are really big or you have many simulation scenarios you may want to do this on the cluster- just use your judgement.</p>
+<ul>
+<li>We can modify <code>source/process_results.R</code> to pull together our results.</li>
+<li>First need to grab them from the cluster.
+<ul>
+<li>For this, I do use <code>scp</code>.</li>
+</ul></li>
+</ul>
+<hr>
+</section>
+<section id="transfering-files-from-hcp-to-local" class="level2">
+<h2 class="anchored" data-anchor-id="transfering-files-from-hcp-to-local">Transfering files from HCP to local</h2>
+<p>In this case I’m going to transfer the <code>.Rda</code> files I just generated.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># cd into local directory where I want to store these files</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> results</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Copy files from remote to local</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">scp</span> <span class="at">-r</span>  jwrobe8@clogin01.sph.emory.edu:/scratch/BIOS731/jwrobel/cluster_project/results/20250220 .</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="making-changes-to-your-code" class="level2">
+<h2 class="anchored" data-anchor-id="making-changes-to-your-code">Making changes to your code</h2>
+<p>Let’s say we want to increase the number of simulations or change the study parameters.</p>
+<ul>
+<li>Make the changes to your repo locally</li>
+<li>Commit and push to GitHub</li>
+<li>Pull them down on the cluster</li>
+</ul>
+<div class="notes">
+<p>Do this.</p>
+</div>
+<hr>
+</section>
+<section id="useful-commands" class="level2">
+<h2 class="anchored" data-anchor-id="useful-commands">Useful commands</h2>
+<ul>
+<li>Check current running jobs for a user: <code>squeue -u &lt;your_user_name&gt;</code>
+<ul>
+<li>For example, my user name is <code>jwrobe8</code></li>
+</ul></li>
+<li>Check current running jobs for a partition: <code>squeue -p &lt;partition_name&gt;</code></li>
+</ul>
+<ul>
+<li>Kill a job: <code>scancel &lt;JOBID&gt;</code></li>
+<li>Kill all jobs: <code>scancel -u &lt;your_user_name&gt;</code></li>
+</ul>
+<hr>
+</section>
+<section id="useful-commands-1" class="level2">
+<h2 class="anchored" data-anchor-id="useful-commands-1">Useful commands</h2>
+<ul>
+<li>Copy from remote to local: <code>scp -r &lt;your_user_name&gt;@clogin01.sph.emory.edu:/&lt;path_to_file&gt; .</code></li>
+<li>Copy from local to remote: <code>scp &lt;file_name&gt; &lt;your_user_name&gt;@clogin01.sph.emory.edu:/&lt;path_to_file&gt; .</code>
+<ul>
+<li><code>-r</code> flag here is not necessary but it is useful; it means “recursive” and can be used to copy whole directories</li>
+</ul></li>
+</ul>
+<hr>
+</section>
+<section id="allocating-memory" class="level2">
+<h2 class="anchored" data-anchor-id="allocating-memory">Allocating memory</h2>
+<p>If your job fails and it’s not due to a bug in the code, it could be due to not having enough memory. You can fix this by increasing the amount of memory allocated to each job. Put the following in the header of your <code>.sh</code> file:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SBATCH --mem=40G for specifying </span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Note</strong>: Be careful with this. Sometimes it is tough to know how much memory to allocate, so start by specifying nothing (I think the default is about 10G but don’t quote me on that).</p>
+<hr>
+</section>
+<section id="parallelization-on-the-cluster" class="level2">
+<h2 class="anchored" data-anchor-id="parallelization-on-the-cluster">Parallelization on the cluster</h2>
+<p>We parallelize by sbatch on the cluster</p>
+<ul>
+<li>Don’t try to parallelize the way we did it locally. I’m not even sure you can.</li>
+</ul>
+<hr>
+</section>
+<section id="cluster-commands-cheat-sheet" class="level2">
+<h2 class="anchored" data-anchor-id="cluster-commands-cheat-sheet">Cluster commands cheat sheet</h2>
 
 
 </section>

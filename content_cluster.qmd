@@ -41,13 +41,76 @@ library(tidyverse)
 **Project organization**  
 [Download slides (PDF)](./slides/topic_cluster/s_cluster_org.pdf)
 
+- [Download cluster_project.zip](./slides/topic_cluster/s_cluster_org.pdf)
 
 
 ***
 
+### Lab: Power simulation on the cluster
 
+You have two files: `power_sim.R` (estimates t-test power via simulation across four sample sizes) and `power_sim.sh` (submits it to the cluster). The `doLocal` flag in `power_sim.R` runs scenario 1 locally; on the cluster the scenario is passed as a command-line argument.
+
+
+
+#### Part 0: Run locally
+
+Run `power_sim.R` in RStudio and confirm it completes without errors and writes a `.RDA` file to `results/`.
+
+---
+
+#### Part 1: Transfer and submit a single job
+
+Copy the files to your scratch directory, then log in:
+
+```bash
+scp power_sim.R power_sim.sh <user>@clogin01.sph.emory.edu:/scratch/BIOS731/<your_folder>/
+ssh <user>@clogin01.sph.emory.edu
+cd ../../scratch/BIOS731/<your_folder>
+mkdir -p results
+```
+
+Submit and monitor:
+
+```bash
+sbatch power_sim.sh
+squeue -u <user>
+```
+
+Check `power_sim.out` for the expected message and `power_sim.err` for errors.
+
+---
+
+#### Part 2: Convert to a job array
+
+Use `vim` to edit `power_sim.sh`. Make two changes: add `--array=1-4` and replace the hard-coded `JOBID=1` with `$SLURM_ARRAY_TASK_ID`.
+
+
+```bash
+#!/bin/bash
+#SBATCH --array=1-4
+#SBATCH --job-name=power_sim
+#SBATCH --partition=wrobel
+#SBATCH --output=power_sim_%a.out
+#SBATCH --error=power_sim_%a.err
+
+module purge
+module load R
+
+JOBID=$SLURM_ARRAY_TASK_ID
+Rscript power_sim.R $JOBID
+```
+
+Submit and verify that four `.RDA` files appear in `results/`.
+
+---
+
+#### Part 3: Modify the simulation
+
+Use `vim power_sim.R` to make one of the following changes, then resubmit the array.
+
+**Option A** — change `nsim` from 1000 to 2000. Do estimates change?
+
+**Option B** — change `alpha` from 0.05 to 0.01. How does power change?
 
 ***
-
-
 :::
