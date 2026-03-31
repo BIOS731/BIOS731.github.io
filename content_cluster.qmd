@@ -36,6 +36,10 @@ library(tidyverse)
 
 ### Slide Deck: Project organization on the cluster
 
+[![](./slides/topic_cluster/preview_cluster_org.png){width=70%}](./slides/topic_cluster/s_cluster_org.pdf)
+
+**Project organization**  
+[Download slides (PDF)](./slides/topic_cluster/s_cluster_org.pdf)
 
 
 

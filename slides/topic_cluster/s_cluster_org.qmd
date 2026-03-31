@@ -1,0 +1,318 @@
+---
+title: "Project organization on the cluster"
+author: "Julia Wrobel"
+format:
+  beamer:
+    theme: metropolis
+    aspectratio: 169
+    fontsize: 14pt
+    slide-level: 2
+execute:
+  echo: true
+  eval: false
+  warning: false
+  message: false
+header-includes:
+  - \usepackage{xcolor}
+  - \newcommand{\red}[1]{\textcolor{red}{#1}}
+  - \newcommand{\green}[1]{\textcolor{green}{#1}}
+---
+
+
+
+## Overview
+
+```{r, echo = FALSE, eval = TRUE}
+library(tidyverse)
+```
+
+
+Today, we cover:
+
+
+- Project organization on the cluster
+- Some added details about variational inference
+
+
+Announcements:
+
+- Final Project proposal due 4/1 at 10AM
+- Homework 4 is last homework, extend due date
+  - To give time for final project
+  - Will have discussion post at least
+
+---
+
+## Lab first
+
+
+---
+
+
+## Project organization on the cluster
+
+- Can move files back and forth from local computer to cluster using `scp`
+
+\vspace{10mm}
+
+- **This is not ideal!**
+
+---
+
+## Project organization on the cluster
+
+- Can move files back and forth from local computer to cluster using `scp`
+
+\vspace{10mm}
+
+- **This is not ideal!**
+  - Probably won't get the code right the first (or second, or even third time) and doing `scp` gets cumbersome quick
+  - Hard to keep track of what code is local and what code is on the cluster
+  - Poor version control
+
+::: notes
+This is what I did as a grad student so I know first hand that it can be super annoying
+:::
+
+---
+
+## Project organization on the cluster
+
+**Solution**: create an organized file structure and put it on GitHub!
+
+
+\vspace{10mm}
+
+You can then commit changes locally, push them to GitHub, and pull them down in the cluster
+
+- Easier than `scp`
+- More reproducible
+- Version control as a byproduct
+
+---
+
+## Project organization on the cluster
+
+Let's take a look at the `cluster_project` folder...
+
+- File structure
+- `run_sim.R`
+  - Local vs. remote behavior
+  - Script runs on simulation scenario at a time
+  - Where does stuff save?
+- `run_sim.sh`
+  - Shell script
+
+
+::: notes
+Make sure to look at each of these elements
+:::
+
+---
+
+
+
+## Short vs. long term cluster storage
+
+Short term storage happens in your `scratch` directory.
+
+```{bash, eval = FALSE}
+cd  ../../scratch/BIOS731
+```
+
+\vspace{10mm}
+
+Longer term storage happens in your `project` directory.
+
+```{bash, eval = FALSE}
+cd  ../../projects/wrobel
+```
+
+---
+
+## Short vs. long term cluster storage
+
+Typically I will work just in my project directory.
+
+
+\vspace{10mm}
+
+For this class, we will work in `scratch`.  However, I'll show you my project directory so you can see what it looks like...
+
+---
+
+
+## Steps for starting a cluster project
+
+Once you have code in a well structured directory that **works the way you expect it to work**, do the following:
+
+- Initialize local repo with desired structure
+- Create `.gitignore` file
+  - Should contain types of files you **don't** want to push back and forth between local computer and GitHub
+- Create empty remote repo of same name **on GitHub**
+- Link remote repo to local repo and push local contents
+- Log into cluster and clone the remote repo
+
+
+::: notes
+For local repo test your code very thoroughly to make sure it's doing what you expect before you start this process
+Also, I really only push in one direction here
+:::
+
+
+---
+
+
+## Steps for starting a cluster project
+
+Let's go ahead and follow these steps and put `cluster_project` on the cluster.
+
+- I'm going to create a directory called `jwrobel` in `scratch/BIOS731` and store my project there. 
+
+---
+
+## Running batch jobs
+
+Assuming we have already connected to the cluster and connected our code on GitHub to the directory we want it to live in on the cluster: 
+
+```{bash}
+cd <path_to_directory_with_sh>
+git pull
+sbatch <file_name>.sh
+```
+
+---
+
+## Running batch jobs
+
+Using `cluster_project` as an example, let's run the script `run_sim.sh` to execute our simulation study on the cluster.
+
+
+
+```{bash}
+ssh jwrobe8@clogin01.sph.emory.edu
+cd ../../scratch/BIOS731/jwrobel/cluster_project
+git pull
+cd simulations
+sbatch run_sim.sh
+```
+
+Note that your file path will look a little different from mine.
+
+---
+
+
+## Running batch jobs
+
+Should have output results for each simulation scenario to the `results` folder (let's check).
+
+---
+
+## Running an interactive job
+
+\fontsize{10pt}{11pt}\selectfont
+I do this primarily to:
+
+1. Install `R` packages I need for an analysis
+2. Test code that isn't working on the cluster, *assuming I have already tested it locally and it works there*
+
+
+```{bash}
+# command for interactive session
+srun -p interactive-cpu --pty bash
+
+# then run
+module load R
+R
+```
+
+---
+
+## Aggregating results
+
+I usually do this locally, but if your files are really big or you have many simulation scenarios you may want to do this on the cluster- just use your judgement.
+
+- We can modify `source/process_results.R` to pull together our results.
+- First need to grab them from the cluster.
+  - For this, I do use `scp`.
+  
+ 
+---
+
+## Transfering files from HCP to local
+
+In this case I'm going to transfer the `.Rda` files I just generated.
+
+\fontsize{10pt}{11pt}\selectfont
+```{bash}
+# cd into local directory where I want to store these files
+cd results
+
+# Copy files from remote to local
+scp -r  jwrobe8@clogin01.sph.emory.edu:/scratch/BIOS731/jwrobel/cluster_project/results/20250220 .
+```
+
+---
+
+
+## Making changes to your code
+
+Let's say we want to increase the number of simulations or change the study parameters.
+
+- Make the changes to your repo locally
+- Commit and push to GitHub
+- Pull them down on the cluster
+
+::: notes
+Do this.
+:::
+
+---
+
+## Useful commands
+
+- Check current running jobs for a user: `squeue -u <your_user_name>`
+  - For example, my user name is `jwrobe8`
+- Check current running jobs for a partition: `squeue -p <partition_name>`
+
+
+\vspace{10mm}
+
+- Kill a job: `scancel <JOBID>`
+- Kill all jobs: `scancel -u <your_user_name>`
+
+---
+
+## Useful commands
+
+\fontsize{10pt}{11pt}\selectfont
+- Copy from remote to local: `scp -r <your_user_name>@clogin01.sph.emory.edu:/<path_to_file> .`
+- Copy from local to remote: `scp <file_name> <your_user_name>@clogin01.sph.emory.edu:/<path_to_file> .`
+  - `-r` flag here is not necessary but it is useful; it means "recursive" and can be used to copy whole directories
+
+---
+
+## Allocating memory
+
+If your job fails and it's not due to a bug in the code, it could be due to not having enough memory. You can fix this by increasing the amount of memory allocated to each job.  Put the following in the header of your `.sh` file:
+
+```{bash}
+# SBATCH --mem=40G for specifying 
+```
+
+**Note**: Be careful with this. Sometimes it is tough to know how much memory to allocate, so start by specifying nothing (I think the default is about 10G but don't quote me on that).
+
+
+---
+
+## Parallelization on the cluster
+
+
+We parallelize by sbatch on the cluster
+
+- Don't try to parallelize the way we did it locally. I'm not even sure you can.
+
+---
+
+## Cluster commands cheat sheet
+
