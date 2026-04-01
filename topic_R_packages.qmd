@@ -4,7 +4,9 @@ toc: true
 sidebar: false
 ---
 
-In progress.
+- [Introduction to R packages](what_is_ds_ii.qmd)
+- [RCPP](what_is_ds_ii.qmd)
+
 
 ```{r, eval = FALSE, echo = FALSE}
 

@@ -37,9 +37,8 @@ Today, we cover:
 Announcements:
 
 - Final Project proposal due 4/1 at 10AM
-- Homework 4 is last homework, extend due date
-  - To give time for final project
-  - Will have discussion post at least
+- Homework 4 is last homework, extended due date
+  - New due date April 15
 
 ::: notes
 I expect today's class to be very interactive. Please try to follow along.
@@ -312,13 +311,13 @@ I usually do this locally, but if your files are really big or you have many sim
 
 In this case I'm going to transfer the `.Rda` files I just generated.
 
-\fontsize{10pt}{11pt}\selectfont
+\fontsize{9pt}{10pt}\selectfont
 ```{bash}
 # cd into local directory where I want to store these files
 cd results
 
 # Copy files from remote to local
-scp -r  jwrobe8@clogin01.sph.emory.edu:/scratch/BIOS731/jwrobel/cluster_project/results/20250220 .
+scp -r  jwrobe8@clogin01.sph.emory.edu:/scratch/BIOS731/jwrobel/cluster_project/results/20260401 .
 ```
 
 ---

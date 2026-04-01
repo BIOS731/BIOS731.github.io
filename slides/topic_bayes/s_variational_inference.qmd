@@ -455,34 +455,125 @@ Solve these expectations to get updates for $\beta$, $\sigma^2$
 ## Bayesian linear regression
 
 \fontsize{10pt}{11pt}\selectfont
-Update for $\beta$  is
+Update for $q^*(\beta) = N(m, S)$
 
-$$q^*(\beta) = N(m, S)$$
-$$S = (\frac{1}{\sigma^2_y}x^Tx + \frac{1}{\sigma^2_b}I)^{-1}$$
+\vspace{3mm}
 
-$$m = S(\frac{1}{\sigma^2_y}x^Ty)$$
+Since $\sigma^2_y$ is unknown, we plug in its **expected precision** under $q(\sigma^2_y)$:
 
---- 
+$$E_{q(\sigma^2_y)}\!\left[\frac{1}{\sigma^2_y}\right] = \frac{A_{post}}{B_{post}}$$
+
+\vspace{3mm}
+
+$$S = \left(\frac{A_{post}}{B_{post}} X^TX + \frac{1}{\sigma^2_b}I\right)^{-1}$$
+
+$$m = S\,\frac{A_{post}}{B_{post}} X^Ty$$
+
+::: notes
+This is the key coupling in CAVI: each update uses the current expected value of the other parameter's variational distribution, not a point estimate.
+:::
+
+---
 
 
 ## Bayesian linear regression
 
 \fontsize{10pt}{11pt}\selectfont
-Update for $\sigma^2_y$  is
+Update for $q^*(\sigma^2_y) = IG(A_{post}, B_{post})$
 
-$$q^*(\sigma^2_y) = IG(A_{post}, B_{post})$$
-$$A_{post} = A_0 + n/2$$
-$$B_{post} = B_0 + 1/2E_{q(\beta)}[(y - x\beta)^2] = B_0 + 1/2\left((y-xm)^2 + tr(x^tx S)\right)$$
+$$A_{post} = A_0 + \frac{n}{2}$$
 
---- 
+$$B_{post} = B_0 + \frac{1}{2}E_{q(\beta)}\!\left[\|y - X\beta\|^2\right]$$
 
-## BLR CAVI Algorithnm:
+\vspace{3mm}
 
-1. Initialize $\sigma^2_y$
-2. Repeat until ELBO converges:
-- Update q(\beta) by computing S and m using current $1/\sigma^2_y$
-- Update q(\sigma^2) by computing $A_{post}$ and $B_{post}$
-3. Return m, S, $A_{post}$, $B_{post}$
+The expectation expands as:
+
+$$E_{q(\beta)}\!\left[\|y - X\beta\|^2\right] = \|y - Xm\|^2 + \text{tr}(X^TX S)$$
+
+so $B_{post} = B_0 + \dfrac{1}{2}\left(\|y - Xm\|^2 + \text{tr}(X^TX S)\right)$
+
+::: notes
+tr(X^T X S) is the contribution from posterior uncertainty in beta — this is what distinguishes the Bayesian update from a plug-in estimate.
+:::
+
+---
+
+## BLR CAVI Algorithm
+
+\fontsize{11pt}{12pt}\selectfont
+
+1. **Initialize**: set $A_{post} = A_0$, $B_{post} = B_0$ (use prior as starting point)
+2. **Repeat** until ELBO converges:
+   - Update $q(\beta)$: compute $S$ and $m$ using $E[1/\sigma^2_y] = A_{post}/B_{post}$
+   - Update $q(\sigma^2_y)$: compute $A_{post}$ and $B_{post}$ using current $m$ and $S$
+   - Compute ELBO and check for convergence
+3. **Return** $m$, $S$, $A_{post}$, $B_{post}$
+
+::: notes
+Initializing with the prior means E[1/sigma^2_y] = A_0/B_0, the prior expected precision. This is more principled than initializing sigma^2_y = 1 or similar.
+:::
+
+---
+
+## BLR CAVI in R: setup
+
+\fontsize{9pt}{10pt}\selectfont
+```{r}
+cavi_blr <- function(y, X, sigma2_b = 10, A0 = 1, B0 = 1,
+                     max_iter = 200, tol = 1e-6) {
+  n <- nrow(X); p <- ncol(X)
+  XtX <- crossprod(X)    # X^T X
+  Xty <- crossprod(X, y) # X^T y
+
+  # initialize using the prior expected precision
+  A_post <- A0
+  B_post <- B0
+
+  elbo_vec <- numeric(max_iter)
+
+  # ... (update loop on next slide)
+}
+```
+
+::: notes
+crossprod(X) is faster than t(X) %*% X.
+We precompute XtX and Xty outside the loop since they don't change.
+:::
+
+---
+
+## BLR CAVI in R: update loop
+
+\fontsize{9pt}{10pt}\selectfont
+```{r}
+  for (iter in seq_len(max_iter)) {
+    E_prec <- A_post / B_post   # E[1/sigma^2_y]
+
+    # update q(beta)
+    S <- solve(E_prec * XtX + (1 / sigma2_b) * diag(p))
+    m <- S %*% (E_prec * Xty)
+
+    # update q(sigma^2_y)
+    resid2  <- sum((y - X %*% m)^2)
+    penalty <- sum(diag(XtX %*% S))  # tr(X^T X S)
+    A_post  <- A0 + n / 2
+    B_post  <- B0 + 0.5 * (resid2 + penalty)
+
+    elbo_vec[iter] <- compute_elbo_blr(y, X, m, S,
+                                        A_post, B_post, sigma2_b)
+    if (iter > 1 && abs(elbo_vec[iter] - elbo_vec[iter-1]) < tol) break
+  }
+  list(m = m, S = S, A_post = A_post, B_post = B_post,
+       elbo = elbo_vec[seq_len(iter)])
+```
+
+::: notes
+Note that A_post doesn't change between iterations — only B_post does.
+The penalty term tr(X^T X S) accounts for uncertainty in beta when updating sigma^2. Without it, we'd be underestimating B_post.
+:::
+
+---
 
 ## Bayesian Gaussian mixture model
 
