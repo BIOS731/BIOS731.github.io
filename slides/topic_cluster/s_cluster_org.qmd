@@ -47,6 +47,16 @@ I expect today's class to be very interactive. Please try to follow along.
 ---
 
 
+## Before we get into it
+
+This will be an interactive lecture. Download the following files:
+
+- [power_sim.R](./labs/power_sim.R )
+- [power_sim.sh](./labs/power_sim.sh)
+- [cluster_project.zip](./slides/topic_cluster/cluster_project.zip)
+
+---
+
 ## Vim
 
 \fontsize{10pt}{11pt}\selectfont
@@ -78,6 +88,9 @@ Write bash code that executes each of the following.
 2. Use vim to edit this file in some way (e.g. add some more text).
 3. Save the results and exit vim.
 
+::: notes
+we will do the editing once we have the commands
+:::
 
 ---
 
@@ -98,24 +111,43 @@ __Navigating in vim__
 
 * `h`, `j`, `k`, `l`: move left, down, up, and right
 * `gg`: go to the beginning of the file
+* `gj/gk`: move cursor down/up a line 
 * `G`: go to the end of the file
+* `e`: jump to end of word
 
 __Editing text__
 
 * `i`: enter Insert mode before the cursor
 * `a`: enter Insert mode after the cursor
+* `esc`: leave Insert mode
 
 ---
 
 ## Lab 
 
-Next we will do the lab on power simulations on the cluster. We will walk through it together.  Download the following files:
+Next we will do the lab on power simulations on the cluster. We will walk through it together.  Uses the following files:
 
 - [power_sim.R](./labs/power_sim.R )
 - [power_sim.sh](./labs/power_sim.sh)
 
 ---
 
+
+## Lab
+
+What did you notice about editing files on the cluster?
+
+
+\vspace{10mm}
+
+Is there a better way?
+
+::: notes
+This is a leading question but it is hard, not reproducible, easy to make mistakes.
+- Aggregating results is also annoying. Do I want to make changes remote or do i want to bring the results over to my local machine? How will I do this?
+:::
+
+---
 
 ## Project organization on the cluster
 
@@ -380,6 +412,10 @@ We parallelize by sbatch on the cluster
 
 - Don't try to parallelize the way we did it locally. I'm not even sure you can.
 
+---
 
+## Resources
+
+- [Vim cheat sheet](https://vim.rtorr.com/)
 
 

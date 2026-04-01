@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Julia Wrobel">
 
-<title>Cluster Computing – BIOS731</title>
+<title>Lab: Building an R Package – BIOS731</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -58,24 +59,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-ff63373b1067ca6f91cf1456aa1f00a2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-ff63373b1067ca6f91cf1456aa1f00a2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -107,16 +108,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </head>
 
-<body class="nav-fixed quarto-light">
+<body class="nav-fixed fullcontent quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
     </a>
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">BIOS731</span>
     </a>
   </div>
@@ -132,35 +133,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-topics">    
         <li>
-    <a class="dropdown-item" href="./topic_reproducible_computing.html">
+    <a class="dropdown-item" href="../topic_reproducible_computing.html">
  <span class="dropdown-text">Reproducible Computing</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./topic_simulation.html">
+    <a class="dropdown-item" href="../topic_simulation.html">
  <span class="dropdown-text">Simulation and Resampling</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./topic_optimization.html">
+    <a class="dropdown-item" href="../topic_optimization.html">
  <span class="dropdown-text">Optimization I</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./topic_bayesian_computing.html">
+    <a class="dropdown-item" href="../topic_bayesian_computing.html">
  <span class="dropdown-text">Bayesian Computing</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./topic_cluster_computing.html">
+    <a class="dropdown-item" href="../topic_cluster_computing.html">
  <span class="dropdown-text">Cluster Computing</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./topic_R_packages.html">
+    <a class="dropdown-item" href="../topic_R_packages.html">
  <span class="dropdown-text">R packages</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./topic_optimization_II.html">
+    <a class="dropdown-item" href="../topic_optimization_II.html">
  <span class="dropdown-text">Optimization II</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./topic_other_material.qmd">
+    <a class="dropdown-item" href="../topic_other_material.qmd">
  <span class="dropdown-text">Other Materials</span></a>
   </li>  
     </ul>
@@ -171,17 +172,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-datasets">    
         <li>
-    <a class="dropdown-item" href="./dataset_cannabis.html">
+    <a class="dropdown-item" href="../dataset_cannabis.html">
  <span class="dropdown-text">Cannabis</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./dataset_brfss.qmd">
+    <a class="dropdown-item" href="../dataset_brfss.qmd">
  <span class="dropdown-text">Craniosynothosis</span></a>
   </li>  
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="./syllabus.html"> 
+    <a class="nav-link" href="../syllabus.html"> 
 <span class="menu-text">Syllabus</span></a>
   </li>  
   <li class="nav-item compact">
@@ -200,27 +201,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
-  </ul>
-</nav>
-    </div>
+    
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Cluster Computing</h1>
+<h1 class="title">Lab: Building an R Package</h1>
+<p class="subtitle lead">BIOS 731: Advanced Statistical Computing</p>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Julia Wrobel </p>
+          </div>
+  </div>
     
   
     
@@ -231,75 +231,168 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="overview" class="level2">
-<h2 class="anchored" data-anchor-id="overview">Overview</h2>
-<p>In this, we will introduce methods for Cluster Computing.</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset panel-pills">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Slide Deck: Using the HPC</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Slide Deck: Project organization on the cluster</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Lab: Power simulation on the cluster</a></li></ul>
-<div class="tab-content panel-pills">
-<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
-<p><a href="./slides/topic_cluster/s_intro.pdf"><img src="./slides/topic_cluster/preview_cluster.png" class="img-fluid" style="width:70.0%"></a></p>
-<p><strong>Guest lecture, Keven Haynes</strong><br>
-<a href="./slides/topic_cluster/s_intro.pdf">Download slides (PDF)</a></p>
-<hr>
-</div>
-<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
-<p><a href="./slides/topic_cluster/s_cluster_org.pdf"><img src="./slides/topic_cluster/preview_cluster_org.png" class="img-fluid" style="width:70.0%"></a></p>
-<p><strong>Project organization</strong><br>
-<a href="./slides/topic_cluster/s_cluster_org.pdf">Download slides (PDF)</a></p>
+<section id="overview" class="level1">
+<h1>Overview</h1>
+<p>In this lab you will build a small R package called <code>projr</code> — a minimal project scaffolding tool inspired by <a href="https://workflowr.github.io/workflowr/"><code>workflowr</code></a>. You start with three working R scripts and progressively turn them into a proper package with documentation and tests.</p>
+<p>The three functions you will package are:</p>
 <ul>
-<li><a href="./slides/topic_cluster/s_cluster_org.pdf">Download cluster_project.zip</a></li>
+<li><code>proj_start(name, path)</code> — creates a standardized project directory</li>
+<li><code>proj_new_analysis(name, project_path)</code> — creates a new <code>.Rmd</code> file in <code>analysis/</code></li>
+<li><code>proj_status(project_path)</code> — prints a summary of files in the project</li>
 </ul>
 <hr>
+</section>
+<section id="part-0-try-the-scripts-first" class="level1">
+<h1>Part 0: Try the scripts first</h1>
+<p>Source the three scripts from <code>labs/projr_scripts/</code> and try the functions:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"projr_scripts/proj_start.R"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"projr_scripts/proj_new_analysis.R"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"projr_scripts/proj_status.R"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">proj_start</span>(<span class="st">"my_first_project"</span>, <span class="at">path =</span> <span class="fu">tempdir</span>())</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">proj_new_analysis</span>(<span class="st">"exploratory"</span>, <span class="at">project_path =</span> <span class="fu">file.path</span>(<span class="fu">tempdir</span>(), <span class="st">"my_first_project"</span>))</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">proj_status</span>(<span class="at">project_path =</span> <span class="fu">file.path</span>(<span class="fu">tempdir</span>(), <span class="st">"my_first_project"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
-<p>You have two files: <code>power_sim.R</code> (estimates t-test power via simulation across four sample sizes) and <code>power_sim.sh</code> (submits it to the cluster). The <code>doLocal</code> flag in <code>power_sim.R</code> runs scenario 1 locally; on the cluster the scenario is passed as a command-line argument.</p>
-<section id="part-0-run-locally" class="level4">
-<h4 class="anchored" data-anchor-id="part-0-run-locally">Part 0: Run locally</h4>
-<p>Run <code>power_sim.R</code> in RStudio and confirm it completes without errors and writes a <code>.RDA</code> file to <code>results/</code>.</p>
+<p>Confirm you understand what each function does before moving on.</p>
 <hr>
 </section>
-<section id="part-1-transfer-and-submit-a-single-job" class="level4">
-<h4 class="anchored" data-anchor-id="part-1-transfer-and-submit-a-single-job">Part 1: Transfer and submit a single job</h4>
-<p>Copy the files to your scratch directory, then log in:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scp</span> power_sim.R power_sim.sh <span class="op">&lt;</span>user<span class="op">&gt;</span>@clogin01.sph.emory.edu:/scratch/BIOS731/<span class="op">&lt;</span>your_folder<span class="op">&gt;</span>/</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh</span> <span class="op">&lt;</span>user<span class="op">&gt;</span>@clogin01.sph.emory.edu</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../../scratch/BIOS731/<span class="op">&lt;</span>your_folder<span class="op">&gt;</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> results</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Submit and monitor:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">sbatch</span> power_sim.sh</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">squeue</span> <span class="at">-u</span> <span class="op">&lt;</span>user<span class="op">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Check <code>power_sim.out</code> for the expected message and <code>power_sim.err</code> for errors.</p>
+<section id="part-1-create-the-package-skeleton" class="level1">
+<h1>Part 1: Create the package skeleton</h1>
+<p>Use <code>usethis</code> to create the package. Run this <strong>outside</strong> of any existing R project:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(usethis)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(devtools)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">create_package</span>(<span class="st">"~/projr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>This opens a new RStudio session inside the <code>projr/</code> project. All remaining steps happen there.</p>
+<p>Set up a license and git:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">use_mit_license</span>()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">use_git</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 <hr>
 </section>
-<section id="part-2-convert-to-a-job-array" class="level4">
-<h4 class="anchored" data-anchor-id="part-2-convert-to-a-job-array">Part 2: Convert to a job array</h4>
-<p>Use <code>vim</code> to edit <code>power_sim.sh</code>. Make two changes: add <code>--array=1-4</code> and replace the hard-coded <code>JOBID=1</code> with <code>$SLURM_ARRAY_TASK_ID</code>.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --array=1-4</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --job-name=power_sim</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --partition=wrobel</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --output=power_sim_%a.out</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --error=power_sim_%a.err</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">module</span> purge</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="ex">module</span> load R</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="va">JOBID</span><span class="op">=</span><span class="va">$SLURM_ARRAY_TASK_ID</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> power_sim.R <span class="va">$JOBID</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Submit and verify that four <code>.RDA</code> files appear in <code>results/</code>.</p>
+<section id="part-2-add-functions" class="level1">
+<h1>Part 2: Add functions</h1>
+<p>Create one <code>.R</code> file per function:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">use_r</span>(<span class="st">"proj_start"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">use_r</span>(<span class="st">"proj_new_analysis"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">use_r</span>(<span class="st">"proj_status"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Copy the body of each function from the starter scripts into the corresponding file. Then load everything and test interactively:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load_all</span>()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">proj_start</span>(<span class="st">"test_proj"</span>, <span class="at">path =</span> <span class="fu">tempdir</span>())</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">proj_status</span>(<span class="fu">file.path</span>(<span class="fu">tempdir</span>(), <span class="st">"test_proj"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 <hr>
 </section>
-<section id="part-3-modify-the-simulation" class="level4">
-<h4 class="anchored" data-anchor-id="part-3-modify-the-simulation">Part 3: Modify the simulation</h4>
-<p>Use <code>vim power_sim.R</code> to make one of the following changes, then resubmit the array.</p>
-<p><strong>Option A</strong> — change <code>nsim</code> from 1000 to 2000. Do estimates change?</p>
-<p><strong>Option B</strong> — change <code>alpha</code> from 0.05 to 0.01. How does power change?</p>
+<section id="part-3-document-with-roxygen2" class="level1">
+<h1>Part 3: Document with roxygen2</h1>
+<p>Add roxygen2 documentation above each function. Here is a template for <code>proj_start</code>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#' Start a new project</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#'</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#' Creates a standardized directory structure for a new research project,</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#' including subdirectories for data, R scripts, analysis, results, and docs.</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#'</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#' @param name Name of the project (also used as the directory name).</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#' @param path Parent directory where the project folder will be created.</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#'   Defaults to the current working directory.</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#'</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#' @return The path to the new project directory (invisibly).</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#' @export</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#'</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#' @examples</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#' proj_start("my_project", path = tempdir())</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>proj_start <span class="ot">&lt;-</span> <span class="cf">function</span>(name, <span class="at">path =</span> <span class="st">"."</span>) { ... }</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Write similar documentation for <code>proj_new_analysis</code> and <code>proj_status</code>, then generate the help files:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">document</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Check that <code>?proj_start</code> works and that <code>NAMESPACE</code> now contains <code>export(proj_start)</code>.</p>
 <hr>
 </section>
+<section id="part-4-add-a-dependency" class="level1">
+<h1>Part 4: Add a dependency</h1>
+<p><code>proj_status</code> uses <code>sprintf()</code> and <code>cat()</code> from base R — no imports needed. But now extend <code>proj_new_analysis</code> to open the file in RStudio after creating it, using <code>rstudioapi</code>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">use_package</span>(<span class="st">"rstudioapi"</span>, <span class="st">"Suggests"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p>Add the following lines at the end of <code>proj_new_analysis()</code>, after <code>writeLines()</code>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (rstudioapi<span class="sc">::</span><span class="fu">isAvailable</span>()) {</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  rstudioapi<span class="sc">::</span><span class="fu">navigateToFile</span>(filename)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p>Because <code>rstudioapi</code> is in <code>Suggests</code> (not <code>Imports</code>), guard the call with <code>rstudioapi::isAvailable()</code> so the function still works outside RStudio. Re-run <code>load_all()</code> and test.</p>
+<hr>
+</section>
+<section id="part-5-write-tests" class="level1">
+<h1>Part 5: Write tests</h1>
+<p>Set up <code>testthat</code>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">use_testthat</span>()</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">use_test</span>(<span class="st">"proj_start"</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">use_test</span>(<span class="st">"proj_status"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p>Fill in <code>tests/testthat/test-proj_start.R</code>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">test_that</span>(<span class="st">"proj_start creates expected directories"</span>, {</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  tmp <span class="ot">&lt;-</span> <span class="fu">tempdir</span>()</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">proj_start</span>(<span class="st">"testproj"</span>, <span class="at">path =</span> tmp)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  project_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(tmp, <span class="st">"testproj"</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expect_true</span>(<span class="fu">dir.exists</span>(project_path))</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (folder <span class="cf">in</span> <span class="fu">c</span>(<span class="st">"data"</span>, <span class="st">"R"</span>, <span class="st">"analysis"</span>, <span class="st">"results"</span>, <span class="st">"docs"</span>)) {</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect_true</span>(<span class="fu">dir.exists</span>(<span class="fu">file.path</span>(project_path, folder)))</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expect_true</span>(<span class="fu">file.exists</span>(<span class="fu">file.path</span>(project_path, <span class="st">"README.md"</span>)))</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="fu">test_that</span>(<span class="st">"proj_start errors if directory already exists"</span>, {</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  tmp <span class="ot">&lt;-</span> <span class="fu">tempdir</span>()</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">proj_start</span>(<span class="st">"testproj2"</span>, <span class="at">path =</span> tmp)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expect_error</span>(<span class="fu">proj_start</span>(<span class="st">"testproj2"</span>, <span class="at">path =</span> tmp))</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Write at least one test for <code>proj_status</code> in <code>test-proj_status.R</code>. Then run:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">test</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="part-6-check-the-package" class="level1">
+<h1>Part 6: Check the package</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">check</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Work through any warnings or notes until you reach 0 errors, 0 warnings, 0 notes.</p>
+<p>Common issues to watch for:</p>
+<ul>
+<li>Missing <code>@export</code> on a function you intended to be user-facing</li>
+<li>An example that calls <code>proj_start()</code> without writing to <code>tempdir()</code> (will fail because it tries to write during check)</li>
+<li>Undocumented arguments</li>
+</ul>
+<hr>
+</section>
+<section id="stretch-add-a-fourth-function" class="level1">
+<h1>Stretch: Add a fourth function</h1>
+<p>Add <code>proj_build(project_path)</code> that renders all <code>.Rmd</code> files in <code>analysis/</code> to HTML using <code>rmarkdown::render()</code>. You will need to:</p>
+<ol type="1">
+<li><code>use_r("proj_build")</code></li>
+<li><code>use_package("rmarkdown")</code></li>
+<li>Write the function, document it, and export it</li>
+<li>Write at least one test</li>
+<li>Re-run <code>check()</code></li>
+</ol>
 
 
 </section>
