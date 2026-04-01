@@ -36,9 +36,9 @@ Today, we cover:
 
 Announcements:
 
-- Final Project proposal due 4/1 at 10AM
 - Homework 4 is last homework, extended due date
   - New due date April 15
+- No office hours tomorrow
 
 ::: notes
 I expect today's class to be very interactive. Please try to follow along.
