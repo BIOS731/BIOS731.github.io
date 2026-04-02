@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Julia Wrobel">
+
+<title>Variational inference – BIOS731</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-ff63373b1067ca6f91cf1456aa1f00a2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+</head><body class="nav-fixed quarto-light">\usepackage{xcolor}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\green}[1]{\textcolor{green}{#1}}
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">BIOS731</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-topics" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Topics</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-topics">    
+        <li>
+    <a class="dropdown-item" href="../../topic_reproducible_computing.html">
+ <span class="dropdown-text">Reproducible Computing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_simulation.html">
+ <span class="dropdown-text">Simulation and Resampling</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_optimization.html">
+ <span class="dropdown-text">Optimization I</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_bayesian_computing.html">
+ <span class="dropdown-text">Bayesian Computing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_cluster_computing.html">
+ <span class="dropdown-text">Cluster Computing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_R_packages.html">
+ <span class="dropdown-text">R packages</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_optimization_II.html">
+ <span class="dropdown-text">Optimization II</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_other_material.qmd">
+ <span class="dropdown-text">Other Materials</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-datasets" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Datasets</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-datasets">    
+        <li>
+    <a class="dropdown-item" href="../../dataset_cannabis.html">
+ <span class="dropdown-text">Cannabis</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../dataset_brfss.qmd">
+ <span class="dropdown-text">Craniosynothosis</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../syllabus.html"> 
+<span class="menu-text">Syllabus</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/BIOS731/BIOS731.github.io"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="s_variational_inference.pdf"><i class="bi bi-file-pdf"></i>Beamer</a></li></ul></div></div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Variational inference</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Julia Wrobel </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>Today, we cover:</p>
+<ul>
+<li>Variational inference</li>
+<li>Example with linear regression, mixture modeling</li>
+</ul>
+<p>Resources:</p>
+<ul>
+<li><a href="https://www.tandfonline.com/doi/full/10.1080/01621459.2017.1285773">Variational Inference: A Review for Statisticians by David Blei</a></li>
+</ul>
+<p>Announcements:</p>
+<ul>
+<li>Final Project proposal due 4/1 at 10AM</li>
+<li>Homework 4 and 5 will be combined, posted by Friday</li>
+</ul>
+<hr>
+</section>
+<section id="for-class-tomorrow" class="level2">
+<h2 class="anchored" data-anchor-id="for-class-tomorrow">For class tomorrow</h2>
+<ul>
+<li>Install VPN and try logging into the cluster</li>
+<li>Try getting into my partition</li>
+</ul>
+<hr>
+</section>
+<section id="final-project-proposal" class="level2">
+<h2 class="anchored" data-anchor-id="final-project-proposal">Final project proposal</h2>
+<p>Due <strong>April 1</strong>!</p>
+<p>Your final project proposal should be one page or less and clearly outline your plans for your final project. This document will help ensure your project is well-defined and feasible.</p>
+<p>Your proposal should include the following elements:</p>
+<ol type="1">
+<li><strong>Project Title</strong></li>
+<li><strong>Objective</strong>: Clearly state the main goal of your project. What problem are you addressing, or what question are you trying to answer?</li>
+<li><strong>Background &amp; Motivation</strong>: Provide brief context on why this project is important or interesting. Why did you choose this topic?</li>
+<li><strong>Approach</strong>: Explain how you plan to complete the project, specifically highlighting concepts, techniques, or tools from class that you will use.</li>
+</ol>
+<hr>
+</section>
+<section id="joint-posterior-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="joint-posterior-distribution">Joint posterior distribution</h2>
+<p>In Bayesian settings our goal is to learn about the joint posterior distribution, i.e.</p>
+<p><span class="math display">\[p(\beta, \sigma^2_y|y, X, hyperparameters)\]</span></p>
+<p>This can be hard!</p>
+<ul>
+<li>Often the joint posterior is analytically intractable</li>
+<li>MCMC: sample from it by constructing a Markov chain whose stationary distribution is the posterior
+<ul>
+<li>Can be very slow to converge</li>
+<li>High computational cost</li>
+</ul></li>
+</ul>
+<div class="notes">
+<p>This is the main motivation for MCMC. Also motivation for variational inference</p>
+</div>
+<hr>
+</section>
+<section id="variational-inference-motivation" class="level2">
+<h2 class="anchored" data-anchor-id="variational-inference-motivation">Variational inference motivation</h2>
+<p>Our goal is still to learn about the joint posterior distribution</p>
+<p><span class="math display">\[p(\beta, \sigma^2_y|y, X, hyperparameters)\]</span></p>
+<ul>
+<li><p>Variational inference turns this from a sampling problem into an <strong>optimization</strong> problem</p></li>
+<li><p>Uses a surrogate distribution to approximate the joint density of interest and maximizes the surrogate instead</p></li>
+<li><p>Scales much better to large datasets</p></li>
+</ul>
+<hr>
+</section>
+<section id="two-part-gaussian-mixture-model" class="level2">
+<h2 class="anchored" data-anchor-id="two-part-gaussian-mixture-model">Two-part Gaussian mixture model</h2>
+<ul>
+<li><span class="math inline">\(Y_1,\ldots,Y_n\)</span> are sampled independently from a mixture of two Normal distributions with density</li>
+</ul>
+<p><span class="math display">\[p(y|\theta) = \lambda \mathcal{N}(y|\mu_1,\sigma_1^2) + (1-\lambda)\mathcal{N}(y|\mu_2, \sigma^2_2)\]</span></p>
+<ul>
+<li><span class="math inline">\(\theta = (\mu_1, \mu_2, \sigma_1^2, \sigma_2^2, \lambda)\)</span></li>
+<li><span class="math inline">\(c_1, \ldots, c_n\)</span>: labels identifying which observation came from which population
+<ul>
+<li><span class="math inline">\(c_i = 1\)</span> if <span class="math inline">\(Y_i\)</span> from <span class="math inline">\(\mathcal{N}(y|\mu_1,\sigma_1^2)\)</span>; <span class="math inline">\(c_i = 0\)</span> otherwise</li>
+</ul></li>
+</ul>
+<p><span class="math display">\[c_i \sim Bernoulli(\lambda)\]</span></p>
+<div class="notes">
+<p>lambda is mixing component, probability of being density one or density two</p>
+<p>Art of EM is coming up with a useful complete data model</p>
+</div>
+<hr>
+</section>
+<section id="two-part-gaussian-mixture-model-1" class="level2">
+<h2 class="anchored" data-anchor-id="two-part-gaussian-mixture-model-1">Two-part Gaussian mixture model</h2>
+<p>Joint density of observed and missing data (i.e.&nbsp;complete data density) is then</p>
+<p><span class="math display">\[p(y,c|\theta) = \left[\lambda \mathcal{N}(y|\mu_1,\sigma_1^2)\right]^c\left[(1-\lambda)\mathcal{N}(y|\mu_2, \sigma^2_2)\right]^{1-c}\]</span></p>
+<hr>
+</section>
+<section id="bayesian-gaussian-k-mixture-model" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-gaussian-k-mixture-model">Bayesian Gaussian K-mixture model</h2>
+<p>Data generating model is</p>
+<p><span class="math display">\[\mu \sim N(0, \sigma^2)\]</span> <span class="math display">\[c_i \sim Cat(\lambda); \sum_{k=1}^K\lambda_k = 1\]</span></p>
+<p><span class="math display">\[y_i|c_i, \mu \sim N(\mu_{c_i}, 1)\]</span></p>
+<hr>
+</section>
+<section id="bayesian-gaussian-mixture-model" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-gaussian-mixture-model">Bayesian Gaussian mixture model</h2>
+<p>Posterior PDF (ignoring hyperparameters) is</p>
+<p><span class="math display">\[p(\mu, \textbf{c}|\mathbf{y}) = \frac{\prod_k p(\mu_k)\prod_i p(c_i)p(y_i|c_i, \mu)}{\int_\mu \sum_c\prod_k p(\mu_k)\prod_i p(c_i)p(y_i|c_i, \mu)}\]</span></p>
+<ul>
+<li>Because of denominator integral cannot be computed easily analytically</li>
+</ul>
+<div class="notes">
+<p>see slide 10 of variational slides 3</p>
+</div>
+<hr>
+</section>
+<section id="bayesian-linear-regression" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-linear-regression">Bayesian linear regression</h2>
+<p><span class="math display">\[y = X\beta + \epsilon\]</span></p>
+<p><span class="math display">\[\begin{align*}
+\epsilon &amp;\sim N(0, \sigma^2_y)\\
+\beta &amp;\sim N(0, \sigma^2_b)\\
+\sigma_y^2 &amp;\sim IG(A, B)
+\end{align*}\]</span></p>
+<p>Joint posterior we want to estimate is</p>
+<p><span class="math display">\[p(\beta, \sigma^2_y|y, X, h) = \frac{p(\beta)p(\sigma^2)\prod_ip(y|\beta, \sigma^2_y)}{\int_{\beta}\int_{\sigma^2_y}p(\beta)p(\sigma^2)\prod_ip(y|\beta, \sigma^2_y)d\beta d\sigma^2_y}\]</span></p>
+<div class="notes">
+<p>Mention which things are priors and what likelihood is induced</p>
+</div>
+<hr>
+</section>
+<section id="general-setup-for-variational-inference" class="level2">
+<h2 class="anchored" data-anchor-id="general-setup-for-variational-inference">General setup for variational inference</h2>
+<p>We have a posterior distribution / other probability distribution with an intractiable integral that makes it challen ging to evaluate.</p>
+<ul>
+<li><strong>MCMC</strong>: sample from it</li>
+<li><strong>VI</strong>: turn it into a tractable optimization problem</li>
+</ul>
+<hr>
+</section>
+<section id="general-setup-for-variational-inference-1" class="level2">
+<h2 class="anchored" data-anchor-id="general-setup-for-variational-inference-1">General setup for variational inference</h2>
+<p>Consider a joint density of latent variables <span class="math inline">\(\textbf{z} = z_{1:m}\)</span> and observations <span class="math inline">\(\textbf{y} = y_{1:n}\)</span>:</p>
+<p><span class="math display">\[p(\textbf{z}, \textbf{y}) = p(\textbf{z})p(\textbf{y}|\textbf{z})\]</span></p>
+<p>Latent variables here could mean latent in the E-M algorithm sense, or just parameters we want to estimate.</p>
+<ul>
+<li>Bayesian mixture models:</li>
+<li>Bayesian linear regression:</li>
+</ul>
+<div class="notes">
+<p>This notation is mostly borrowed from the Blei tutorial with some modifications.</p>
+</div>
+<hr>
+</section>
+<section id="main-idea-behind-variational-bayes" class="level2">
+<h2 class="anchored" data-anchor-id="main-idea-behind-variational-bayes">Main idea behind variational Bayes</h2>
+<p>Choose a family of approximate densities, <span class="math inline">\(\mathcal{Q}\)</span> over the latent variables <span class="math inline">\(z\)</span>. Then, find a specific member of that family <span class="math inline">\(q(z|\nu) \in \mathcal{Q}\)</span> that minimizes the <strong>Kullback-Leibler (KL) divergence</strong> to the exact posterior, <span class="math inline">\(p(z|y)\)</span>. Here, <span class="math inline">\(\nu\)</span> is a variational factor we find the optimal value of.</p>
+<p><span class="math display">\[KL(q \parallel p) = \int_z q(z)\log\frac{q(z)}{p(z|y)}dz = E_q\left[\log\frac{q(z)}{p(z|y)}\right]\]</span></p>
+<ul>
+<li>Goal is to minimize <span class="math inline">\(KL(q \parallel p)\)</span></li>
+<li>Then, we approximate the posterior with the optimized member of the family <span class="math inline">\(q^*(\cdot)\)</span></li>
+</ul>
+<div class="notes">
+<ul>
+<li><p>explain what we mean by family of distributions KL divergence of q from p where q is the distribution being evaluated and p is the target distribution</p></li>
+<li><p>value is nonnegative</p></li>
+<li><p>If q is high and p is high, then we are happy (i.e.&nbsp;low KL divergence).</p></li>
+<li><p>If q is high and p is low then we pay a price (i.e.&nbsp;high KL divergence).</p></li>
+<li><p>If q is low then we don’t care (i.e.&nbsp;also low KL divergence, regardless of p).<br>
+</p></li>
+</ul>
+</div>
+<hr>
+</section>
+<section id="the-evidence-lower-bound" class="level2">
+<h2 class="anchored" data-anchor-id="the-evidence-lower-bound">The evidence lower bound</h2>
+<ul>
+<li><p>Can’t actually minimize <span class="math inline">\(KL(q \parallel p)\)</span> directly, but can optimize a function that is equal to it up to a constant.</p></li>
+<li><p>Called <strong>evidence lower bound (ELBO)</strong></p></li>
+<li><p>In this setting, “evidence” is a term for the marginal likelihood of observed data, <span class="math inline">\(p(y)\)</span>.</p></li>
+</ul>
+<div class="notes">
+<p>Show why you can’t minimize KL directly later</p>
+</div>
+<hr>
+</section>
+<section id="the-evidence-lower-bound-1" class="level2">
+<h2 class="anchored" data-anchor-id="the-evidence-lower-bound-1">The evidence lower bound</h2>
+<p><span class="math display">\[\begin{align*}
+KL(q \parallel p) &amp;=  E_q\left[\log\frac{q(z)}{p(z|y)}\right]\\
+&amp;= E[\log q(z)] - E[\log p(z, y)] + \log p(y)
+\end{align*}\]</span></p>
+<p>ELBO is</p>
+<p><span class="math display">\[ELBO(q) = E[\log p(z, y)] - E[\log q(z)]\]</span></p>
+<ul>
+<li>Maximizing <span class="math inline">\(ELBO(q)\)</span> is equivalent to minimizing <span class="math inline">\(KL(q \parallel p)\)</span>.</li>
+</ul>
+<div class="notes">
+<p>More precisely, finding an approximation <span class="math inline">\(q\)</span> that maximizes the ELBO is equivalent to finding the <span class="math inline">\(q\)</span> that minimizes the KL divergence to the posterior!</p>
+</div>
+<hr>
+</section>
+<section id="the-evidence-lower-bound-2" class="level2">
+<h2 class="anchored" data-anchor-id="the-evidence-lower-bound-2">The evidence lower bound</h2>
+<p>Why is it called the evidence lower bound? Serves as a lower bound for <span class="math inline">\(p(y)\)</span> by Jensen’s Inequality:</p>
+<div class="notes">
+<p>ELBO is less than or equal to the evidence - optimize this over densities q(z) to find optimal approximation</p>
+</div>
+<hr>
+</section>
+<section id="the-evidence-lower-bound-3" class="level2">
+<h2 class="anchored" data-anchor-id="the-evidence-lower-bound-3">The evidence lower bound</h2>
+<p>Why is it called the evidence lower bound? Serves as a lower bound for <span class="math inline">\(p(y)\)</span> by Jensen’s Inequality:</p>
+<p><span class="math display">\[\begin{align*}
+\log p(y) &amp;= \log \int_z p(y, z)dz\\
+&amp;= \log \int_z p(y,z)\frac{q(z)}{q(z)}\\
+&amp;= \log \left( E_q\left[\frac{p(y,z)}{q(z)}\right]\right)\\
+&amp;\ge E[\log p(y,z)] - E[\log q(z)]
+\end{align*}\]</span></p>
+<div class="notes">
+<p>ELBO is less than or equal to the evidence - optimize this over densities q(z) to find optimal approximation</p>
+</div>
+<hr>
+</section>
+<section id="the-evidence-lower-bound-4" class="level2">
+<h2 class="anchored" data-anchor-id="the-evidence-lower-bound-4">The evidence lower bound</h2>
+<ul>
+<li>Optimize this over densities <span class="math inline">\(q(z)\)</span> to find optimal approximation</li>
+<li>In variational inference, we find settings of the variational density that maximize the ELBO, which is equivalent to minimizing the KL divergence.</li>
+<li>We choose a family of variational distributions such that these two expectations can be computed</li>
+</ul>
+<ul>
+<li>How to choose the family of densities?</li>
+</ul>
+<hr>
+</section>
+<section id="mean-field-variational-inference" class="level2">
+<h2 class="anchored" data-anchor-id="mean-field-variational-inference">Mean field variational inference</h2>
+<p>Mean field makes the strong simplifying assumption that the latent variables are independent in the approximation:</p>
+<p><span class="math display">\[q(\textbf{z}) = \prod_{j = 1}^mq_j(z_j)\]</span></p>
+<ul>
+<li>The variational family is not a model of the observed data! Instead, it is the ELBO and the corresponding KL minimization problem which connects the fitted variational density to the data.</li>
+</ul>
+<div class="notes">
+<p>Assumes latent variables are mutually independent - easier to optimize over a simple family - data doesn’t appear in this equation</p>
+</div>
+<hr>
+</section>
+<section id="mean-field-variational-inference-1" class="level2">
+<h2 class="anchored" data-anchor-id="mean-field-variational-inference-1">Mean field variational inference</h2>
+<p>In principle, <span class="math inline">\(q_j\)</span> can take on any parametric form appropriate to the corresponding variable <span class="math inline">\(z_j\)</span>.</p>
+<ul>
+<li>For example, continuous variable might have a Gaussian factor</li>
+<li>Categorical variable might have a categorical factor</li>
+</ul>
+<ul>
+<li>Allows for optimization of each <span class="math inline">\(z_j\)</span> independently</li>
+</ul>
+<hr>
+</section>
+<section id="coordinate-ascent-variational-inference-cavi" class="level2">
+<h2 class="anchored" data-anchor-id="coordinate-ascent-variational-inference-cavi">Coordinate Ascent Variational Inference (CAVI)</h2>
+<ul>
+<li>Iterative algorithm for solving this optimization problem</li>
+<li>CAVI iteratively optimizes each factor of the mean-field variational density while holding the others fixed</li>
+<li>Climbs ELBO to a <strong>local</strong> optimum</li>
+<li><em>Complete conditional</em> of jth latent variable <span class="math inline">\(z_j\)</span> is <span class="math inline">\(p(z_j|\mathbf{z}_{-j}, \mathbf{y})\)</span>.</li>
+</ul>
+<p>Optimal <span class="math inline">\(q_j(z_j)\)</span> is</p>
+<p><span class="math display">\[q_j^*(z_j) = \exp\left\{E_{-j }\left[\log p(z_j|\textbf{z}_{-j}, \mathbf{y}) \right]\right\}\]</span> where expectation is taken W.R.T. <span class="math inline">\(q_{-j}(\textbf{z}_{-j}) = \prod_{l \ne j}q_l(z_l)\)</span>.</p>
+<div class="notes">
+<p>What is the optimization problem we are trying to solve? - Maximize ELBO, which finds q closest to our posterior of interest - ELBO isn’t guaranteed to be convex</p>
+</div>
+<hr>
+</section>
+<section id="coordinate-ascent-variational-inference-cavi-1" class="level2">
+<h2 class="anchored" data-anchor-id="coordinate-ascent-variational-inference-cavi-1">Coordinate Ascent Variational Inference (CAVI)</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="cavi.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="notes">
+<p>Algorithm 1 from Blei tutorial</p>
+</div>
+<hr>
+</section>
+<section id="derivation-of-cavi-updates" class="level2">
+<h2 class="anchored" data-anchor-id="derivation-of-cavi-updates">Derivation of CAVI updates</h2>
+<p>Goal is to find <span class="math inline">\(q(z)\)</span> that maximizes ELBO. First, some useful results.</p>
+<ul>
+<li>by probability chain rule:</li>
+</ul>
+<p><span class="math display">\[p(\textbf{y}, z) = p(\textbf{y}) \prod_{j = 1}^m p(z_j | \textbf{z}_{-j}, \textbf{y})\]</span></p>
+<ul>
+<li>using mean field approximation <span class="math inline">\(q(\textbf{z}) = \prod_{j = 1}^mq_j(z_j)\)</span>:</li>
+</ul>
+<p><span class="math display">\[E_q[\log q(\textbf{z})] = \sum_{j = 1}^m E_{q_j}[\log q_j(z_j)]\]</span></p>
+<hr>
+</section>
+<section id="bayesian-linear-regression-1" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-linear-regression-1">Bayesian linear regression</h2>
+<p><span class="math display">\[y = X\beta + \epsilon\]</span></p>
+<p><span class="math display">\[\begin{align*}
+\epsilon &amp;\sim N(0, \sigma^2_y)\\
+\beta &amp;\sim N(0, \sigma^2_b)\\
+\sigma_y^2 &amp;\sim IG(A, B)
+\end{align*}\]</span></p>
+<ul>
+<li>Posterior is <span class="math inline">\(p(\beta, \sigma^2_y | y, x)\)</span></li>
+<li>Approximate with <span class="math inline">\(q\)</span></li>
+</ul>
+<hr>
+</section>
+<section id="bayesian-linear-regression-2" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-linear-regression-2">Bayesian linear regression</h2>
+<p>From mean field assumption,</p>
+<p><span class="math display">\[q(\beta, \sigma^2_y) = q(\beta)q(\sigma^2_y)\]</span></p>
+<p><span class="math display">\[ELBO(q) = E_q[\log p (y, \beta, \sigma^2_y)] - E_q[\log q(\beta)] - E_q[\log q(\sigma^2_y)]\]</span></p>
+<p><span class="math display">\[\begin{align*}
+\log q^*(\beta) &amp;\propto E_{q(\sigma^2_y)}[\log p(y, \beta, \sigma^2_y)]\\
+\log q^*(\sigma^2) &amp;\propto E_{q(\beta)}[\log p(y, \beta, \sigma^2_y)]
+\end{align*}\]</span></p>
+<p>Solve these expectations to get updates for <span class="math inline">\(\beta\)</span>, <span class="math inline">\(\sigma^2\)</span></p>
+<hr>
+</section>
+<section id="bayesian-linear-regression-3" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-linear-regression-3">Bayesian linear regression</h2>
+<p>Update for <span class="math inline">\(q^*(\beta) = N(m, S)\)</span></p>
+<p>Since <span class="math inline">\(\sigma^2_y\)</span> is unknown, we plug in its <strong>expected precision</strong> under <span class="math inline">\(q(\sigma^2_y)\)</span>:</p>
+<p><span class="math display">\[E_{q(\sigma^2_y)}\!\left[\frac{1}{\sigma^2_y}\right] = \frac{A_{post}}{B_{post}}\]</span></p>
+<p><span class="math display">\[S = \left(\frac{A_{post}}{B_{post}} X^TX + \frac{1}{\sigma^2_b}I\right)^{-1}\]</span></p>
+<p><span class="math display">\[m = S\,\frac{A_{post}}{B_{post}} X^Ty\]</span></p>
+<div class="notes">
+<p>This is the key coupling in CAVI: each update uses the current expected value of the other parameter’s variational distribution, not a point estimate.</p>
+</div>
+<hr>
+</section>
+<section id="bayesian-linear-regression-4" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-linear-regression-4">Bayesian linear regression</h2>
+<p>Update for <span class="math inline">\(q^*(\sigma^2_y) = IG(A_{post}, B_{post})\)</span></p>
+<p><span class="math display">\[A_{post} = A_0 + \frac{n}{2}\]</span></p>
+<p><span class="math display">\[B_{post} = B_0 + \frac{1}{2}E_{q(\beta)}\!\left[\|y - X\beta\|^2\right]\]</span></p>
+<p>The expectation expands as:</p>
+<p><span class="math display">\[E_{q(\beta)}\!\left[\|y - X\beta\|^2\right] = \|y - Xm\|^2 + \text{tr}(X^TX S)\]</span></p>
+<p>so <span class="math inline">\(B_{post} = B_0 + \dfrac{1}{2}\left(\|y - Xm\|^2 + \text{tr}(X^TX S)\right)\)</span></p>
+<div class="notes">
+<p>tr(X^T X S) is the contribution from posterior uncertainty in beta — this is what distinguishes the Bayesian update from a plug-in estimate.</p>
+</div>
+<hr>
+</section>
+<section id="blr-cavi-algorithm" class="level2">
+<h2 class="anchored" data-anchor-id="blr-cavi-algorithm">BLR CAVI Algorithm</h2>
+<ol type="1">
+<li><strong>Initialize</strong>: set <span class="math inline">\(A_{post} = A_0\)</span>, <span class="math inline">\(B_{post} = B_0\)</span> (use prior as starting point)</li>
+<li><strong>Repeat</strong> until ELBO converges:
+<ul>
+<li>Update <span class="math inline">\(q(\beta)\)</span>: compute <span class="math inline">\(S\)</span> and <span class="math inline">\(m\)</span> using <span class="math inline">\(E[1/\sigma^2_y] = A_{post}/B_{post}\)</span></li>
+<li>Update <span class="math inline">\(q(\sigma^2_y)\)</span>: compute <span class="math inline">\(A_{post}\)</span> and <span class="math inline">\(B_{post}\)</span> using current <span class="math inline">\(m\)</span> and <span class="math inline">\(S\)</span></li>
+<li>Compute ELBO and check for convergence</li>
+</ul></li>
+<li><strong>Return</strong> <span class="math inline">\(m\)</span>, <span class="math inline">\(S\)</span>, <span class="math inline">\(A_{post}\)</span>, <span class="math inline">\(B_{post}\)</span></li>
+</ol>
+<div class="notes">
+<p>Initializing with the prior means E[1/sigma^2_y] = A_0/B_0, the prior expected precision. This is more principled than initializing sigma^2_y = 1 or similar.</p>
+</div>
+<hr>
+</section>
+<section id="blr-cavi-in-r-setup" class="level2">
+<h2 class="anchored" data-anchor-id="blr-cavi-in-r-setup">BLR CAVI in R: setup</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>cavi_blr <span class="ot">&lt;-</span> <span class="cf">function</span>(y, X, <span class="at">sigma2_b =</span> <span class="dv">10</span>, <span class="at">A0 =</span> <span class="dv">1</span>, <span class="at">B0 =</span> <span class="dv">1</span>,</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">max_iter =</span> <span class="dv">200</span>, <span class="at">tol =</span> <span class="fl">1e-6</span>) {</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(X); p <span class="ot">&lt;-</span> <span class="fu">ncol</span>(X)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  XtX <span class="ot">&lt;-</span> <span class="fu">crossprod</span>(X)    <span class="co"># X^T X</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  Xty <span class="ot">&lt;-</span> <span class="fu">crossprod</span>(X, y) <span class="co"># X^T y</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># initialize using the prior expected precision</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  A_post <span class="ot">&lt;-</span> A0</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  B_post <span class="ot">&lt;-</span> B0</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  elbo_vec <span class="ot">&lt;-</span> <span class="fu">numeric</span>(max_iter)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ... (update loop on next slide)</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="notes">
+<p>crossprod(X) is faster than t(X) %*% X. We precompute XtX and Xty outside the loop since they don’t change.</p>
+</div>
+<hr>
+</section>
+<section id="blr-cavi-in-r-update-loop" class="level2">
+<h2 class="anchored" data-anchor-id="blr-cavi-in-r-update-loop">BLR CAVI in R: update loop</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (iter <span class="cf">in</span> <span class="fu">seq_len</span>(max_iter)) {</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    E_prec <span class="ot">&lt;-</span> A_post <span class="sc">/</span> B_post   <span class="co"># E[1/sigma^2_y]</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># update q(beta)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    S <span class="ot">&lt;-</span> <span class="fu">solve</span>(E_prec <span class="sc">*</span> XtX <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">/</span> sigma2_b) <span class="sc">*</span> <span class="fu">diag</span>(p))</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    m <span class="ot">&lt;-</span> S <span class="sc">%*%</span> (E_prec <span class="sc">*</span> Xty)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># update q(sigma^2_y)</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    resid2  <span class="ot">&lt;-</span> <span class="fu">sum</span>((y <span class="sc">-</span> X <span class="sc">%*%</span> m)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    penalty <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">diag</span>(XtX <span class="sc">%*%</span> S))  <span class="co"># tr(X^T X S)</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    A_post  <span class="ot">&lt;-</span> A0 <span class="sc">+</span> n <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    B_post  <span class="ot">&lt;-</span> B0 <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> (resid2 <span class="sc">+</span> penalty)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    elbo_vec[iter] <span class="ot">&lt;-</span> <span class="fu">compute_elbo_blr</span>(y, X, m, S,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>                                        A_post, B_post, sigma2_b)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (iter <span class="sc">&gt;</span> <span class="dv">1</span> <span class="sc">&amp;&amp;</span> <span class="fu">abs</span>(elbo_vec[iter] <span class="sc">-</span> elbo_vec[iter<span class="dv">-1</span>]) <span class="sc">&lt;</span> tol) <span class="cf">break</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">m =</span> m, <span class="at">S =</span> S, <span class="at">A_post =</span> A_post, <span class="at">B_post =</span> B_post,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">elbo =</span> elbo_vec[<span class="fu">seq_len</span>(iter)])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="notes">
+<p>Note that A_post doesn’t change between iterations — only B_post does. The penalty term tr(X^T X S) accounts for uncertainty in beta when updating sigma^2. Without it, we’d be underestimating B_post.</p>
+</div>
+<hr>
+</section>
+<section id="bayesian-gaussian-mixture-model-1" class="level2">
+<h2 class="anchored" data-anchor-id="bayesian-gaussian-mixture-model-1">Bayesian Gaussian mixture model</h2>
+<p>For homework.</p>
+<div class="notes">
+<p>slides 2 page 50 has good slides on this</p>
+</div>
+<hr>
+</section>
+<section id="variational-inference-with-exponential-families" class="level2">
+<h2 class="anchored" data-anchor-id="variational-inference-with-exponential-families">Variational inference with exponential families</h2>
+<p>In the example above we used exponential families for priors- this allows for easier derivation of CAVI updates that have a closed form.</p>
+<p>There are a wide range of models that can use this approach:</p>
+<ul>
+<li>Matrix factorization, regression, stochastic block models of networks, and more</li>
+<li>For this class of models, generic updates for the exponential family distributions have been derived (see 4.1, Blei)</li>
+</ul>
+<hr>
+</section>
+<section id="drawbacks" class="level2">
+<h2 class="anchored" data-anchor-id="drawbacks">Drawbacks</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="mean_field.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="notes">
+<p>exact posterior has positive correlation between x1 and x2. In other words, the posterior covariance matrix has non-zero off-diagonal entries. - mean field cannot capture correlation between variables - also underestimates marginal variances - means look good though</p>
+</div>
+<hr>
+</section>
+<section id="drawbacks-1" class="level2">
+<h2 class="anchored" data-anchor-id="drawbacks-1">Drawbacks</h2>
+<p>Exact posterior has positive correlation between x1 and x2. In other words, the posterior covariance matrix has non-zero off-diagonal entries.</p>
+<ul>
+<li>Mean field cannot capture correlation between variables</li>
+<li>Also underestimates marginal variances</li>
+<li>Means look good though</li>
+</ul>
+<p>This is fine if all you want is point estimates! But if you care about uncertainty quantification, it’s not that great.</p>
+<hr>
+</section>
+<section id="variational-inference-outside-of-mean-field-assumption" class="level2">
+<h2 class="anchored" data-anchor-id="variational-inference-outside-of-mean-field-assumption">Variational inference outside of mean field assumption</h2>
+<p>In principal, you can choose any <span class="math inline">\(q\)</span> explicitly rather than have it fall out of the math:</p>
+<ul>
+<li>Pick a parametric family and optimize it’s parameters (maximize the ELBO with respect to it’s parameters using gradient ascent)</li>
+<li>Variational autoencoders</li>
+<li>Structured variational inference</li>
+</ul>
+<div class="notes">
+<p>These are beyond the scope of what i’m going to cover</p>
+</div>
+<hr>
+</section>
+<section id="connection-to-the-em-algorithm" class="level2">
+<h2 class="anchored" data-anchor-id="connection-to-the-em-algorithm">Connection to the EM Algorithm</h2>
+<p>Let’s say we have latent variables <span class="math inline">\(z\)</span>, parameters <span class="math inline">\(\theta\)</span>, and data <span class="math inline">\(y\)</span>. Fundamental problem is that the marginal likelihood of the data, <span class="math inline">\(p(y|\theta) = \int_zp(y,z|\theta)dz\)</span>, is intractable.</p>
+<ul>
+<li>EM goal: maximize <span class="math inline">\(p(y|\theta)\)</span>, the marginal likelihood</li>
+<li>VI goal: compute posterior <span class="math inline">\(p(z, \theta|y)\)</span></li>
+</ul>
+<div class="notes">
+<p>EM can be viewed as a special case of VI - EM treats parameters theta as fixed</p>
+</div>
+<hr>
+</section>
+<section id="inla" class="level2">
+<h2 class="anchored" data-anchor-id="inla">INLA</h2>
+<p>Performs approximate Bayesian inference in latent Gaussian models</p>
+<ul>
+<li>Also underestimate posterior variance</li>
+<li>Used often in spatial statistics</li>
+</ul>
+<div class="notes">
+<p>Have emily guest lecture on this next year</p>
+</div>
+<hr>
+</section>
+<section id="lab" class="level2">
+<h2 class="anchored" data-anchor-id="lab">Lab</h2>
+<p>Implement Bayesian regression</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
