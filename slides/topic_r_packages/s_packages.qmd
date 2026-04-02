@@ -29,6 +29,7 @@ Today, we cover:
 
 - Finish up cluster computing
 - R packages 
+- Follow along and make a package
 
 ::: notes
 Resources: Hadley Wickham's R Packages (2e), https://r-pkgs.org. This is free online and is the definitive reference.
@@ -203,6 +204,87 @@ Additional components you will typically add:
 You never need to create most of this by hand — usethis handles it.
 NAMESPACE in particular is something you should almost never edit by hand.
 :::
+
+---
+
+## Package structure
+
+Let's take a look at the `refund` and `registr` packages.
+
+---
+
+
+
+
+## Package naming conventions
+
+R package names must follow specific rules:
+
+- Only letters, numbers, and periods (`.`)
+- Must start with a letter
+- Cannot end with a period
+- **No underscores, no hyphens**
+
+\vspace{5mm}
+
+Good names are short, memorable, and hint at what the package does:
+
+- `ggplot2`, `dplyr`, `tidyr`, `stringr`, `purrr`
+- `lme4`, `refund`, `registr`
+
+::: notes
+The no-underscore rule catches many people off guard — it's a strict CRAN requirement.
+Avoid names already on CRAN: check with available.packages() or the CRAN search page.
+Hadley's advice: find a word that evokes the problem, then modify it to be unique (e.g., lubridate for dates, forcats for factors).
+:::
+
+---
+
+## The `usethis` package
+
+`usethis` automates the repetitive, error-prone parts of package setup
+
+\vspace{5mm}
+
+- Generates boilerplate files with the right structure
+- Edits `DESCRIPTION` and `NAMESPACE` correctly
+- Connects your package to git and GitHub
+- Sets up testing, licensing, vignettes, and more
+
+\vspace{5mm}
+
+Think of it as a **project scaffolding tool** — you describe *what* you want, it handles *how* to set it up
+
+::: notes
+Before usethis, developers had to create and edit many files by hand, which was tedious and easy to get wrong.
+usethis was created by Jenny Bryan and Hadley Wickham. Full docs at https://usethis.r-lib.org.
+Most usethis functions are called once during setup, not in ongoing development.
+:::
+
+---
+
+
+## Lab: create your own `projectr` package
+
+
+Download the  [projr scripts](./labs/lab_r_packages/projr_scripts.zip). These:
+
+- Create a new project that has the reproducible file structure we've learned about in class
+- We're going to turn these scripts into an R package
+
+
+---
+
+## Lab: create your own `projectr` package
+
+Download and try out the scripts. 
+
+- Name your package. I'm calling mine the "feyre" package. 
+
+```{r echo=FALSE, eval = TRUE, fig.align='center', out.width='70%'}
+knitr::include_graphics("feyre.png")
+```
+
 
 ---
 
