@@ -560,6 +560,8 @@ For the pipe |> specifically: if using base R pipe (R 4.1+) no import needed. If
 
 ## Unit testing
 
+
+\fontsize{11pt}{12pt}\selectfont
 A **unit test** checks that a small, isolated piece of code (a function) produces the correct output for a given input
 
 \vspace{5mm}
@@ -794,33 +796,9 @@ Full reference at https://usethis.r-lib.org.
 
 
 
-## Package development demo
-
-Next we're gonna make an R package that processes data from a pupillometer device.. this uses a real pipeline that I'm working on with Sarah Bird, a PhD student at Colorado.
-- GitHub repo we're gonna turn into a package is at https://github.com/sarahmbird/pupillometer_pipeline
 
 
 
----
-
-## Package development demo
-
-```{r echo=FALSE, eval = FALSE, fig.align='center', out.width='120%'}
-knitr::include_graphics("pupil.png")
-```
-
-
----
-
-## Using use_this()
-
-Converting my repo to a package
-
-- Does name of repo reflect name of package?
-- Add imports.R file
-- Make sure all R functions are in a folder called `R`
-
----
 
 ## Using use_this()
 
@@ -848,6 +826,7 @@ usethis::use_data(DATAOBJECT, compress = "xz")
 - `install()`
 
 ---
+
 ## References
 
 - Wickham H, Bryan J. [*R Packages* (2e).](https://r-pkgs.org)
