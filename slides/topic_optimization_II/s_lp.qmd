@@ -1,0 +1,385 @@
+---
+title: "Rcpp"
+author: "Julia Wrobel"
+format:
+  beamer:
+    theme: metropolis
+    aspectratio: 169
+    fontsize: 14pt
+    slide-level: 2
+execute:
+  echo: true
+  eval: false
+  warning: false
+  message: false
+header-includes:
+  - \usepackage{xcolor}
+  - \newcommand{\red}[1]{\textcolor{red}{#1}}
+  - \newcommand{\green}[1]{\textcolor{green}{#1}}
+---
+
+```{r, echo = FALSE, eval = TRUE}
+library(tidyverse)
+library(microbenchmark)
+```
+
+## Overview
+
+Today, we cover:
+
+- Finish up R packages 
+- RCPP
+- Start of linear programming
+
+Announcements
+
+- HW4 due April 15, 10:00AM
+- No class tomorrow, April 9
+
+
+
+---
+
+
+## Introduction to LP
+
+**Linear programming** (LP) or **linear optimization** is a set of (constrained) optimization
+algorithms.
+- began in 1947 when George Dantzig devised the simplex method
+- LP and **quadratic programming** are two special cases of convex optimization with linear constraints
+
+<br>
+Widely used across industries!
+
+
+---
+
+## Linear programming
+
+An optimization problem with a linear objective function and linear constraint functions is called a linear program (LP):
+
+$$\begin{align}
+\mbox{minimize } &c^Tx + d\\
+\mbox{subject to } &Ax \preceq b\\
+\end{align}$$
+
+
+<br>
+- **Recall**: you can always convert a minimization problem to a maximization problem by multiplying the objective function by $-1$
+- In statistics, applications include LASSO, quantile regression, support vector machine
+
+
+::: notes
+less than equal sign here is a partial order relation.  Just means that some constraints may be less than and some may be greater than, and this allows for both
+:::
+
+---
+
+
+## Linear programming techniques
+
+Methods for solving LP problems:
+
+- Graphical method
+- Simplex algorithm
+- Interior point methods
+
+
+
+::: notes
+We're gonna get pretty in the weeds here with estimation techniques because I think it helps to see how these things work.  But just keep in mind that the bigger picture is sometimes you might have constraints you need to take into account
+:::
+
+---
+
+## Linear programming techniques
+
+
+```{r, echo = FALSE, fig.align = 'center', out.width = '90%'}
+knitr::include_graphics("rq.png")
+```
+
+
+::: notes
+This is the motivation for why we are doing this
+:::
+
+---
+
+## Carpenter problem
+
+A carpenter can make tables or she can make bookshelves.
+
+- **Table**: costs 10 units of lumber and 5 hours of labor
+  - Provides $180 in profit
+- **Bookcase**: costs 20 units of lumber, 4 hours of labor
+  - $200 in profit
+  
+<br>
+- Only 200 units of lumber available
+- 80 hours of labor available
+
+**What number of tables and bookcases provide the optimal profit?**
+
+::: notes
+This is a simple motivating example
+:::
+
+---
+
+
+## Carpenter problem
+
+- **Table**: costs 10 units of lumber and 5 hours of labor, $180 in profit
+- **Bookcase**: costs 20 units of lumber, 4 hours of labor, $200 in profit
+- 200 units of lumber available; 80 hours of labor available
+
+<br>
+Let $x_1$ and $x_2$ denote number of tables, bookshelves respectively
+- $10x_1 + 20x_2 \le 200$
+- $5x_1 + 4x_2 \le 80$
+- $x_1, x_2 \ge 0$
+- maximize $f(x_1, x_2) = 180x_1 + 200x_2$
+
+::: notes
+Set up constraints and objective function
+Since we only have two variables here we can plot this and observe the solution graphically
+:::
+
+---
+
+
+
+
+
+## Carpenter problem
+
+
+
+```{r, echo = FALSE, fig.align = 'center', out.width = '60%'}
+tibble(x = seq(-5, 20, by = 1),
+       y = x) %>%
+  ggplot() +
+  xlim(-2, 20) +
+  ylim(-2, 20) +
+  labs(x = "x1", y = "x2") +
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) +
+  geom_abline(intercept = 20, slope = -5/4) +
+  geom_abline(intercept = 10, slope = -1/2)
+
+```
+
+::: notes
+shade and put in vertices. Shaded region
+number of vertices should equal the number of constraints
+calculate f(x, y) at each vertex
+:::
+
+---
+
+## Solving LP graphically
+
+The small 2-variable problem can be represented in a 2D graph.
+The isoprofit line (any point on the line generate the same profit) is perpendicular to
+the gradient of objective function. The problem can be solved by sliding the isoprofit
+line.
+
+
+
+---
+
+## Feasible region
+
+Shaded region that satisfies constraints is called feasible region
+
+```{r, echo = FALSE, fig.align = 'center', out.width = '90%'}
+knitr::include_graphics("feasible_region.png")
+```
+
+
+---
+
+
+
+
+
+## Properties of the optimal solution
+
+Optimal solution might not exist 
+- the objective function is unbounded in the solution space (can be improved indefinitely without violating any constraints)
+- the feasible region is empty (no solution satisfies all constraints)
+
+But if the optimal solutions exists:
+- Interior point: No.
+- Corner point: Yes. The corner points are often referred to as “extreme points” or vertices.
+- Edge point: Yes, only when the edge is parallel to the isoprofit line. In this case, every point on that edge has the same objective function value, including the corner point of that edge.
+- **Key result**: If an LP has an optimal solution, it must have a extreme point optimal solution. This greatly reduces our search of optimal solutions: only need to check a finite number of extreme points.
+
+---
+
+## Big ideas of LP
+
+- Number of vertices in feasible regions corresponds to number of constraints
+- inequalities make a bounded, concave feasible region
+- Extreme values (min and max) occur at the vertices of this region
+- Solution: compute vertices, choose which one gives largest value of $f(x_1, x_2)$
+
+You can solve this algorithmically (rather than graphically) using the **simplex method**.
+---
+
+
+## Simplex method
+
+Linear programming involves optimizing (maximizing or minimizing) a linear objective function, subject to a set of linear constraints. The Simplex method helps to find the optimal solution to such problems, provided one exists.
+
+For simplex method:
+
+- the LP problem needs to be in **standard** form
+  - objective function set up as a maximization problem
+  - constraints set up as linear inequalities of the form $Ax \le b$
+  - need all variables $x$ to be nonnegative
+
+---
+
+
+## LP Standard form
+
+An LP can be expressed using only equality and nonnegativity
+constraints. This is called **standard form**:
+
+
+$$\begin{align}
+\mbox{minimize } &c^Tx\\
+\mbox{subject to } &Ax = b\\
+&x \ge = 0
+\end{align}$$
+
+
+An LP can also be expressed using only inequality constraints. This is
+called **inequality form**:
+
+
+$$\begin{align}
+\mbox{minimize } &c^Tx\\
+\mbox{subject to } &Ax \le b
+\end{align}$$
+
+---
+
+## Slack variables
+
+Are added to less than or equal to inequality constraints to transform them into equality constraints 
+- represent the "unused" capacity within a constraint
+- non-negative variables
+- Say you have inequality $2x + 3y \le 10$.  
+  - Convert to to equality constraint  $2x + 3y + s = 10$
+  - If $s \ne 0$, then there the combination of $x$ and $y$ could be increased further without violating the constraint
+
+---
+
+## Simplex: convert to standard form using slack variables
+
+Go back to Carpenter example.
+
+- maximize $z = f(x_1, x_2) = 180x_1 + 200x_2$
+- $x_1, x_2 \ge 0$
+
+Constraints: 
+- $10x_1 + 20x_2 \le 200$ $\to 10x_1 + 20x_2 + s_1 = 200$
+- $5x_1 + 4x_2 \le 80$ $\to 5x_1 + 4x_2 + s_2 = 80$
+
+Slack variables pick up any "slack" in the system based on current values of $x_1$ and $x_2$
+
+- $s_1, s_2 \ge 0$
+- $s_1, s_2 = 0$ when $z$ is maximized
+
+
+::: notes
+Each constraint will have a slack variable
+:::
+
+---
+
+
+
+
+
+
+## Steps of Simplex algorithm
+
+1. Convert problem to standard form
+2. Set up "tableau": basically amounts to writing out problem as a matrix
+3. Start at a vertex of the feasible region, then pivot
+  
+- Essentially, you are iteratively moving from one vertex (or "corner point") of the feasible region to another, with the goal of improving the objective function at each step.
+
+---
+
+## Initial tableau
+
+First 
+$z =  180x_1 + 200x_2 \to z -180x_1 - 200x_2 = 0$
+
+- $10x_1 + 20x_2 \le 200$ $\to 10x_1 + 20x_2 + s_1 = 200$
+- $5x_1 + 4x_2 \le 80$ $\to 5x_1 + 4x_2 + s_2 = 80$
+
+Start at $x_1, x_2 = 0$
+
+
+
+::: notes
+when x1 and x2 are zeros slack variables have all the extra stuff in the inequality
+:::
+
+---
+
+
+## Pivot step
+
+
+---
+
+## Pivot step
+
+---
+
+## Pivot step
+
+--- 
+
+## Solution
+
+
+
+```{r, echo = FALSE, eval = FALSE, fig.align = 'center', out.width = '90%'}
+knitr::include_graphics("carpenter_solution.png")
+```
+
+
+
+---
+
+## Summary of the Simplex method
+
+Basic variables define current corner point/vertex!
+- Those are the variables that are literally a unit basis of the matrix
+- Walks along the edge of the feasible space to improve the objective function
+  - "Basic" variables are the current solution
+- Only considers vertices
+- Moves as far as it can in optimal direction until movement is blocked by another constraint
+
+---
+
+
+
+
+## Standard form as a matrix
+
+$$\begin{align}
+\max z &= c^T\boldsymbol{x}\\
+s.t. A\boldsymbol{x} &= b\\
+\boldsymbol{x} &\ge 0
+\end{align}$$
+
+$$\boldsymbol{x} = [x_1, x_2, s_1, s_2]^T$$

@@ -1,5 +1,5 @@
 ---
-title: "Cluster Computing"
+title: "R packages"
 format:
   html:
     toc: true
@@ -28,9 +28,119 @@ library(microbenchmark)
 
 [![](./slides/topic_R_packages/preview_package.png){width=70%}](./slides/topic_R_packages/s_packages.pdf)
 
-**Intro R packages**  
+**Intro R packages**
 [Download slides (PDF)](./slides/topic_R_packages/s_packages.pdf)
 
+
+***
+
+### Slide Deck: Rcpp
+
+[![](./slides/topic_R_packages/preview_rcpp.png){width=70%}](./slides/topic_R_packages/s_rcpp.pdf)
+
+**Intro R packages**
+[Download slides (PDF)](./slides/topic_R_packages/s_rcpp.pdf)
+
+
+***
+
+### Lab: Variational Bayes Mixture Model
+
+This lab gets you started on **Problem 2** of HW4: implementing CAVI for a Bayesian Gaussian mixture model.
+
+#### Model
+
+We fit a $K$-component mixture of unit-variance Gaussians with a Gaussian prior on the means:
+
+$$\mu_k \sim N(0, \sigma^2), \quad c_i \sim \text{Categorical}(1/K,\ldots,1/K), \quad y_i \mid c_i, \mu \sim N(c_i^T\mu,\; 1)$$
+
+#### Exercise 1: Set up the function skeleton
+
+Below is a starting skeleton for your CAVI function. Fill in the update steps for $r_{ik}$, $m_k$, $s_k^2$, and the ELBO.
+
+```{r, echo = TRUE, eval = FALSE}
+cavi_mixture <- function(y, K, sigma2 = 1, tol = 1e-6, max_iter = 1000) {
+  n <- length(y)
+
+  # Initialize responsibilities randomly
+  r <- matrix(runif(n * K), nrow = n, ncol = K)
+  r <- r / rowSums(r)          # normalize so rows sum to 1
+
+  # Initialize variational parameters for q(mu_k) = N(m_k, s2_k)
+  m  <- rnorm(K, mean = mean(y), sd = sd(y))
+  s2 <- rep(1, K)
+
+  elbo_vals <- numeric(max_iter)
+
+  for (iter in seq_len(max_iter)) {
+
+    # --- Update q(c_i) ---
+    # log_r[i, k] = y[i] * m[k] - 0.5 * (m[k]^2 + s2[k])
+    log_r <- outer(y, m) - 0.5 * outer(rep(1, n), m^2 + s2)
+    # log-sum-exp normalization
+    log_r <- log_r - apply(log_r, 1, function(x) log(sum(exp(x - max(x)))) + max(x))
+    r <- exp(log_r)
+
+    # --- Update q(mu_k) ---
+    # s2[k]  = 1 / (sum_i r[i,k] + 1/sigma2)
+    # m[k]   = s2[k] * sum_i r[i,k] * y[i]
+    nk  <- colSums(r)
+    s2  <- 1 / (nk + 1 / sigma2)
+    m   <- s2 * colSums(r * y)
+
+    # --- Compute ELBO ---
+    # expected log-likelihood
+    ell <- sum(r * (outer(y, m) - 0.5 * outer(rep(1, n), m^2 + s2)))
+    # entropy of q(c)
+    ent_c <- -sum(r * log(r + 1e-300))
+    # KL[ N(m_k, s2_k) || N(0, sigma2) ]
+    kl_mu <- sum(0.5 * ((m^2 + s2) / sigma2 - 1 + log(sigma2) - log(s2)))
+    elbo_vals[iter] <- ell + ent_c - kl_mu
+
+    # --- Check convergence ---
+    if (iter > 1 && abs(elbo_vals[iter] - elbo_vals[iter - 1]) < tol) {
+      elbo_vals <- elbo_vals[seq_len(iter)]
+      break
+    }
+  }
+
+  list(
+    m        = m,
+    s2       = s2,
+    r        = r,
+    clusters = apply(r, 1, which.max),
+    elbo     = elbo_vals
+  )
+}
+```
+
+#### Exercise 2: Test on simulated data
+
+Simulate data from a 2-component mixture and check that CAVI recovers the true means. Plot the ELBO over iterations to verify it increases monotonically.
+
+```{r, echo = TRUE, eval = FALSE}
+set.seed(123)
+y_sim <- c(rnorm(50, mean = -3), rnorm(50, mean = 3))
+
+fit <- cavi_mixture(y_sim, K = 2, sigma2 = 10)
+
+# check recovered means
+fit$m
+
+# ELBO should increase monotonically
+plot(fit$elbo, type = "l", xlab = "Iteration", ylab = "ELBO")
+```
+
+#### Exercise 3: Apply to Old Faithful
+
+Apply your function to the Old Faithful waiting times (used in the EM lecture) with $K = 2$. Compare the cluster means to what you obtained from the Gibbs sampler in Problem 1.
+
+```{r, echo = TRUE, eval = FALSE}
+data(faithful)
+fit_faithful <- cavi_mixture(faithful$waiting, K = 2, sigma2 = 100)
+fit_faithful$m
+table(fit_faithful$clusters)
+```
 
 ***
 

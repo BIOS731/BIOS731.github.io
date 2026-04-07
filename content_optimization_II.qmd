@@ -1,0 +1,37 @@
+---
+title: "Optimization, Part II"
+format:
+  html:
+    toc: true
+    toc-location: right
+execute:
+  echo: false
+  fig-width: 6
+  fig-asp: 0.6
+  out-width: "90%"
+---
+
+
+
+## Overview
+
+In this, we will introduce more methods for optimization, including constrained optimization.
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+
+```
+
+::: {.panel-tabset .panel-pills}
+
+### Slide Deck: Introduction to R packages
+
+[![](./slides/topic_R_packages/preview_package.png){width=70%}](./slides/topic_R_packages/s_packages.pdf)
+
+**Intro R packages**  
+[Download slides (PDF)](./slides/topic_R_packages/s_packages.pdf)
+
+
+***
+
+:::

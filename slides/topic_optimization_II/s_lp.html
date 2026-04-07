@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Julia Wrobel">
+
+<title>Rcpp – BIOS731</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-ff63373b1067ca6f91cf1456aa1f00a2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+</head><body class="nav-fixed quarto-light">\usepackage{xcolor}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\green}[1]{\textcolor{green}{#1}}
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">BIOS731</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-topics" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Topics</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-topics">    
+        <li>
+    <a class="dropdown-item" href="../../topic_reproducible_computing.html">
+ <span class="dropdown-text">Reproducible Computing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_simulation.html">
+ <span class="dropdown-text">Simulation and Resampling</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_optimization.html">
+ <span class="dropdown-text">Optimization I</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_bayesian_computing.html">
+ <span class="dropdown-text">Bayesian Computing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_cluster_computing.html">
+ <span class="dropdown-text">Cluster Computing</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_R_packages.html">
+ <span class="dropdown-text">R packages</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_optimization_II.html">
+ <span class="dropdown-text">Optimization II</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../topic_other_material.qmd">
+ <span class="dropdown-text">Other Materials</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-datasets" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Datasets</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-datasets">    
+        <li>
+    <a class="dropdown-item" href="../../dataset_cannabis.html">
+ <span class="dropdown-text">Cannabis</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../dataset_brfss.qmd">
+ <span class="dropdown-text">Craniosynothosis</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../syllabus.html"> 
+<span class="menu-text">Syllabus</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/BIOS731/BIOS731.github.io"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="s_lp.pdf"><i class="bi bi-file-pdf"></i>Beamer</a></li></ul></div></div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Rcpp</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Julia Wrobel </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>Today, we cover:</p>
+<ul>
+<li>Finish up R packages</li>
+<li>RCPP</li>
+<li>Start of linear programming</li>
+</ul>
+<p>Announcements</p>
+<ul>
+<li>HW4 due April 15, 10:00AM</li>
+<li>No class tomorrow, April 9</li>
+</ul>
+<hr>
+</section>
+<section id="introduction-to-lp" class="level2">
+<h2 class="anchored" data-anchor-id="introduction-to-lp">Introduction to LP</h2>
+<p><strong>Linear programming</strong> (LP) or <strong>linear optimization</strong> is a set of (constrained) optimization algorithms. - began in 1947 when George Dantzig devised the simplex method - LP and <strong>quadratic programming</strong> are two special cases of convex optimization with linear constraints</p>
+<p><br> Widely used across industries!</p>
+<hr>
+</section>
+<section id="linear-programming" class="level2">
+<h2 class="anchored" data-anchor-id="linear-programming">Linear programming</h2>
+<p>An optimization problem with a linear objective function and linear constraint functions is called a linear program (LP):</p>
+<p><span class="math display">\[\begin{align}
+\mbox{minimize } &amp;c^Tx + d\\
+\mbox{subject to } &amp;Ax \preceq b\\
+\end{align}\]</span></p>
+<p><br> - <strong>Recall</strong>: you can always convert a minimization problem to a maximization problem by multiplying the objective function by <span class="math inline">\(-1\)</span> - In statistics, applications include LASSO, quantile regression, support vector machine</p>
+<div class="notes">
+<p>less than equal sign here is a partial order relation. Just means that some constraints may be less than and some may be greater than, and this allows for both</p>
+</div>
+<hr>
+</section>
+<section id="linear-programming-techniques" class="level2">
+<h2 class="anchored" data-anchor-id="linear-programming-techniques">Linear programming techniques</h2>
+<p>Methods for solving LP problems:</p>
+<ul>
+<li>Graphical method</li>
+<li>Simplex algorithm</li>
+<li>Interior point methods</li>
+</ul>
+<div class="notes">
+<p>We’re gonna get pretty in the weeds here with estimation techniques because I think it helps to see how these things work. But just keep in mind that the bigger picture is sometimes you might have constraints you need to take into account</p>
+</div>
+<hr>
+</section>
+<section id="linear-programming-techniques-1" class="level2">
+<h2 class="anchored" data-anchor-id="linear-programming-techniques-1">Linear programming techniques</h2>
+<div class="notes">
+<p>This is the motivation for why we are doing this</p>
+</div>
+<hr>
+</section>
+<section id="carpenter-problem" class="level2">
+<h2 class="anchored" data-anchor-id="carpenter-problem">Carpenter problem</h2>
+<p>A carpenter can make tables or she can make bookshelves.</p>
+<ul>
+<li><strong>Table</strong>: costs 10 units of lumber and 5 hours of labor
+<ul>
+<li>Provides $180 in profit</li>
+</ul></li>
+<li><strong>Bookcase</strong>: costs 20 units of lumber, 4 hours of labor
+<ul>
+<li>$200 in profit</li>
+</ul></li>
+</ul>
+<p><br> - Only 200 units of lumber available - 80 hours of labor available</p>
+<p><strong>What number of tables and bookcases provide the optimal profit?</strong></p>
+<div class="notes">
+<p>This is a simple motivating example</p>
+</div>
+<hr>
+</section>
+<section id="carpenter-problem-1" class="level2">
+<h2 class="anchored" data-anchor-id="carpenter-problem-1">Carpenter problem</h2>
+<ul>
+<li><strong>Table</strong>: costs 10 units of lumber and 5 hours of labor, $180 in profit</li>
+<li><strong>Bookcase</strong>: costs 20 units of lumber, 4 hours of labor, $200 in profit</li>
+<li>200 units of lumber available; 80 hours of labor available</li>
+</ul>
+<p><br> Let <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> denote number of tables, bookshelves respectively - <span class="math inline">\(10x_1 + 20x_2 \le 200\)</span> - <span class="math inline">\(5x_1 + 4x_2 \le 80\)</span> - <span class="math inline">\(x_1, x_2 \ge 0\)</span> - maximize <span class="math inline">\(f(x_1, x_2) = 180x_1 + 200x_2\)</span></p>
+<div class="notes">
+<p>Set up constraints and objective function Since we only have two variables here we can plot this and observe the solution graphically</p>
+</div>
+<hr>
+</section>
+<section id="carpenter-problem-2" class="level2">
+<h2 class="anchored" data-anchor-id="carpenter-problem-2">Carpenter problem</h2>
+<div class="notes">
+<p>shade and put in vertices. Shaded region number of vertices should equal the number of constraints calculate f(x, y) at each vertex</p>
+</div>
+<hr>
+</section>
+<section id="solving-lp-graphically" class="level2">
+<h2 class="anchored" data-anchor-id="solving-lp-graphically">Solving LP graphically</h2>
+<p>The small 2-variable problem can be represented in a 2D graph. The isoprofit line (any point on the line generate the same profit) is perpendicular to the gradient of objective function. The problem can be solved by sliding the isoprofit line.</p>
+<hr>
+</section>
+<section id="feasible-region" class="level2">
+<h2 class="anchored" data-anchor-id="feasible-region">Feasible region</h2>
+<p>Shaded region that satisfies constraints is called feasible region</p>
+<hr>
+</section>
+<section id="properties-of-the-optimal-solution" class="level2">
+<h2 class="anchored" data-anchor-id="properties-of-the-optimal-solution">Properties of the optimal solution</h2>
+<p>Optimal solution might not exist - the objective function is unbounded in the solution space (can be improved indefinitely without violating any constraints) - the feasible region is empty (no solution satisfies all constraints)</p>
+<p>But if the optimal solutions exists: - Interior point: No. - Corner point: Yes. The corner points are often referred to as “extreme points” or vertices. - Edge point: Yes, only when the edge is parallel to the isoprofit line. In this case, every point on that edge has the same objective function value, including the corner point of that edge. - <strong>Key result</strong>: If an LP has an optimal solution, it must have a extreme point optimal solution. This greatly reduces our search of optimal solutions: only need to check a finite number of extreme points.</p>
+<hr>
+</section>
+<section id="big-ideas-of-lp" class="level2">
+<h2 class="anchored" data-anchor-id="big-ideas-of-lp">Big ideas of LP</h2>
+<ul>
+<li>Number of vertices in feasible regions corresponds to number of constraints</li>
+<li>inequalities make a bounded, concave feasible region</li>
+<li>Extreme values (min and max) occur at the vertices of this region</li>
+<li>Solution: compute vertices, choose which one gives largest value of <span class="math inline">\(f(x_1, x_2)\)</span></li>
+</ul>
+</section>
+<section id="you-can-solve-this-algorithmically-rather-than-graphically-using-the-simplex-method." class="level2">
+<h2 class="anchored" data-anchor-id="you-can-solve-this-algorithmically-rather-than-graphically-using-the-simplex-method.">You can solve this algorithmically (rather than graphically) using the <strong>simplex method</strong>.</h2>
+</section>
+<section id="simplex-method" class="level2">
+<h2 class="anchored" data-anchor-id="simplex-method">Simplex method</h2>
+<p>Linear programming involves optimizing (maximizing or minimizing) a linear objective function, subject to a set of linear constraints. The Simplex method helps to find the optimal solution to such problems, provided one exists.</p>
+<p>For simplex method:</p>
+<ul>
+<li>the LP problem needs to be in <strong>standard</strong> form
+<ul>
+<li>objective function set up as a maximization problem</li>
+<li>constraints set up as linear inequalities of the form <span class="math inline">\(Ax \le b\)</span></li>
+<li>need all variables <span class="math inline">\(x\)</span> to be nonnegative</li>
+</ul></li>
+</ul>
+<hr>
+</section>
+<section id="lp-standard-form" class="level2">
+<h2 class="anchored" data-anchor-id="lp-standard-form">LP Standard form</h2>
+<p>An LP can be expressed using only equality and nonnegativity constraints. This is called <strong>standard form</strong>:</p>
+<p><span class="math display">\[\begin{align}
+\mbox{minimize } &amp;c^Tx\\
+\mbox{subject to } &amp;Ax = b\\
+&amp;x \ge = 0
+\end{align}\]</span></p>
+<p>An LP can also be expressed using only inequality constraints. This is called <strong>inequality form</strong>:</p>
+<p><span class="math display">\[\begin{align}
+\mbox{minimize } &amp;c^Tx\\
+\mbox{subject to } &amp;Ax \le b
+\end{align}\]</span></p>
+<hr>
+</section>
+<section id="slack-variables" class="level2">
+<h2 class="anchored" data-anchor-id="slack-variables">Slack variables</h2>
+<p>Are added to less than or equal to inequality constraints to transform them into equality constraints - represent the “unused” capacity within a constraint - non-negative variables - Say you have inequality <span class="math inline">\(2x + 3y \le 10\)</span>.<br>
+- Convert to to equality constraint <span class="math inline">\(2x + 3y + s = 10\)</span> - If <span class="math inline">\(s \ne 0\)</span>, then there the combination of <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> could be increased further without violating the constraint</p>
+<hr>
+</section>
+<section id="simplex-convert-to-standard-form-using-slack-variables" class="level2">
+<h2 class="anchored" data-anchor-id="simplex-convert-to-standard-form-using-slack-variables">Simplex: convert to standard form using slack variables</h2>
+<p>Go back to Carpenter example.</p>
+<ul>
+<li>maximize <span class="math inline">\(z = f(x_1, x_2) = 180x_1 + 200x_2\)</span></li>
+<li><span class="math inline">\(x_1, x_2 \ge 0\)</span></li>
+</ul>
+<p>Constraints: - <span class="math inline">\(10x_1 + 20x_2 \le 200\)</span> <span class="math inline">\(\to 10x_1 + 20x_2 + s_1 = 200\)</span> - <span class="math inline">\(5x_1 + 4x_2 \le 80\)</span> <span class="math inline">\(\to 5x_1 + 4x_2 + s_2 = 80\)</span></p>
+<p>Slack variables pick up any “slack” in the system based on current values of <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span></p>
+<ul>
+<li><span class="math inline">\(s_1, s_2 \ge 0\)</span></li>
+<li><span class="math inline">\(s_1, s_2 = 0\)</span> when <span class="math inline">\(z\)</span> is maximized</li>
+</ul>
+<div class="notes">
+<p>Each constraint will have a slack variable</p>
+</div>
+<hr>
+</section>
+<section id="steps-of-simplex-algorithm" class="level2">
+<h2 class="anchored" data-anchor-id="steps-of-simplex-algorithm">Steps of Simplex algorithm</h2>
+<ol type="1">
+<li>Convert problem to standard form</li>
+<li>Set up “tableau”: basically amounts to writing out problem as a matrix</li>
+<li>Start at a vertex of the feasible region, then pivot</li>
+</ol>
+<ul>
+<li>Essentially, you are iteratively moving from one vertex (or “corner point”) of the feasible region to another, with the goal of improving the objective function at each step.</li>
+</ul>
+<hr>
+</section>
+<section id="initial-tableau" class="level2">
+<h2 class="anchored" data-anchor-id="initial-tableau">Initial tableau</h2>
+<p>First <span class="math inline">\(z =  180x_1 + 200x_2 \to z -180x_1 - 200x_2 = 0\)</span></p>
+<ul>
+<li><span class="math inline">\(10x_1 + 20x_2 \le 200\)</span> <span class="math inline">\(\to 10x_1 + 20x_2 + s_1 = 200\)</span></li>
+<li><span class="math inline">\(5x_1 + 4x_2 \le 80\)</span> <span class="math inline">\(\to 5x_1 + 4x_2 + s_2 = 80\)</span></li>
+</ul>
+<p>Start at <span class="math inline">\(x_1, x_2 = 0\)</span></p>
+<div class="notes">
+<p>when x1 and x2 are zeros slack variables have all the extra stuff in the inequality</p>
+</div>
+<hr>
+</section>
+<section id="pivot-step" class="level2">
+<h2 class="anchored" data-anchor-id="pivot-step">Pivot step</h2>
+<hr>
+</section>
+<section id="pivot-step-1" class="level2">
+<h2 class="anchored" data-anchor-id="pivot-step-1">Pivot step</h2>
+<hr>
+</section>
+<section id="pivot-step-2" class="level2">
+<h2 class="anchored" data-anchor-id="pivot-step-2">Pivot step</h2>
+<hr>
+</section>
+<section id="solution" class="level2">
+<h2 class="anchored" data-anchor-id="solution">Solution</h2>
+<hr>
+</section>
+<section id="summary-of-the-simplex-method" class="level2">
+<h2 class="anchored" data-anchor-id="summary-of-the-simplex-method">Summary of the Simplex method</h2>
+<p>Basic variables define current corner point/vertex! - Those are the variables that are literally a unit basis of the matrix - Walks along the edge of the feasible space to improve the objective function - “Basic” variables are the current solution - Only considers vertices - Moves as far as it can in optimal direction until movement is blocked by another constraint</p>
+<hr>
+</section>
+<section id="standard-form-as-a-matrix" class="level2">
+<h2 class="anchored" data-anchor-id="standard-form-as-a-matrix">Standard form as a matrix</h2>
+<p><span class="math display">\[\begin{align}
+\max z &amp;= c^T\boldsymbol{x}\\
+s.t. A\boldsymbol{x} &amp;= b\\
+\boldsymbol{x} &amp;\ge 0
+\end{align}\]</span></p>
+<p><span class="math display">\[\boldsymbol{x} = [x_1, x_2, s_1, s_2]^T\]</span></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

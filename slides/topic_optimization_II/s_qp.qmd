@@ -1,0 +1,514 @@
+---
+title: "Rcpp"
+author: "Julia Wrobel"
+format:
+  beamer:
+    theme: metropolis
+    aspectratio: 169
+    fontsize: 14pt
+    slide-level: 2
+execute:
+  echo: true
+  eval: false
+  warning: false
+  message: false
+header-includes:
+  - \usepackage{xcolor}
+  - \newcommand{\red}[1]{\textcolor{red}{#1}}
+  - \newcommand{\green}[1]{\textcolor{green}{#1}}
+---
+
+```{r, echo = FALSE, eval = TRUE}
+library(tidyverse)
+library(microbenchmark)
+```
+
+## Overview
+
+Today, we cover:
+
+- Finish up R packages 
+- RCPP
+- Start of linear programming
+
+Announcements
+
+- HW4 due April 15, 10:00AM
+- No class tomorrow, April 9
+
+
+
+---
+
+
+
+
+## Quantile regression
+
+
+The goal of regression is to understand the relationship between an outcome and covariates. Traditional regression models the conditional mean, $E(Y|X)$
+- Relies on normal error assumptions and homoscedasticity
+- Sensitive to outliers and skewed distributions
+
+Quantile regression:
+- Provides a more exhaustive description of the data
+- The collection of regressions at all quantiles would give a complete picture of outcome-covariate relationships
+
+---
+
+## Quantile regression
+
+```{r, echo = FALSE, fig.align = 'center', out.width = '70%', message = FALSE}
+
+data(engel)
+
+attach(engel)
+plot(income,foodexp,xlab="Household Income",ylab="Food Expenditure",type = "n", cex=.5)
+points(income,foodexp,cex=.5,col="blue")
+xx <- seq(min(engel$income),max(engel$income),100)
+taus <- c(.05,.1,.25, .5, .75,.9,.95)
+
+f <- coef(rq((foodexp)~(income),tau=taus, data = engel))
+yy <- cbind(1,xx)%*%f
+for(i in 1:length(taus)){
+        lines(xx,yy[,i],col = "gray")
+        }
+
+
+```
+
+---
+
+## Colorado cannabis and driving study
+
+```{r, echo = FALSE, fig.align = 'center', out.width = '90%'}
+knitr::include_graphics("ccds.png")
+```
+
+
+
+
+::: notes
+Digression- I'm going to show some examples in class using data from a big study I'm a part of.  You'll also use this dataset in your homework
+:::
+
+---
+
+## Colorado cannabis and driving study
+
+```{r, echo = FALSE, fig.align = 'center', out.width = '90%', message = FALSE, warning = FALSE, fig.height = 6, fig.width = 10}
+
+cannabis = readRDS(here::here("Homework", "4_constrained_optimization/", "cannabis.rds"))
+
+p1 = cannabis %>%
+  ggplot(aes(t_mmr1)) +
+  geom_histogram(bins = 8) +
+  ggtitle("THC molar metabolite ratio") +
+  xlab("Molar metabolite ratio")
+
+p2 = cannabis %>%
+  ggplot(aes(p_change,t_mmr1)) +
+  labs(x = "percent change in pupil diameter after light flash", 
+       y = "THC molar metabolite ratio") +
+  geom_point()
+
+
+p1 + p2
+```
+
+
+
+
+::: notes
+MMR tells you about acute cannabis impairment
+Probably not great data for linear regression... why?
+:::
+
+---
+
+## Quantile regression model
+
+Regress conditional quantiles of response on the covariates. Assume the outcome Y is continuous.
+
+- Classical model: $Q_{\tau}(Y|X)=X\beta_{\tau}$
+- $Q_{\tau}(Y|X)$ is the $\tau$th conditional quantile of $Y$ given $X$
+
+
+The above model is equivalent to specifying
+
+$$Y = X\beta_{\tau} + \epsilon; \quad Q_{\tau}(\epsilon|X) = 0.$$
+
+In comparison, mean regression is:
+
+$$Y = X\beta + \epsilon; \quad E(\epsilon|X) = 0.$$
+
+---
+
+## Pros and cons
+
+**Advantages**:
+
+- Regression at a sequence of quantiles provides a more complete view of data
+- Inference is robust to outliers
+- Estimation is more efficient when residual normality is highly violated
+- Allows interpretation in the outcome's original scale of measurement
+
+**Disadvantages**:
+
+- To be useful, needs to regress on a set of quantiles: computational burden
+- Solution has no closed form
+- Adaptation to non-continuous outcomes is difficult
+
+---
+
+## The loss function
+
+Link between estimands and loss functions:
+
+- To obtain sample mean of $\{y_1,y_2,\ldots y_n\}$ minimize $\sum_i(y_i-b)^2$
+- To obtain sample median of $\{y_1,y_2,\ldots y_n\}$ minimize $\sum_i|y_i-b|$
+
+It can be shown that to obtain the sample $\tau$th quantile, one needs to minimize asymmetric absolute loss, that is, compute
+
+$$\hat{Q}_{\tau} = \arg\min_b \left\{ \sum_{i: y_i\ge b}\tau|y_i-b| + \sum_{i: y_i< b}(1-\tau)|y_i-b|\right\}.$$
+
+For notational simplicity, define $\rho_{\tau}(x) = x[\tau-(x<0)]$.
+---
+
+## The loss function
+
+```{r, echo = FALSE, fig.align = 'center', fig.height = 7, fig.width = 11, message = FALSE}
+quantile_loss = function(b, y, tau) {
+  loss <- ifelse(y >= b, tau * (y - b), (1 - tau) * (b - y))
+  return(loss)
+}
+
+set.seed(2123)
+y = rnorm(100)
+
+tau = c(.1,.25, .5, .75, .9)
+loss = map_dfc(tau, quantile_loss, b = 0, y = y)
+colnames(loss) = paste0("tau_", tau)
+
+loss %>%
+  mutate(y = y) %>%
+  pivot_longer(tau_0.1:tau_0.9, names_to = "tau", values_to = "loss", 
+              names_prefix = "tau_") %>%
+  mutate(tau = factor(tau)) %>%
+  ggplot(aes(y, loss, group = tau)) + 
+  geom_line(aes(color = tau, linetype = tau)) +
+  theme_minimal()
+```
+
+---
+
+## Estimator
+
+The linear quantile regression model is fitted by determining
+
+$$\hat{\beta}_{\tau} = \arg\min_b \sum_{i=1}^n \rho_{\tau}(y_i-x_ib)$$
+
+The estimator has all "expected" properties:
+
+- Scale equivariance: 
+$$\hat{\beta}_{\tau}(ay, X) = a\hat{\beta}_{\tau}(y,X), \quad \hat{\beta}_{\tau}(-ay, X) = -a\hat{\beta}_{1-\tau}(y,X)$$
+
+- Shift (or regression) equivariance: $\hat{\beta}_{\tau}(y+\gamma, X) = \hat{\beta}_{\tau}(y,X)+\gamma$
+
+- Equivariance to reparametrization of design: $\hat{\beta}_{\tau}(y, XA) = A^{-1}\hat{\beta}_{\tau}(y,X)$
+
+
+::: notes
+- Scale equivariance in quantile regression means that if all input values are multiplied by a constant, the predicted quantiles are also multiplied by the same constant, preserving the relative distribution of the response variable.
+- Shift equivariance in quantile regression means that if a constant is added to all input values, the predicted quantiles are also shifted by the same constant, preserving the relative spacing between them.
+- Equivariance to reparameterization of the design in quantile regression means that if the predictor variables undergo a linear transformation (e.g., rescaling or shifting), the estimated quantiles transform accordingly, ensuring that the quantile function remains consistent with the new parameterization of the predictors.
+:::
+
+---
+
+## Asymmetric Double Exponential (ADE) distribution
+
+Density function for ADE is
+
+$$f(y;\mu,\sigma,\tau)= \frac{\tau(1-\tau)}{\sigma}\exp\left\{-\rho_{\tau}(\frac{y-\mu}{\sigma})\right\}$$
+
+
+- Least squares estimator $\iff$ MLE if residuals are Normal
+- QR estimator $\iff$ MLE if residuals are ADE
+- If residuals re iid $ADE(0,1,\tau)$, then the log-likelihood for $\beta_{\tau}$ is 
+
+$$l(\beta_{\tau}; Y,X,\tau)=-\sum_i^n \rho_{\tau}(y_i-x_i\beta_{\tau}) + c_0$$
+---
+
+
+## QR model fitting
+
+The QR estimation problem $\hat{\beta}_{\tau} = \arg\min_b \sum_{i=1}^n \rho_{\tau}(y_i-x_ib)$ can be framed as an LP problem!
+- First, define a set of new variables
+
+$$\begin{aligned}
+    u_i &\equiv [y_i - x_i b]_+ \\
+    v_i &\equiv [y_i - x_i b]_- \\
+    b_+ &\equiv [b]_+ \\
+    b_- &\equiv [b]_-
+\end{aligned}$$
+
+Note:
+- $[\cdot]_+$ and $[\cdot]_-$ mean the positive and negative part of a number
+- $x \equiv [x]_+ - [x]_-$
+  - $[x]_+ = \max(x, 0)$
+  - $[x]_- = \max(-x, 0)$
+
+---
+
+
+## QR model fitting
+
+Remember the objective function is $\sum_{i = 1}^n \rho_{\tau}(y_i-x_ib)$. Notice that 
+- When $y_i-x_ib\ge 0$, we have $\rho_{\tau}(y_i-x_ib)=\tau u_i$, and $v_i =0$.
+- When $y_i-x_ib < 0$, we have $\rho_{\tau}(y_i-x_ib)=(1-\tau) v_i$, and $u_i = 0$.
+
+So we can write $\rho_{\tau}(y_i-x_ib)=\tau u_i + (1-\tau) v_i$.
+
+---
+
+## QR model fitting
+
+The optimization problem can then be reformulated as:
+
+$$\begin{aligned}
+    &\max \quad - \sum_{i=1}^{n} [\tau u_i + (1 - \tau) v_i] \\
+    &\text{s.t.} \quad y_i = x_i b_+ - x_i b_- + u_i - v_i \\
+    &\quad u_i, v_i \geq 0, \quad i = 1, \dots, n \\
+    &\quad b_+, b_- \geq 0
+\end{aligned}$$
+
+<br>
+This is a standard LP problem can be solved by Simplex or interior point methods.
+---
+
+## QR model fitting, cont
+
+
+```{r, echo = FALSE, fig.align = 'center', out.width = '90%'}
+knitr::include_graphics("qr.png")
+```
+
+
+---
+
+
+## QR model fitting, cont
+
+
+```{r, echo = FALSE, fig.align = 'center', out.width = '90%'}
+knitr::include_graphics("qr2.png")
+```
+
+
+---
+
+
+## QR model fitting, cont
+
+
+```{r, echo = FALSE, fig.align = 'center', out.width = '90%'}
+knitr::include_graphics("qr3.png")
+```
+
+
+---
+
+## QR in R
+
+```{r, echo = FALSE, fig.align = 'center', out.width = '90%', message = FALSE, warning = FALSE, fig.height = 6, fig.width = 10}
+p1 + p2
+```
+
+::: notes
+Now we're going to fit this quantile regression
+:::
+
+---
+
+
+## QR in R
+
+Want to compare linear and quantile regression
+
+```{r}
+ols = lm(t_mmr1 ~ p_change, data = cannabis)
+
+# default method, which is a simplex method
+median_regression = rq(t_mmr1 ~ p_change, tau = 0.5, data = cannabis, 
+                       method = "br")
+qr.9 = rq(t_mmr1 ~ p_change, tau = 0.9, data = cannabis, 
+          method = "br")
+
+summary(ols)$coefficients
+summary(median_regression, se = "boot")$coefficients
+```
+
+
+
+---
+
+## QR in R
+
+Blue is ols, red is median regression, pink is tau = 0.9
+
+
+```{r, echo = FALSE, fig.align = 'center', out.width = '90%', message = FALSE, warning = FALSE, fig.height = 6, fig.width = 10}
+p2 + 
+  geom_abline(slope = coef(ols)[2], intercept = coef(ols)[1], color = "blue") +
+  geom_abline(slope = coef(median_regression)[2], intercept = coef(median_regression)[1], color = "red") +
+  geom_abline(slope = coef(qr.9)[2], intercept = coef(qr.9)[1], color = "pink") 
+
+
+```
+
+---
+
+
+## LASSO
+
+Consider usual regression settings with data $(\bf{x}_i, y_i)$, where $\textbf{x}_i = (x_{i1},\ldots, x_{ip})$ is a p-vector of predictors and $y_i$ is the response for the $i$th subject.The OLS setting finds a coefficient vector to minimize the residual sum of squares:
+
+$$\hat{\beta} = \arg\min_{\beta}\sum_i^n(y_i-x_i\beta)^2$$
+- Solution is the MLE assuming a Normal model:
+$$y_i = \textbf{x}_i\beta + \epsilon_i, \quad \epsilon_i\sim N(0, \sigma^2)$$
+- This is undesirable when $p$ is large because
+1. When p>n, model can't be fit
+2. One typically wants a more parsimonius model for interpretability
+
+---
+
+## LASSO
+
+LASSO stands for "Least Absolute Shrinkage and Selection Operator", which aims for model selection when $p$ is large (works even $p > n$). The LASSO procedure will "shrink" the coefficients toward 0 and eventually force some to be exactly zero
+- predictors with $\beta=0$ will be selected out
+
+The LASSO estimates are defined as:
+$$\tilde{\beta} = \arg\min_{\beta} \left\{\sum_i^n(y_i-\textbf{x}_i\beta)^2\right\} s.t. ||\beta||_1\le \lambda$$
+- $||\beta||_1 = \sum_{j=1}^p|b_j|$ is the $L_1$ norm
+- $\lambda\ge 0$ is a tuning parameter controlling the strength of shrinkage 
+
+**What kind of optimization problem does this look like?**
+
+::: notes
+So LASSO tries to minimize the residual sum of squares, with a constraint on the
+sum of the absolute values of the coefficients.
+:::
+
+---
+
+## Regularization side note
+
+LASSO is a regularization approach- regularization prevents overfitting by adding a penalty term to the objective function.
+- LASSO tries to minimize the residual sum of square, with a constraint on the sum of the absolute values of the coefficients.
+
+<br>
+- There are other types of regularized regressions
+- **Ridge regression**: adds an $L_2$ penalty, $\sum_jb_j^2\le \lambda$
+
+---
+
+## LASSO vs. Ridge visualized
+
+```{r, echo = FALSE, fig.align = 'center', out.width = '120%'}
+knitr::include_graphics("lasso.png")
+```
+
+
+::: notes
+Standard lasso picture. The diamond-shaped region (blue) is the constraint imposed by the L1 penalty.
+- The elliptical contours (red) represent the objective function of least squares regression.
+- Because of the sharp corners of the diamond, the solution (where the contours first touch the constraint) often lies on an axis, meaning some coefficients are exactly zero (sparse solution).
+
+For ridge
+- The circular region (blue) is the constraint imposed by the L2 penalty.
+- The smooth shape does not favor solutions on the axes, meaning all coefficients remain nonzero but shrink toward zero.
+:::
+
+---
+
+## LASSO model fitting
+
+The LASSO problem can be solved by quadratic programming algorithms.
+
+$$\begin{align}
+\max \quad -&\sum_i^n\left(y_i-\sum_j\beta_jx_{ij}\right)^2\\
+s.t. \quad &\sum_j|b_j|\le \lambda
+\end{align}$$
+
+- **Issue**: not in standard LP/QP form, since the constraints have the absolute value operator
+---
+
+
+## LASSO model fitting
+
+The trick is to convert the problem into the standard QP problem setting, i.e., to remove the absolute value operator.
+- To get rid of the $|\cdot|$, let $\beta_j = \beta_j^+-\beta_j^-$, where $\beta_j^+, \beta_j^-\ge0$. 
+- Then $|\beta_j|=\beta_j^++\beta_j^-$ and problem can be written as:
+
+$$\begin{align}
+\max \quad -&\sum_i^n\left(y_i-\sum_j\beta_j^+x_{ij} + \sum_j\beta_j^-x_{ij}\right)^2\\
+s.t. \quad &\sum_j (\beta_j^++\beta_j^-)\le \lambda,\\
+&\beta_j^+, \beta_j^- \ge 0
+\end{align}$$
+
+<br>
+This is now a standard QP problem can be solved by standard QP solvers.
+
+
+::: notes
+Need to explain exactly what this notation means- this is the same thing as what we did for quantile regression.
+- this notation essentially stores the magnitude and sign of the value separately
+- note that the variables here are $\beta$ not x
+:::
+
+---
+
+
+## A little more on LASSO
+
+The Lagrangian for the LASSO optimization problem is:
+
+$$L(\mathbf{\beta},\lambda) = -\sum_{i=1}^n\left (y_i-\sum_j\beta_jx_{ij}\right)^2 - \lambda\sum_{j = 1}^p|\beta_j|$$
+
+This is equivalent to the likelihood function for a Bayesian model with a double exponential (DE) prior on $\beta$s (remember ADE used in quantile regression?):
+
+$$\begin{align}
+Y|X, \beta &\sim N(X\beta, \sigma^2)\\
+\beta_j &\sim DE(1/\lambda)
+\end{align}$$
+
+where the DE density function is 
+
+$$f(x,\tau) = \frac1{2\tau}\exp\left(\frac{-|x|}{\tau}\right)$$
+
+::: notes
+Ridge gives you a normal prior on beta
+:::
+
+---
+
+## LASSO in R
+
+The package `glmnet` is standard for elastic net and LASSO in R.
+
+
+```{r, fig.align = 'center', fig.height = 5, fig.width = 9, message = FALSE}
+### Lasso results from R package "glmnet"
+library(glmnet)
+lasso_mod = glmnet(x = dplyr::select(cannabis, -id, -t_mmr1), 
+                   y = cannabis$t_mmr1)
+plot(lasso_mod, "lambda")
+```
+
+::: notes
+There are other functions for this as well
+:::
+
+
+
