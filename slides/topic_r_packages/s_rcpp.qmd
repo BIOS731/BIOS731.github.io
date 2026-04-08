@@ -35,6 +35,7 @@ Announcements
 
 - HW4 due April 15, 10:00AM
 - No class tomorrow, April 9
+- Email me to set up office hours
 
 
 
@@ -169,7 +170,7 @@ Reveals important differences between C++ and R:
 ## Scalar input, scalar output
 
 
-\fontsize{10pt}{11pt}\selectfont
+\fontsize{8pt}{9pt}\selectfont
 The next example function implements a scalar version of the `sign()` function which returns 1 if the input is positive, and -1 if it’s negative:
 
 ```{r, eval = FALSE}
@@ -205,7 +206,7 @@ cppFunction('int signC(int x) {
 ## Vector input, scalar output
 
 
-\fontsize{10pt}{11pt}\selectfont
+\fontsize{9pt}{10pt}\selectfont
 One big difference between R and C++ is that the cost of loops is much lower in C++. In R we would never use the following code. But in C++, loops have very little overhead, so it’s fine to use them. 
 
 ```{r, eval = TRUE}
@@ -321,6 +322,7 @@ rowSumsC(x)
 
 ## Using sourceCpp
 
+\fontsize{10pt}{11pt}\selectfont
 So far, we’ve used inline C++ with `cppFunction()`. For real problems, it’s usually easier to use stand-alone C++ files and then source them into R using `sourceCpp()`.
 
 
@@ -362,7 +364,7 @@ You can embed R code in special C++ comment blocks. This is really convenient if
 ## Using sourceCpp
 
 
-\fontsize{10pt}{11pt}\selectfont
+\fontsize{8pt}{9pt}\selectfont
 ```{cpp}
 #include <Rcpp.h>
 using namespace Rcpp;
@@ -409,6 +411,7 @@ Sugar functions can be roughly broken down into
 - logical summary functions
 - vector views
 - other useful functions
+
 ---
 
 ## Rcpp sugar
@@ -449,14 +452,14 @@ Won't be faster than our C loop version but is easier to read
 - Weird things can happen if you have missing values in an R object and pass them to C++
 
 
-I am glossing over a **ton** of stuff. Lucky, there is good documentation if you need to implement this yourself.
+I am glossing over a **ton** of stuff. There is good documentation if you need to implement this yourself.
 
 ---
 
 ## Missing values
 
 
-\fontsize{10pt}{11pt}\selectfont
+\fontsize{7pt}{8pt}\selectfont
 R's `NA` does not map cleanly to C++ — each type has its own sentinel:
 
 ```{cpp}
@@ -496,7 +499,7 @@ Passing an NA through without checking can silently produce wrong answers in C++
 ## Working with Lists and DataFrames
 
 
-\fontsize{10pt}{11pt}\selectfont
+\fontsize{7pt}{8pt}\selectfont
 Rcpp provides `List` and `DataFrame` types that map to R's `list` and `data.frame`:
 
 ```{cpp}
@@ -530,42 +533,11 @@ DataFrame works similarly — DataFrame::create(Named("col") = vec). You can als
 
 ---
 
-## STL containers
-
-One of the advertised benefits of Rcpp is access to the C++ Standard Template Library (STL). A few useful containers:
-
-| STL type | Use case |
-|---|---|
-| `std::vector<double>` | growable array (push_back) |
-| `std::map<std::string, int>` | key-value lookup |
-| `std::set<int>` | unique elements |
-| `std::sort` | fast in-place sorting |
-
-Example — counting unique values with a `std::map`:
-
-```{cpp}
-#include <Rcpp.h>
-#include <map>
-using namespace Rcpp;
-
-// [[Rcpp::export]]
-std::map<int, int> table_int(IntegerVector x) {
-  std::map<int, int> counts;
-  for (int i = 0; i < x.size(); ++i) counts[x[i]]++;
-  return counts;
-}
-```
-
-::: notes
-STL containers are returned to R as named vectors or lists automatically by Rcpp. The real power is when you need data structures R doesn't have — ordered maps, priority queues, etc.
-:::
-
----
 
 ## Debugging Rcpp code
 
 
-\fontsize{10pt}{11pt}\selectfont
+\fontsize{9pt}{10pt}\selectfont
 Rcpp is hard to debug. A few strategies:
 
 **1. Write a pure-R version first** and test edge cases before porting to C++.
@@ -589,7 +561,7 @@ if (x.size() == 0) Rcpp::stop("x must be non-empty");
 
 **4. Check types carefully** — passing the wrong R type (e.g., integer vs double) is a common silent bug.
 
-**5. `valgrind` / `AddressSanitizer`** for memory issues (advanced).
+
 
 ::: notes
 The most common beginner mistake is off-by-one errors (C++ is 0-indexed, R is 1-indexed) and type mismatches. Compile early and often.
@@ -615,13 +587,16 @@ importFrom(Rcpp, evalCpp)
 useDynLib(yourpkg, .registration = TRUE)
 ```
 
-- The easiest way — just run:
+- The easiest way:
 ```{r}
 usethis::use_rcpp()
 ```
+
 This edits `DESCRIPTION`, `NAMESPACE`, creates `src/`, and adds a placeholder `.cpp` file.
 
+::: notes
 For more details see the Rcpp package vignette, `vignette("Rcpp-package")`.
+:::
 
 
 ---
@@ -647,88 +622,7 @@ For more details see the Rcpp package vignette, `vignette("Rcpp-package")`.
 
 ---
 
-## HW4: CAVI for a Gaussian Mixture Model
 
-**Problem 2** asks you to implement CAVI for a $K$-component unit-variance Gaussian mixture.
-
-The model:
-
-\begin{align*}
-\mu_k &\sim N(0, \sigma^2), \quad k = 1,\ldots,K \\
-c_i &\sim \text{Categorical}(1/K, \ldots, 1/K) \\
-y_i \mid c_i, \mu &\sim N(c_i^T\mu,\; 1)
-\end{align*}
-
-Goal: approximate the posterior $p(\mu, \mathbf{c} \mid y)$ with a variational distribution $q(\mu, \mathbf{c})$ by maximizing the **ELBO**.
-
-::: notes
-c_i is a one-hot vector so c_i^T mu picks out the mean for the cluster that obs i belongs to. Walk through the model before jumping into the derivation.
-:::
-
----
-
-## Mean-field approximation
-
-Assume a **mean-field** factorization:
-
-$$q(\mu, \mathbf{c}) = \prod_{k=1}^K q(\mu_k) \prod_{i=1}^n q(c_i)$$
-
-Define the variational families:
-
-- $q(\mu_k) = N(m_k,\; s_k^2)$ — one Gaussian per cluster mean
-- $q(c_i) = \text{Categorical}(r_{i1}, \ldots, r_{iK})$ — "responsibilities"
-  - $r_{ik} = \mathbb{E}_q[c_{ik}] = \Pr_q(c_i = k)$, with $\textstyle\sum_k r_{ik} = 1$
-
-The parameters to learn: $\{m_k,\; s_k^2\}_{k=1}^K$ and $\{r_{ik}\}_{i,k}$
-
-::: notes
-The mean-field assumption means we treat the cluster assignments and means as independent under q. This is the key approximation that makes the problem tractable.
-:::
-
----
-
-## CAVI update equations
-
-**Update $q(c_i)$** — holding $q(\mu)$ fixed:
-
-$$r_{ik} \;\propto\; \exp\!\left(y_i m_k - \tfrac{1}{2}(m_k^2 + s_k^2)\right)$$
-
-Normalize so $\sum_k r_{ik} = 1$ (use log-sum-exp to avoid underflow)
-
-<br>
-
-**Update $q(\mu_k)$** — holding $q(\mathbf{c})$ fixed:
-
-$$s_k^2 = \left(\sum_i r_{ik} + \frac{1}{\sigma^2}\right)^{-1}, \qquad m_k = s_k^2 \sum_i r_{ik}\, y_i$$
-
-Iterate these two steps until the **ELBO** converges.
-
-::: notes
-These come directly from taking expectations of the log joint under the mean-field approximation. Derive them by completing the square (for mu_k) and by exponentiating the expected log joint (for c_i).
-:::
-
----
-
-## ELBO and implementation tips
-
-Monitor convergence with the **ELBO**:
-
-$$\text{ELBO} = \underbrace{\sum_{i,k} r_{ik}\,\mathbb{E}[\log p(y_i\mid c_i{=}k,\mu_k)]}_{\text{expected likelihood}} - \underbrace{\sum_{i,k} r_{ik}\log r_{ik}}_{\text{entropy of } q(c)} - \underbrace{\sum_k \text{KL}[q(\mu_k)\,\|\,p(\mu_k)]}_{\text{KL for means}}$$
-
-Closed-form KL between two Gaussians:
-$$\text{KL}[N(m, s^2)\,\|\,N(0, \sigma^2)] = \frac{m^2 + s^2}{2\sigma^2} - \frac{1}{2} + \log\frac{\sigma}{s}$$
-
-**Tips:**
-
-- Initialize $r_{ik}$ randomly and normalize; or initialize $m_k$ by K-means
-- Stop when $|\Delta\text{ELBO}| < \varepsilon$ (e.g. $10^{-6}$)
-- Cluster assignments: $\hat{c}_i = \arg\max_k\; r_{ik}$
-
-::: notes
-The ELBO should increase monotonically — if it decreases you have a bug. The KL term is the penalty for q(mu_k) deviating from the prior. Expected likelihood term looks like a soft-assignment weighted sum of log-normals.
-:::
-
----
 
 ## References
 
