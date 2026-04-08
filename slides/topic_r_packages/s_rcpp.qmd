@@ -27,7 +27,7 @@ library(microbenchmark)
 
 Today, we cover:
 
-- Finish up R packages 
+
 - RCPP
 
 
@@ -56,7 +56,7 @@ Announcements
 
 ## About Rcpp
 
-\fontsize{10pt}{11pt}\selectfont
+\fontsize{11pt}{12pt}\selectfont
 Typical bottlenecks that C++ can address include:
 
 
@@ -78,9 +78,6 @@ You don't really need to know C++ to use Rcpp.
 - But... Rcpp is notoriously annoying to debug.
 
 
-::: notes
-It took me over an hour to get it working on this machine since i haven't used it on the machine as a super simple example, even though I have used it previously. Actually it was 35 minutes but it felt like forever.
-:::
 
 ---
 
@@ -170,7 +167,7 @@ Reveals important differences between C++ and R:
 ## Scalar input, scalar output
 
 
-\fontsize{8pt}{9pt}\selectfont
+\fontsize{7pt}{8pt}\selectfont
 The next example function implements a scalar version of the `sign()` function which returns 1 if the input is positive, and -1 if it’s negative:
 
 ```{r, eval = FALSE}
@@ -212,7 +209,7 @@ One big difference between R and C++ is that the cost of loops is much lower in 
 ```{r, eval = TRUE}
 sumR <- function(x) {
   total <- 0
-  for (i in seq_along(x)) {
+  for (i in 1:length(x)) {
     total <- total + x[i]
   }
   total
@@ -245,7 +242,7 @@ The following R code is terrible because we would never do this in a loop, we wo
 \fontsize{10pt}{11pt}\selectfont
 
 ```{r, eval = TRUE}
-x <- runif(1e3)
+x <- runif(1e4)
 microbenchmark(
   sum(x),
   sumC(x),
@@ -412,12 +409,17 @@ Sugar functions can be roughly broken down into
 - vector views
 - other useful functions
 
+```{r, echo = TRUE, eval = FALSE}
+vignette("Rcpp-sugar")
+```
+
+
 ---
 
 ## Rcpp sugar
 
 
-\fontsize{10pt}{11pt}\selectfont
+\fontsize{8pt}{9pt}\selectfont
 All the basic arithmetic and logical operators are vectorised: : +, *, -, /, pow, <, <=, >, >=, ==. For example a simpler version of our `pdistC()` function:
 
 ```{r}
@@ -434,6 +436,17 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 NumericVector pdistC2(double x, NumericVector ys) {
   return sqrt(pow((x - ys), 2));
+}
+
+
+NumericVector pdistC(double x, NumericVector ys) {
+  int n = ys.size();
+  NumericVector out(n);
+
+  for(int i = 0; i < n; ++i) {
+    out[i] = sqrt(pow(ys[i] - x, 2.0));
+  }
+  return out;
 }
 ```
 
@@ -460,7 +473,7 @@ I am glossing over a **ton** of stuff. There is good documentation if you need t
 
 
 \fontsize{7pt}{8pt}\selectfont
-R's `NA` does not map cleanly to C++ — each type has its own sentinel:
+R's `NA` does not map cleanly to C++. Each type has its own sentinel:
 
 ```{cpp}
 #include <Rcpp.h>
@@ -476,25 +489,32 @@ List scalar_missings() {
 }
 ```
 
-For vectors, use `NumericVector::is_na()` to check:
 
-```{cpp}
-// [[Rcpp::export]]
-LogicalVector is_naC(NumericVector x) {
-  int n = x.size();
-  LogicalVector out(n);
-  for (int i = 0; i < n; ++i) {
-    out[i] = NumericVector::is_na(x[i]);
-  }
-  return out;
-}
+```{r, echo = TRUE, eval = FALSE}
+
+sourceCpp("test_cpp.cpp")
+scalar_missings()
+
 ```
+
+
 
 ::: notes
 Passing an NA through without checking can silently produce wrong answers in C++ — no error thrown. Always think about whether your input might contain NAs.
 :::
 
 ---
+
+
+## Missing values
+
+- Logical entry doesn't come back as NA like the others. This is a common source of bugs.
+- Check your code against it's R function
+- Write unit tests for expected input and output
+- Could code as numeric instead of bool
+
+---
+
 
 ## Working with Lists and DataFrames
 
@@ -632,3 +652,4 @@ For more details see the Rcpp package vignette, `vignette("Rcpp-package")`.
 - [`devtools` documentation](https://devtools.r-lib.org)
 - Eddelbuettel D. [*Seamless R and C++ Integration with Rcpp*.](https://www.rcpp.org/book/) Springer.
 - [Rcpp vignettes](https://cran.r-project.org/web/packages/Rcpp/vignettes/)
+- [Rcpp sugar](https://cran.r-project.org/web/packages/Rcpp/vignettes/Rcpp-sugar.pdf)

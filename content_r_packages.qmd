@@ -15,7 +15,7 @@ execute:
 
 ## Overview
 
-In this, we will introduce methods for Cluster Computing.
+In this, we will learn about writing R packages.
 
 ```{r, message = FALSE, warning = FALSE}
 library(tidyverse)
