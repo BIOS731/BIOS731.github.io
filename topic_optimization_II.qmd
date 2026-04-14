@@ -5,8 +5,8 @@ sidebar: false
 ---
 
 
--   [Linear programming](what_is_ds_ii.qmd)
--   [Quadratic programming](what_is_ds_ii.qmd)
+-   [Linear programming](content_optimization_II.qmd)
+-   [Quadratic programming and examples](content_optimization_II.qmd)
 
 
 

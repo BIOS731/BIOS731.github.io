@@ -1,5 +1,5 @@
 ---
-title: "Rcpp"
+title: "Quadratic Programming"
 author: "Julia Wrobel"
 format:
   beamer:
@@ -27,19 +27,148 @@ library(microbenchmark)
 
 Today, we cover:
 
-- Finish up R packages 
-- RCPP
-- Start of linear programming
+- Quadratic programming
+- Examples of LP and QP in statistics
 
 Announcements
 
-- HW4 due April 15, 10:00AM
-- No class tomorrow, April 9
+- Final project due 
 
+---
+
+
+
+## Introduction to quadratic programming
+
+
+\fontsize{10pt}{11pt}\selectfont
+We have discussed linear programming, where both the objective function and
+constraints are linear functions of the unknowns.
+
+The **quadratic programming** (QP) problem has a quadratic objective function and
+linear constraints:
+
+\begin{align*}
+        \max \quad &f(x) = \frac12 x^TBx + cx\\
+        s.t. \quad &Ax \le b, x\ge 0  
+    \end{align*}
+
+The algorithm for solving QP problem is very similar to that for LP. But first we need
+to first introduce the **KKT conditions**.
+
+---
+
+## KKT conditions
+
+
+\fontsize{10pt}{11pt}\selectfont
+For LP, complementary slackness gave us conditions for optimality. **KKT conditions** generalize this to non-linear objective functions. They are necessary conditions for a solution to be optimal in a general non-linear programming problem.
+
+Consider the following problem:
+
+\begin{align*}
+        \max \quad &f(x)\\
+        s.t. \quad &g_i(x) \le 0, i = 1,\ldots,I\\
+        &h_j(x)=0, j = 1,\ldots, J
+    \end{align*}
+
+The Lagrangian is: $L(x,y,z) = f(x) - \sum_iy_ig_i(x) - \sum_jz_jh_j(x)$. Then at the optimal solution, the following **KKT** conditions must be satisfied:
+
+- Primal feasibility: $g_i(x^*)\le 0, h_j(x^*)=0$
+- Dual feasibility: $y_i\ge 0$
+- Complementary slackness: $y_ig_i(x^*)=0$
+- Stationary: $\nabla f(x^*)-\sum_iy_i\nabla g_i(x)-\sum_jz_j\nabla h_j(x) = 0$
+
+---
+
+## Optimal solution for QP
+
+
+\fontsize{10pt}{11pt}\selectfont
+The Lagrangian for the QP problem is
+
+$$L(x,\mu,\lambda) = \frac12 x^TBx + cx - y^T(Ax-b)+z^Tx$$
+
+The KKT conditions for the QP problem are:
+
+- Primal feasibility: $Ax\le b, x\ge 0$
+- Dual feasibility: $y\ge 0, z\ge 0$ ($z$ multiplies the constraint $x\ge 0$, written as $-x\le 0$, so it requires the same non-negativity as $y$)
+- Complementary slackness: $Y(Ax-b)=0, Zx = 0$
+- Stationary: $Bx+c-A^Ty+z = 0$
+
+Here, $Y$ and $Z$ are diagonal matrices with $y$ and $z$ at the diagonal.  This can be solved using an interior point method.
+
+---
+
+## Optimal solution for QP
+
+
+\fontsize{10pt}{11pt}\selectfont
+To be specific, define slack variable $w=b-Ax$, the optimality conditions become
+
+\begin{align*}
+    A x - b + w &= 0, \\
+    B x + c - A^T y + z &= 0, \\
+    Z x &= 0, \\
+    Y w &= 0, \\
+    x, y, z, w &\geq 0.
+\end{align*}
+
+The unknowns are $x, y, z, w$. We can then obtain the Jacobians, form the Newton
+equation and solve for the optimal solution iteratively.
+
+---
+
+
+## QP in R
+
+
+\fontsize{10pt}{11pt}\selectfont
+The `quadprog` package provides functions (`solve.QP.compact`) to solve quadratic
+programming problem. Pay attention to the definition of function parameters. They are slightly different from what I have used in the standard form!  
+
+- Solve $\min \frac12 (x_1^2 + x_2^2)$ s.t. $2x_1+x_2\ge 1$:
+
+```{r, eval = FALSE}
+library(quadprog)
+Dmat = diag(rep(1,2))
+dvec = rep(0,2)
+Amat = matrix(c(2,1))
+solve.QP(Dmat=Dmat, dvec=dvec, Amat=Amat, bvec=c(1))
+```
 
 
 ---
 
+## Review
+
+
+\fontsize{10pt}{11pt}\selectfont
+We have now covered:
+
+- LP problem set up
+- Simplex methods
+- Duality
+- Interior point algorithms
+- Quadratic programming
+
+Now you should be able to formulate an LP/QP problem and solve it. But how are these useful in statistics?
+
+- Remember that LP is an optimization algorithm
+- There are plenty of optimization problems in statistics, e.g. MLE
+- It's just a matter of formulating the objective function and constraints.
+
+---
+
+## Lab problem
+
+Write out the primal and dual for the carpenter problem.
+
+- Check the set of feasible solutions (corner points).  
+  - What are the values of the objective functions of the primal and dual at each vertex? 
+  - Does weak duality appear to hold?
+
+---
 
 
 
@@ -172,7 +301,7 @@ It can be shown that to obtain the sample $\tau$th quantile, one needs to minimi
 
 $$\hat{Q}_{\tau} = \arg\min_b \left\{ \sum_{i: y_i\ge b}\tau|y_i-b| + \sum_{i: y_i< b}(1-\tau)|y_i-b|\right\}.$$
 
-For notational simplicity, define $\rho_{\tau}(x) = x[\tau-(x<0)]$.
+For notational simplicity, define $\rho_{\tau}(x) = x[\tau-(x<0)]$, where $(x<0)$ is an indicator equal to 1 if $x<0$ and 0 otherwise. This compactly encodes the asymmetric weighting: $\rho_\tau(x) = \tau x$ when $x \ge 0$ and $\rho_\tau(x) = (\tau-1)x$ when $x < 0$.
 ---
 
 ## The loss function
@@ -442,14 +571,16 @@ s.t. \quad &\sum_j|b_j|\le \lambda
 \end{align}
 
 - **Issue**: not in standard LP/QP form, since the constraints have the absolute value operator
+
 ---
 
 
 ## LASSO model fitting
 
-The trick is to convert the problem into the standard QP problem setting, i.e., to remove the absolute value operator.
-- To get rid of the $|\cdot|$, let $\beta_j = \beta_j^+-\beta_j^-$, where $\beta_j^+, \beta_j^-\ge0$. 
-- Then $|\beta_j|=\beta_j^++\beta_j^-$ and problem can be written as:
+The trick is to convert the problem into the standard QP problem setting, i.e., to remove the absolute value operator. This is the **same decomposition used in QR** model fitting ($u_i, v_i$ for residuals), now applied to the coefficients $\beta_j$.
+
+- Let $\beta_j = \beta_j^+-\beta_j^-$, where $\beta_j^+, \beta_j^-\ge0$ (positive and negative parts)
+- Then $|\beta_j|=\beta_j^++\beta_j^-$ and the problem can be written as:
 
 \begin{align}
 \max \quad -&\sum_i^n\left(y_i-\sum_j\beta_j^+x_{ij} + \sum_j\beta_j^-x_{ij}\right)^2\\
@@ -510,5 +641,19 @@ plot(lasso_mod, "lambda")
 There are other functions for this as well
 :::
 
+
+---
+
+## Resources
+
+- [Hao Wu's lecture with matrix represenation of Simplex algorithm](https://www.haowulab.org/teaching/statcomp/Notes/lp1.pdf)
+
+
+**Some videos**
+
+
+- [convexity explained, and duality](https://www.youtube.com/watch?v=d0CF3d5aEGc&ab_channel=VisuallyExplained)
+- [KKT conditions explained](https://www.youtube.com/watch?v=uh1Dk68cfWs&ab_channel=VisuallyExplained)
+- [Simple explanation of Lagrangian](https://www.youtube.com/watch?v=GR4ff0dTLTw&ab_channel=MATLAB)
 
 

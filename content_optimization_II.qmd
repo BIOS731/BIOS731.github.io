@@ -15,7 +15,7 @@ execute:
 
 ## Overview
 
-In this, we will introduce more methods for optimization, including constrained optimization.
+In this, we will introduce more methods for optimization, focusing on constrained optimization through linear and quadratic programming.
 
 ```{r, message = FALSE, warning = FALSE}
 library(tidyverse)
@@ -24,12 +24,22 @@ library(tidyverse)
 
 ::: {.panel-tabset .panel-pills}
 
-### Slide Deck: Introduction to R packages
+### Slide Deck: Introduction to Linear Programming
 
-[![](./slides/topic_R_packages/preview_package.png){width=70%}](./slides/topic_R_packages/s_packages.pdf)
+[![](./slides/topic_optimization_II/preview_lp.png){width=70%}](./slides/topic_optimization_II/s_lp.pdf)
 
 **Intro R packages**  
-[Download slides (PDF)](./slides/topic_R_packages/s_packages.pdf)
+[Download slides (PDF)](./slides/topic_optimization_II/s_lp.pdf)
+
+
+***
+
+### Slide Deck: Quadratic Programming
+
+[![](./slides/topic_optimization_II/preview_qp.png){width=70%}](./slides/topic_optimization_II/s_qp.pdf)
+
+**Intro R packages**  
+[Download slides (PDF)](./slides/topic_optimization_II/s_qp.pdf)
 
 
 ***

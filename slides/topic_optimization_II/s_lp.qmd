@@ -116,7 +116,7 @@ We're gonna get pretty in the weeds here with estimation techniques because I th
 ## Linear programming techniques
 
 
-```{r, echo = FALSE, fig.align = 'center', out.width = '90%'}
+```{r, echo = FALSE, fig.align = 'center', out.width = '80%'}
 knitr::include_graphics("rq.png")
 ```
 
@@ -158,6 +158,7 @@ This is a simple motivating example
 
 
 Let $x_1$ and $x_2$ denote number of tables, bookshelves respectively
+
 - $10x_1 + 20x_2 \le 200$
 - $5x_1 + 4x_2 \le 80$
 - $x_1, x_2 \ge 0$
@@ -203,9 +204,12 @@ calculate f(x, y) at each vertex
 ## Solving LP graphically
 
 The small 2-variable problem can be represented in a 2D graph.
-The isoprofit line (any point on the line generate the same profit) is perpendicular to
-the gradient of objective function. The problem can be solved by sliding the isoprofit
-line.
+
+- An **isoprofit line** connects all combinations of $x_1$ and $x_2$ that yield the same profit value
+  - e.g., $180x_1 + 200x_2 = k$ for different values of $k$
+- The isoprofit line is perpendicular to the gradient of the objective function
+- **Key idea**: slide the isoprofit line outward (increasing $k$) until it just touches the feasible region 
+  - that contact point is optimal
 
 
 
@@ -245,12 +249,13 @@ But if the optimal solutions exists:
 
 ## Big ideas of LP
 
-- Number of vertices in feasible regions corresponds to number of constraints
-- inequalities make a bounded, concave feasible region
-- Extreme values (min and max) occur at the vertices of this region
-- Solution: compute vertices, choose which one gives largest value of $f(x_1, x_2)$
+- Each inequality constraint defines a half-plane; their intersection is the **feasible region**
+- The feasible region is convex (no "dents")
+- Extreme values (min and max) occur at the **vertices** of this region
+- For 2 variables: graphical method works. For $p$ variables: need an algorithm.
 
 You can solve this algorithmically (rather than graphically) using the **simplex method**.
+
 ---
 
 
@@ -366,14 +371,33 @@ when x1 and x2 are zeros slack variables have all the extra stuff in the inequal
 
 ## Pivot step
 
+**Choose the entering variable** (which $x_j$ to increase from zero?):
+
+- Look at the objective row: $z - 180x_1 - 200x_2 = 0$
+- The most negative coefficient determines the entering variable
+- Here: $x_2$ enters (coefficient $-200$ is more negative than $-180$)
 
 ---
 
 ## Pivot step
 
+**Choose the leaving variable** (minimum ratio test):
+
+- Divide each RHS by the entering variable's coefficient in that row
+- $s_1$: $200/20 = 10$; $s_2$: $80/4 = 20$
+- The row with the **smallest non-negative ratio** leaves: $s_1$ leaves
+- This keeps all variables non-negative (stays in the feasible region)
+
 ---
 
 ## Pivot step
+
+**Perform row operations** to make the pivot column a unit vector:
+
+- Divide the pivot row by the pivot element (20)
+- Eliminate $x_2$ from all other rows using row operations
+- Update $z$ row and the RHS
+- Repeat until no negative coefficients remain in the $z$ row
 
 ---
 
@@ -406,6 +430,7 @@ Basic variables define current corner point/vertex!
 
 ## Standard form as a matrix
 
+\fontsize{10pt}{11pt}\selectfont
 \begin{align*}
 \max z &= c^T\boldsymbol{x}\\
 s.t. A\boldsymbol{x} &= b\\
@@ -414,20 +439,8 @@ s.t. A\boldsymbol{x} &= b\\
 
 $$\boldsymbol{x} = [x_1, x_2, s_1, s_2]^T$$
 
-
-## Linear programming
-
-An optimization problem with a linear objective function and linear constraint functions is called a linear program (LP):
-
-\begin{align*}
-\mbox{minimize } &c^Tx + d\\
-\mbox{subject to } &Ax \preceq b\\
-\end{align*}
-
-
-::: notes
-less than equal sign here is a partial order relation.  Just means that some constraints may be less than and some may be greater than, and this allows for both
-:::
+- Extending $\boldsymbol{x}$ to include slack variables $s_1, s_2$ converts all inequalities to equalities
+- The full augmented vector is what the simplex algorithm operates on
 
 ---
 
@@ -489,7 +502,7 @@ This is a reminder of what type of problem we are solving. We will generalize th
 
 ## LP problem for resource allocation
 
-
+\fontsize{10pt}{11pt}\selectfont
 Take a typical maximizing LP problem (3 variables and 2 constraints).
 
 
@@ -500,7 +513,8 @@ Take a typical maximizing LP problem (3 variables and 2 constraints).
         & x_1, x_2, x_3 \geq 0
     \end{align*}
     
-Economic interpretation of the problem:    
+Economic interpretation of the problem:  
+
 - We produce three products using two materials
 - $x_j$: unit of production of product $j \in \{1,2,3\}$. Unknown to obtain.
 - $c_j$: profit per unit of product
@@ -518,6 +532,7 @@ X's are variables/products. These were bookcases and tables.
 
 ## Resource valuation problem
 
+\fontsize{10pt}{11pt}\selectfont
 Now, suppose a buyer is considering purchasing our entire inventory of materials but is unsure how to price them. The buyer knows we will only agree to the sale if it yields a higher return than using the materials for production.
 
 **Buyer's business strategy**: producing one fewer unit of product $j$ will save us:
@@ -546,6 +561,7 @@ Walk through this in detail to make sure they know how we got here. Use Carpente
 
 ## Duality
 
+\fontsize{10pt}{11pt}\selectfont
 The buyer’s LP problem is called the "**dual**" problem of the original problem, which is called the "**primal** problem.
 
 In matrix notation, if the **primal** LP problem is:
@@ -577,7 +593,8 @@ We can also express the dual problem in canonical form (a maximization problem w
     \end{align*}
 
 The **dual is the negative transpose of the primal**. 
-- This means that the dual of the dual problem is the primal problem 
+
+- i.e. the dual of the dual problem is the primal problem 
 
 
 **Why do we care about duality?**
@@ -591,18 +608,10 @@ Why do we care about duality? This has come up in papers I reviewed and I had no
 
 ## Duality
 
-We can also express the dual problem in canonical form (a maximization problem with $\le$ constraints):
-
-\begin{align*}
-        \max \quad & -b^Ty\\
-        \text{s.t.} \quad &-A^Ty \le -c^T, y\ge0
-    \end{align*}
-
-
-
 
 
 **Why do we care about duality?**
+
 - Sometimes the dual problem is easier to solve than the primal one
 - If a constraint is slightly relaxed or tightened, the dual variables indicate how much the objective function will change
 - Solution to primal is **always** $\le$ solution to dual (weak duality theorem)!
@@ -617,6 +626,7 @@ Why do we care about duality?
 
 ## Duality in non-canonical form
 
+\fontsize{10pt}{11pt}\selectfont
 What if the primal problem doesn’t fit into the canonical form (e.g., has $\ge$ or $=$ constraints, unrestricted variables)?
 
 The **variable types in the dual problem** are determined by the **constraint types in the primal problem** as follows:
@@ -665,7 +675,7 @@ $$\begin{array}{|c|c|}
 \end{array}$$
 
 ::: notes
-IS DIRECTION OF THIS CORRECT? CHECK ON THIS TOMORROW. CHATGPT SAYS NO.
+Direction is correct: verified against the worked example below (x1>=0 gives dual constraint >=, x2 unrestricted gives dual =, x3<=0 gives dual <=).
 :::
 
 ---
@@ -673,7 +683,7 @@ IS DIRECTION OF THIS CORRECT? CHECK ON THIS TOMORROW. CHATGPT SAYS NO.
 
 ## Non-canonical duality example
 
-
+\fontsize{9pt}{10pt}\selectfont
 If the primal problem is:
 
 \begin{align*}
@@ -694,7 +704,7 @@ The dual problem is:
 
 ## Non-canonical duality example
 
-
+\fontsize{8pt}{9pt}\selectfont
 If the primal problem is:
 
 \begin{align*}
@@ -719,6 +729,7 @@ The dual problem is:
 
 ## Weak duality
 
+\fontsize{10pt}{11pt}\selectfont
 **Weak duality theorem:**
 
 - For any feasible solution $x$ to the **primal** (maximization) problem and any feasible solution $y$ to the **dual** (minimization) problem:
@@ -745,26 +756,30 @@ Solution to primal is always less than or equal to solution to dual
 
 ## Weak duality proof
 
-**Weak duality**: If $(x_1, \dots, x_n)$ is a feasible solution for the primal, and $(y_1, \dots, y_m)$ is a feasible solution for the dual, then $\sum_j c_j x_j \leq \sum_i b_i y_i.$.
+\fontsize{10pt}{11pt}\selectfont
+**Weak duality**: If $(x_1, \dots, x_n)$ is a feasible solution for the primal, and $(y_1, \dots, y_m)$ is a feasible solution for the dual, then $\sum_j c_j x_j \leq \sum_i b_i y_i$.
 
 ---
 
 
 ## Weak duality proof
 
-**Weak duality**: If $(x_1, \dots, x_n)$ is a feasible solution for the primal, and $(y_1, \dots, y_m)$ is a feasible solution for the dual, then $\sum_j c_j x_j \leq \sum_i b_i y_i.$.
+\fontsize{10pt}{11pt}\selectfont
+**Weak duality**: If $(x_1, \dots, x_n)$ is a feasible solution for the primal, and $(y_1, \dots, y_m)$ is a feasible solution for the dual, then $\sum_j c_j x_j \leq \sum_i b_i y_i$.
 
-\begin{align}
+\begin{align*}
 \sum_j c_j x_j &\leq \sum_j \left( \sum_i y_i a_{ij} \right) x_j \\
 &= \sum_{i,j} y_i a_{ij} x_j \\
 &= \sum_i \left( \sum_j a_{ij} x_j \right) y_i \\
 &\leq \sum_i b_i y_i.
-\end{align}
+\end{align*}
+
 ---
 
 
 ## Strong duality 
 
+\fontsize{10pt}{11pt}\selectfont
 - We know that at feasible solutions for both dual and primal, the solution to the dual is always greater or equal
 - If there is a difference between the largest primal value and
 the smallest dual value it is called the "**Duality gap**".
@@ -773,6 +788,7 @@ the smallest dual value it is called the "**Duality gap**".
 **Strong Duality Theorem:** If the primal has an optimal solution, then the dual also has an optimal solution and there is no duality gap, i.e.:
 
 $$\mbox{objective of dual } = \mbox{ objective of primal}.$$
+
 - Condition for strong duality: the feasible region must be nonempty and bounded.
 - The **duality gap** is zero when strong duality holds.
 
@@ -809,6 +825,7 @@ Can be used to check if a candidate solution (i.e. a feasible solution) is optim
 
 ## Complementary slackness theorem
 
+\fontsize{9pt}{10pt}\selectfont
 Consider a simple LP problem:
 
 \begin{align*}
@@ -830,6 +847,7 @@ Write out the dual problem here
 
 ## Complementary slackness theorem
 
+\fontsize{9pt}{10pt}\selectfont
 Consider a simple LP problem:
 
 \begin{align*}
@@ -852,9 +870,10 @@ Its dual problem is:
 
 ## Complementary slackness theorem
 
-The complementary slackness theorem states...
+
 
 ::: notes
+The complementary slackness theorem states...
 Write out what this means in terms of the complementary slackness theorem
 :::
 
@@ -865,6 +884,7 @@ Write out what this means in terms of the complementary slackness theorem
 
 ## Complementary slackness theorem
 
+\fontsize{10pt}{11pt}\selectfont
 The complementary slackness theorem states:
 
 \begin{align*}
@@ -937,6 +957,7 @@ primal + dual
 
 ## Complementary slackness theorem
 
+\fontsize{10pt}{11pt}\selectfont
 Modify the simple LP problem a bit:
 
 \begin{align*}
@@ -958,7 +979,7 @@ and its dual problem is:
 
 ## Complementary slackness theorem
 
-
+\fontsize{9pt}{10pt}\selectfont
 Now the complementary slackness theorem states:
 
 \begin{align*}
@@ -971,9 +992,9 @@ Now the complementary slackness theorem states:
 For this LP problem, the optimal solutions are $\bf{x} = (50, 0)$, $\bf{y = (0, 1.5)}$. Complementary slackness still holds. We observe that:
 
 - In the primal problem:
-  - The first constraint is unbounded, so its corresponding variable in the dual problem ($y_1$) must be 0
-  - Second constraint is bounded, so $y_2$ can be non-zero
-  
+  - The first constraint is **inactive** (slack $> 0$) at the optimum, so its shadow price $y_1 = 0$
+  - Second constraint is **active** (binding, slack $= 0$), so $y_2$ can be non-zero
+
 ::: notes
 y_2 is the corresponding variable in the dual problem
 :::
@@ -982,15 +1003,17 @@ y_2 is the corresponding variable in the dual problem
 
 ## Complementary slackness theorem
 
+\fontsize{10pt}{11pt}\selectfont
 For this LP problem, the optimal solutions are $\bf{x} = (50, 0)$, $\bf{y = (0, 1.5)}$. Complementary slackness still holds. We observe that:
 
 - In the primal problem:
-  - The first constraint is unbounded, so its corresponding variable in the dual problem ($y_1$) must be 0.
-  - Second constraint is bounded, so $y_2$ can be non-zero.
-  
+  - The first constraint is **inactive** (slack $> 0$), so its shadow price $y_1 = 0$.
+  - The second constraint is **active** (binding, slack $= 0$), so $y_2$ can be non-zero.
+
 - In the dual problem:
-  - The first constraint is bounded, so its corresponding variable in the primal problem ($x_1$) can be non-zero.
-  - The second constraint is unbounded, so its corresponding variable in the primal problem ($x_2$) must be zero.
+  - The first constraint is **active** (binding), so its primal variable $x_1$ can be non-zero.
+  - The second constraint is **inactive** (slack $> 0$), so its primal variable $x_2 = 0$.
+  
 ---
 
 ## Plot of constraints
@@ -1060,6 +1083,7 @@ Think of shadow prices like the value of extra resources in a constrained system
 
 ## Economics interpretation
 
+\fontsize{10pt}{11pt}\selectfont
 **Bakery example**: Imagine you're running a bakery, and can make a limited number of cakes because you have a limited amount of flour. Shadow price tells you how much more profit you’d gain if you had a little more flour.
 
 - If you're tight on flour, getting more flour would let you bake more cakes and make more money.   - In this case, the shadow price is nonzero because the extra resource improves your outcome.
@@ -1077,6 +1101,7 @@ Think of shadow prices like the value of extra resources in a constrained system
 
 ## Primal/dual optimality conditions 
 
+\fontsize{9pt}{10pt}\selectfont
 Given the primal and dual problem with slack/surplus variables added:
 
 
@@ -1090,10 +1115,9 @@ Given the primal and dual problem with slack/surplus variables added:
     & &\quad &\textit{s.t.} \quad A^T y - z = c^T, \quad y, z \geq 0.
 \end{align*}
 
-The *complementary slackness theorem* states that at optimal solution, we should have $x_jz_j = 0 \forall j$, and $w_iy_i = 0 \forall i$.
-
-In matrix notation, the complementary conditions can be rewritten as 
+The *complementary slackness theorem* states that at optimal solution, we should have $x_jz_j = 0 \forall j$, and $w_iy_i = 0 \forall i$. In matrix notation, the complementary conditions can be rewritten as 
 $$XZe=0, WYe = 0$$
+
 - $X,Z,W,Y$ are diagonal matrices
 - $e$ is a vector of $1$'s
 
@@ -1101,6 +1125,7 @@ $$XZe=0, WYe = 0$$
 
 ## Primal/dual optimality conditions
 
+\fontsize{10pt}{11pt}\selectfont
 We now have the optimality conditions for the primal/dual problems as:
 
 \begin{align*}
@@ -1114,11 +1139,13 @@ We now have the optimality conditions for the primal/dual problems as:
 - The first two conditions are simply the constraints for primal/dual problems
 - The next two are complementary slackness
 - The last one is the non-negativity constraint
+
 ---
 
 
 ## Primal/dual optimality conditions
 
+\fontsize{10pt}{11pt}\selectfont
 We now have the optimality conditions for the primal/dual problems as:
 
 \begin{align*}
@@ -1143,6 +1170,7 @@ Such approach is called "primal-dual interior point method".
 
 ## Primal-dual interior point method
 
+\fontsize{10pt}{11pt}\selectfont
 The primal-dual interior point method finds the primal-dual optimal solution $(x^*, y^*, w^*, z^*)$ by applying Newton’s method to the primal-dual optimality conditions.
 
 - The direction and length of the steps are modified in each step so that the
@@ -1165,7 +1193,7 @@ The goal is to find solution for $F = 0$.
 
 ## Primal-dual interior point method
 
-
+\fontsize{10pt}{11pt}\selectfont
 Applying Newton’s method, if at iteration $k$ the variables are $(x^k, y^k, w^k, z^k)$,
 we obtain a search direction  
 $(\delta x, \delta y, \delta w, \delta z)$
@@ -1182,3 +1210,164 @@ F'(x^k, y^k, w^k, z^k)
 =
 -F(x^k, y^k, w^k, z^k).
 $$
+
+---
+
+## Primal-dual interior point method
+
+
+\fontsize{10pt}{11pt}\selectfont
+Then the update will be:
+
+$$
+(x^{k+1}, y^{k+1}, w^{k+1}, z^{k+1})= (x^k, y^k, w^k, z^k) + \alpha (\delta x, \delta y, \delta w, \delta z)
+$$
+
+with $\alpha \in (0,1]$ chosen so that the result from the next iteration is feasible.
+
+- Solving for $(\delta x, \delta y, \delta w, \delta z)$ using the equation on the previous slide enforces feasibility of solutions
+
+::: notes
+Given that at current iteration, both primal and dual are strictly feasible, the first two terms on the right hand side are 0.
+:::
+
+---
+
+
+## An improved algorithm
+
+
+\fontsize{10pt}{11pt}\selectfont
+The algorithm in its current setup is not ideal because often the steps are small to
+avoid violating the positivity constraints. Instead:
+
+- The value of $XZe + WYe$ represents the duality gap
+- Instead of trying to eliminate the duality gap (set it to 0), reduce the duality gap by some factor in each step
+
+We replace the complementary slackness by:
+
+\begin{align}
+XZe &= \mu_xe\\
+WYe &= \mu_ye
+\end{align}
+
+When $\mu_x, \mu_y\to 0$ as $k\to\infty$ the solution from this system will converge to the optimal solution of the original LP problem. Good selections of $\mu$ are $\mu_x^{k+1}=(x^k)^Tz^k/n$ and $\mu_y^{k+1}=(w^k)^Ty^k/m$ 
+
+- $n$ and $m$ are the dimensions of $x$ and $y$
+
+---
+
+## An improved algorithm
+
+
+\fontsize{10pt}{11pt}\selectfont
+Under the new algorithm, at the $k$th iteration, the Newton equations become:
+
+$$\begin{bmatrix}
+    A & 0 & I & -0 \\
+    0 & A^T & 0 & -I \\
+    Z & 0 & 0 & X \\
+    0 & W & Y & 0
+\end{bmatrix}
+\begin{bmatrix}
+    \delta x \\
+    \delta y \\
+    \delta w \\
+    \delta z
+\end{bmatrix}
+=
+\begin{bmatrix}
+    0 \\
+    0 \\
+    -X^k Z^k e + \mu_x^k e \\
+    -W^k Y^k e + \mu_y^k e
+\end{bmatrix}$$
+
+This provides the **general primal-dual interior point method** as follows:
+
+1. Choose strictly feasible initial solution $(x^0, y^0, w^0, z^0)$, and set $k = 0$. Then repeat (2) and (3) until convergence:
+2. Solve system (1) to obtain the updates $(\delta x, \delta y, \delta w, \delta z)$
+3. Update the solution $(x^{k+1}, y^{k+1}, w^{k+1}, z^{k+1}) = (x^k, y^k, w^k, z^k)+ \alpha^k(\delta x, \delta y, \delta w, \delta z)$. $\alpha^k$ is chosen so that all variables are $\ge$ 0.
+
+
+::: notes
+System (1) is the system above  
+:::
+
+---
+
+
+
+## Lagrange multipliers
+
+
+\fontsize{10pt}{11pt}\selectfont
+The method of Lagrange multiplier is a general algorithm for optimization problems with equality constraints. For example, consider a problem:
+
+\begin{align*}
+        \max \quad &f(x,y)\\
+        s.t. \quad &g(x,y) = c
+    \end{align*}
+
+We introduce a new variable $\lambda$ called a **Lagrange multiplier** and form the following new objective function:
+
+$$L(x,y,\lambda) = f(x,y) + \lambda[g(x,y)-c]$$
+
+We will then optimize $L$ with respect to $x,y$ and $\lambda$ using typical methods. Note that the condition $\partial L/\partial \lambda = 0$ at the optimal solution guarantees that the constraints will be satisfied.
+
+---
+
+## The barrier problem
+
+
+\fontsize{10pt}{11pt}\selectfont
+The interior point algorithm is closely related to the **Barrier Problem**. Go back to
+the primal problem:
+
+\begin{align*}
+        \max \quad &z=cx\\
+        s.t. \quad &Ax + w = b; x,w\ge0
+    \end{align*}
+
+The non-negativity constraints can be replaced by adding two **barrier terms** in the
+objective function. The barrier term is defined as $B(x) = \sum_j\log x_j$, which is finite as long as $x_j$ is positive. Then the primal problem becomes:
+
+
+\begin{align*}
+        \max \quad &z=cx +\mu_xB(x) + \mu_yB(w)\\
+        s.t. \quad &Ax + w = b
+\end{align*}
+
+The barrier terms make sure $x$ and $w$ won't become negative.
+
+---
+
+
+## The barrier problem
+
+
+\fontsize{10pt}{11pt}\selectfont
+The Lagrangian for this problem is (using $y$ as the multiplier):
+
+$$L(x,y,w) = cx +  \mu_xB(x) + \mu_yB(w) + y^T(b-w-Ax)$$
+
+The optimal solution for the problem satisfies:
+
+\begin{align}
+c + \mu_xX^{-1}e-A^Ty &= 0\\
+b-w-Ax &= 0\\
+\mu_yW^{-1}e-y &= 0
+\end{align}
+
+Define new variables $z = \mu_xX^{-1}e$ and rewrite these conditions, we obtain exactly the same set of equations as the relaxed optimality conditions for primal-dual problem.
+**Note**: $z = \mu_xX^{-1}e$ is also a condition so there are 4 in total.
+
+
+::: notes
+Barrier function essentially transforms problem into unconstrained problem using the barrier function.
+
+Next year try to come up with a visualization to better understand this
+:::
+
+
+
