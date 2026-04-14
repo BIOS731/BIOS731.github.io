@@ -246,12 +246,12 @@ $$l(\beta_{\tau}; Y,X,\tau)=-\sum_i^n \rho_{\tau}(y_i-x_i\beta_{\tau}) + c_0$$
 The QR estimation problem $\hat{\beta}_{\tau} = \arg\min_b \sum_{i=1}^n \rho_{\tau}(y_i-x_ib)$ can be framed as an LP problem!
 - First, define a set of new variables
 
-$$\begin{aligned}
+\begin{align}
     u_i &\equiv [y_i - x_i b]_+ \\
     v_i &\equiv [y_i - x_i b]_- \\
     b_+ &\equiv [b]_+ \\
     b_- &\equiv [b]_-
-\end{aligned}$$
+\end{align}
 
 Note:
 - $[\cdot]_+$ and $[\cdot]_-$ mean the positive and negative part of a number
@@ -276,14 +276,14 @@ So we can write $\rho_{\tau}(y_i-x_ib)=\tau u_i + (1-\tau) v_i$.
 
 The optimization problem can then be reformulated as:
 
-$$\begin{aligned}
+\begin{align}
     &\max \quad - \sum_{i=1}^{n} [\tau u_i + (1 - \tau) v_i] \\
     &\text{s.t.} \quad y_i = x_i b_+ - x_i b_- + u_i - v_i \\
     &\quad u_i, v_i \geq 0, \quad i = 1, \dots, n \\
     &\quad b_+, b_- \geq 0
-\end{aligned}$$
+\end{align}
 
-<br>
+
 This is a standard LP problem can be solved by Simplex or interior point methods.
 ---
 
@@ -436,10 +436,10 @@ For ridge
 
 The LASSO problem can be solved by quadratic programming algorithms.
 
-$$\begin{align}
+\begin{align}
 \max \quad -&\sum_i^n\left(y_i-\sum_j\beta_jx_{ij}\right)^2\\
 s.t. \quad &\sum_j|b_j|\le \lambda
-\end{align}$$
+\end{align}
 
 - **Issue**: not in standard LP/QP form, since the constraints have the absolute value operator
 ---
@@ -451,11 +451,11 @@ The trick is to convert the problem into the standard QP problem setting, i.e., 
 - To get rid of the $|\cdot|$, let $\beta_j = \beta_j^+-\beta_j^-$, where $\beta_j^+, \beta_j^-\ge0$. 
 - Then $|\beta_j|=\beta_j^++\beta_j^-$ and problem can be written as:
 
-$$\begin{align}
+\begin{align}
 \max \quad -&\sum_i^n\left(y_i-\sum_j\beta_j^+x_{ij} + \sum_j\beta_j^-x_{ij}\right)^2\\
 s.t. \quad &\sum_j (\beta_j^++\beta_j^-)\le \lambda,\\
 &\beta_j^+, \beta_j^- \ge 0
-\end{align}$$
+\end{align}
 
 <br>
 This is now a standard QP problem can be solved by standard QP solvers.
@@ -478,10 +478,10 @@ $$L(\mathbf{\beta},\lambda) = -\sum_{i=1}^n\left (y_i-\sum_j\beta_jx_{ij}\right)
 
 This is equivalent to the likelihood function for a Bayesian model with a double exponential (DE) prior on $\beta$s (remember ADE used in quantile regression?):
 
-$$\begin{align}
+\begin{align}
 Y|X, \beta &\sim N(X\beta, \sigma^2)\\
 \beta_j &\sim DE(1/\lambda)
-\end{align}$$
+\end{align}
 
 where the DE density function is 
 
