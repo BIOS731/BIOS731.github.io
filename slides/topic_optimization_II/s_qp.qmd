@@ -27,6 +27,7 @@ library(microbenchmark)
 
 Today, we cover:
 
+- Finish linear programming
 - Quadratic programming
 - Examples of LP and QP in statistics
 
@@ -37,6 +38,304 @@ Announcements
 ---
 
 
+
+## Primal/dual optimality conditions
+
+\fontsize{9pt}{10pt}\selectfont
+Given the primal and dual problem with slack/surplus variables added:
+
+::: notes
+Now we set up the machinery for interior point methods. We add slack/surplus variables to convert both the primal and dual into equality-constrained form. w are slack variables for the primal (Ax + w = b). z are surplus variables for the dual (A^T y - z = c^T). Complementary slackness in matrix form: X and Z are diagonal matrices with x and z on the diagonal. The condition x_j z_j = 0 for all j becomes XZe = 0 where e is the all-ones vector. Similarly WYe = 0. Count the variables: we have x (n), y (m), w (m), z (n) — that's 2n + 2m unknowns total.
+:::
+
+
+\begin{align*}
+    &\textbf{Primal:} &\quad &\textit{max} \quad c x \\
+    & &\quad &\textit{s.t.} \quad A x + w = b, \quad x, w \geq 0.
+\end{align*}
+
+\begin{align*}
+    &\textbf{Dual:} &\quad &\textit{min} \quad b^T y \\
+    & &\quad &\textit{s.t.} \quad A^T y - z = c^T, \quad y, z \geq 0.
+\end{align*}
+
+The *complementary slackness theorem* states that at optimal solution, we should have $x_jz_j = 0 \forall j$, and $w_iy_i = 0 \forall i$. In matrix notation, the complementary conditions can be rewritten as 
+$$XZe=0, WYe = 0$$
+
+- $X,Z,W,Y$ are diagonal matrices
+- $e$ is a vector of $1$'s
+
+---
+
+## Primal/dual optimality conditions
+
+\fontsize{10pt}{11pt}\selectfont
+We now have the optimality conditions for the primal/dual problems as:
+
+\begin{align*}
+    A x + w - b &= 0, \\
+    A^T y - z - c^T &= 0, \\
+    XZ e &= 0, \\
+    WYe &= 0, \\
+    x, y, w, z &\geq 0.
+\end{align*}
+
+- The first two conditions are simply the constraints for primal/dual problems
+- The next two are complementary slackness
+- The last one is the non-negativity constraint
+
+::: notes
+Walk through each condition. Conditions 1 and 2 are just primal and dual feasibility — the constraints must be satisfied. Conditions 3 and 4 are complementary slackness in matrix form — XZe = 0 means x_j z_j = 0 for each j, and WYe = 0 means w_i y_i = 0 for each i. Condition 5 is non-negativity. Together these are necessary AND sufficient for optimality (by strong duality). Count: conditions 1 gives m equations, condition 2 gives n equations, conditions 3 gives n equations, condition 4 gives m equations. Total: 2n + 2m equations. Same as the number of unknowns — square system!
+:::
+
+---
+
+
+## Primal/dual optimality conditions
+
+\fontsize{10pt}{11pt}\selectfont
+We now have the optimality conditions for the primal/dual problems as:
+
+\begin{align*}
+    A x + w - b &= 0, \\
+    A^T y - z - c^T &= 0, \\
+    XZ e &= 0, \\
+    WYe &= 0, \\
+    x, y, w, z &\geq 0.
+\end{align*}
+
+
+
+Ignoring the non-negativity constraints, this is a set of $2n + 2m$ equations with
+$2n + 2m$ unknowns ($n$ and $m$ are the number of unknowns and constraints in the
+primal problem), which can be solved using Newton's method.
+
+::: notes
+Key insight: if we ignore the non-negativity constraint (condition 5) for a moment, we have a square nonlinear system of 2n + 2m equations in 2n + 2m unknowns. Nonlinear because of the complementary slackness terms XZe and WYe — these are products of variables. We know how to solve nonlinear square systems: Newton's method. The challenge is enforcing non-negativity throughout the iterations. This is what makes interior point methods more sophisticated than naive Newton — they take steps that keep all variables strictly positive.
+:::
+
+---
+
+## Primal-dual interior point method
+
+\fontsize{10pt}{11pt}\selectfont
+The primal-dual interior point method finds the primal-dual optimal solution $(x^*, y^*, w^*, z^*)$ by applying Newton’s method to the primal-dual optimality conditions.
+
+- The direction and length of the steps are modified in each step so that the
+non-negativity condition is strictly satisfied in each iteration.
+
+To be specific, define the following function $F:R^{2n+2m}\to R^{2n + 2m}$:
+
+
+$$\mathbf{F}(x, y, w, z) =
+\begin{bmatrix}
+    \mathbf{A}x + \mathbf{w} - \mathbf{b} \\
+    \mathbf{A}^T y - \mathbf{z} - \mathbf{c}^T \\
+    XZ e \\
+    WYe
+\end{bmatrix}$$
+
+The goal is to find solution for $F = 0$.
+
+::: notes
+We package the five optimality conditions into a vector function F. The domain and codomain are both R^{2n+2m}. F = 0 corresponds exactly to satisfying all optimality conditions (except non-negativity, which we handle separately). Newton’s method finds roots of nonlinear systems by iterating: at each step, linearize F around the current point, solve for the direction to move, take a step. The key modification for interior point: choose the step size α to ensure all variables remain strictly positive (stay in the interior of the non-negative orthant — hence "interior point").
+:::
+
+---
+
+## Primal-dual interior point method
+
+\fontsize{10pt}{11pt}\selectfont
+Applying Newton’s method, if at iteration $k$ the variables are $(x^k, y^k, w^k, z^k)$,
+we obtain a search direction
+$(\delta x, \delta y, \delta w, \delta z)$
+by solving the linear equations:
+
+$$
+F’(x^k, y^k, w^k, z^k)
+\begin{bmatrix}
+    \delta x \\
+    \delta y \\
+    \delta w \\
+    \delta z
+\end{bmatrix}
+=
+-F(x^k, y^k, w^k, z^k).
+$$
+
+::: notes
+This is Newton’s method written out explicitly. F’ is the Jacobian of F with respect to all the variables — a (2n+2m) × (2n+2m) matrix. The Newton step solves a linear system (Jacobian × direction = -F) to find the search direction (δx, δy, δw, δz). Notice that if we’re already primal and dual feasible (conditions 1 and 2 satisfied), the first two blocks of F are zero, and the Newton equation simplifies significantly — we only need to deal with the complementary slackness blocks. In practice, solvers maintain primal and dual feasibility throughout and only worry about reducing XZe and WYe to zero.
+:::
+
+---
+
+## Primal-dual interior point method
+
+
+\fontsize{10pt}{11pt}\selectfont
+Then the update will be:
+
+$$
+(x^{k+1}, y^{k+1}, w^{k+1}, z^{k+1})= (x^k, y^k, w^k, z^k) + \alpha (\delta x, \delta y, \delta w, \delta z)
+$$
+
+with $\alpha \in (0,1]$ chosen so that the result from the next iteration is feasible.
+
+- Solving for $(\delta x, \delta y, \delta w, \delta z)$ using the equation on the previous slide enforces feasibility of solutions
+
+::: notes
+The update formula. After solving for the search direction, take a step of size α in that direction. The crucial constraint: α must be chosen so that all four variable vectors (x, y, w, z) remain strictly positive — no variable can hit zero. A simple approach: find the maximum step α_max that would bring any variable to zero (set it to that value and solve for α), then take α = 0.99 × α_max to stay in the interior. More sophisticated step selection rules (like Mehrotra's predictor-corrector) are used in production solvers. The name "interior point" comes from this: we always stay in the strict interior of the feasible region, never touching the boundary.
+:::
+
+---
+
+
+## An improved algorithm
+
+
+\fontsize{10pt}{11pt}\selectfont
+The algorithm in its current setup is not ideal because often the steps are small to
+avoid violating the positivity constraints. Instead:
+
+- The value of $XZe + WYe$ represents the duality gap
+- Instead of trying to eliminate the duality gap (set it to 0), reduce the duality gap by some factor in each step
+
+We replace the complementary slackness by:
+
+\begin{align}
+XZe &= \mu_xe\\
+WYe &= \mu_ye
+\end{align}
+
+When $\mu_x, \mu_y\to 0$ as $k\to\infty$ the solution from this system will converge to the optimal solution of the original LP problem. Good selections of $\mu$ are $\mu_x^{k+1}=(x^k)^Tz^k/n$ and $\mu_y^{k+1}=(w^k)^Ty^k/m$
+
+- $n$ and $m$ are the dimensions of $x$ and $y$
+
+::: notes
+The basic algorithm has a practical problem: near the boundary, the steps become tiny (to avoid violating non-negativity), so convergence slows dramatically. The fix: instead of driving XZe → 0 exactly, aim for XZe = μe where μ > 0 is a small positive number. This keeps the iterates away from the boundary and allows larger steps. μ is called the "centering parameter" — larger μ pushes you toward the center of the feasible region, smaller μ pushes toward the boundary (and toward optimality). The recommended choice for μ is the current average complementarity: (x^T z)/n and (w^T y)/m. These are the mean of the x_j z_j products — when all of these are small, we're near the optimal.
+:::
+
+---
+
+## An improved algorithm
+
+
+\fontsize{10pt}{11pt}\selectfont
+Under the new algorithm, at the $k$th iteration, the Newton equations become:
+
+$$\begin{bmatrix}
+    A & 0 & I & -0 \\
+    0 & A^T & 0 & -I \\
+    Z & 0 & 0 & X \\
+    0 & W & Y & 0
+\end{bmatrix}
+\begin{bmatrix}
+    \delta x \\
+    \delta y \\
+    \delta w \\
+    \delta z
+\end{bmatrix}
+=
+\begin{bmatrix}
+    0 \\
+    0 \\
+    -X^k Z^k e + \mu_x^k e \\
+    -W^k Y^k e + \mu_y^k e
+\end{bmatrix}$$
+
+This provides the **general primal-dual interior point method** as follows:
+
+1. Choose strictly feasible initial solution $(x^0, y^0, w^0, z^0)$, and set $k = 0$. Then repeat (2) and (3) until convergence:
+2. Solve system (1) to obtain the updates $(\delta x, \delta y, \delta w, \delta z)$
+3. Update the solution $(x^{k+1}, y^{k+1}, w^{k+1}, z^{k+1}) = (x^k, y^k, w^k, z^k)+ \alpha^k(\delta x, \delta y, \delta w, \delta z)$. $\alpha^k$ is chosen so that all variables are $\ge$ 0.
+
+
+::: notes
+The full matrix system for the Newton step at each iteration. The 4×4 block structure comes from the four groups of variables (x, y, w, z). The right-hand side has zeros in the first two blocks (because we maintain primal and dual feasibility throughout) and the relaxed complementary slackness terms in the last two blocks. This is the algorithm that underlies modern LP solvers like CPLEX, Gurobi, and MOSEK. They use sophisticated variants of this with Mehrotra's predictor-corrector, warm starts, and preconditioning — but the core is this primal-dual interior point iteration. Convergence is typically in 20-50 iterations regardless of problem size, which is why it scales so well.
+:::
+
+---
+
+
+
+## Lagrange multipliers
+
+
+\fontsize{10pt}{11pt}\selectfont
+The method of Lagrange multiplier is a general algorithm for optimization problems with equality constraints. For example, consider a problem:
+
+\begin{align*}
+        \max \quad &f(x,y)\\
+        s.t. \quad &g(x,y) = c
+    \end{align*}
+
+We introduce a new variable $\lambda$ called a **Lagrange multiplier** and form the following new objective function:
+
+$$L(x,y,\lambda) = f(x,y) + \lambda[g(x,y)-c]$$
+
+We will then optimize $L$ with respect to $x,y$ and $\lambda$ using typical methods. Note that the condition $\partial L/\partial \lambda = 0$ at the optimal solution guarantees that the constraints will be satisfied.
+
+::: notes
+Before the barrier problem, a brief review of Lagrange multipliers in case students haven't seen them recently. The key idea: convert a constrained optimization into an unconstrained one by adding a penalty for violating the constraint. The multiplier λ plays the role of a shadow price — it tells you how much the optimal objective would change if you relaxed the constraint (changed the value of c). Setting ∂L/∂λ = 0 gives g(x,y) = c — the constraint is automatically satisfied at the optimum. Setting ∂L/∂x = ∂L/∂y = 0 gives the optimality conditions for x and y given the constraint. This is the foundation for the barrier approach to interior point methods.
+:::
+
+---
+
+## The barrier problem
+
+
+\fontsize{10pt}{11pt}\selectfont
+The interior point algorithm is closely related to the **Barrier Problem**. Go back to
+the primal problem:
+
+\begin{align*}
+        \max \quad &z=cx\\
+        s.t. \quad &Ax + w = b; x,w\ge0
+    \end{align*}
+
+The non-negativity constraints can be replaced by adding two **barrier terms** in the
+objective function. The barrier term is defined as $B(x) = \sum_j\log x_j$, which is finite as long as $x_j$ is positive. Then the primal problem becomes:
+
+
+\begin{align*}
+        \max \quad &z=cx +\mu_xB(x) + \mu_yB(w)\\
+        s.t. \quad &Ax + w = b
+\end{align*}
+
+The barrier terms make sure $x$ and $w$ won't become negative.
+
+::: notes
+The barrier approach is an alternative derivation that gives the same algorithm. Instead of explicitly constraining x ≥ 0, we add log(x_j) terms to the objective. The log function goes to -∞ as x_j → 0, creating a "wall" that prevents any variable from reaching zero. The parameter μ controls how strong the barrier is: large μ keeps us far from the boundary, small μ lets us get close to the boundary (and to the actual constrained optimum). As μ → 0, the barrier disappears and the modified problem converges to the original constrained problem. The only remaining constraints are the equality constraints Ax + w = b, which we can handle directly with Lagrange multipliers.
+:::
+
+---
+
+
+## The barrier problem
+
+
+\fontsize{10pt}{11pt}\selectfont
+The Lagrangian for this problem is (using $y$ as the multiplier):
+
+$$L(x,y,w) = cx +  \mu_xB(x) + \mu_yB(w) + y^T(b-w-Ax)$$
+
+The optimal solution for the problem satisfies:
+
+\begin{align}
+c + \mu_xX^{-1}e-A^Ty &= 0\\
+b-w-Ax &= 0\\
+\mu_yW^{-1}e-y &= 0
+\end{align}
+
+Define new variables $z = \mu_xX^{-1}e$ and rewrite these conditions, we obtain exactly the same set of equations as the relaxed optimality conditions for primal-dual problem.
+**Note**: $z = \mu_xX^{-1}e$ is also a condition so there are 4 in total.
+
+
+::: notes
+Walk through the Lagrangian. We use y as the multiplier for the equality constraint Ax + w = b. Taking first-order conditions: ∂L/∂x = c + μ_x X^{-1} e - A^T y = 0. ∂L/∂w = μ_y W^{-1} e - y = 0. Plus the constraint Ax + w = b = 0. Three conditions, four unknowns (x, y, w and then z we define). Now define z = μ_x X^{-1} e — this is a new variable. With this substitution, the conditions become: c + z - A^T y = 0, Ax + w - b = 0, μ_y W^{-1} e = y → W y = μ_y e (which is WYe = μ_y e), and by definition XZe = μ_x e. This is EXACTLY the relaxed optimality conditions from the primal-dual approach! The two methods — barrier function and primal-dual — are mathematically equivalent. Beautiful convergence of two independent ideas.
+:::
+
+---
 
 ## Introduction to quadratic programming
 
