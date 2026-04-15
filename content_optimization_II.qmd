@@ -28,7 +28,7 @@ library(tidyverse)
 
 [![](./slides/topic_optimization_II/preview_lp.png){width=70%}](./slides/topic_optimization_II/s_lp.pdf)
 
-**Intro R packages**  
+**Linear Programming**  
 [Download slides (PDF)](./slides/topic_optimization_II/s_lp.pdf)
 
 
@@ -38,7 +38,7 @@ library(tidyverse)
 
 [![](./slides/topic_optimization_II/preview_qp.png){width=70%}](./slides/topic_optimization_II/s_qp.pdf)
 
-**Intro R packages**  
+**Quadratic Programming**  
 [Download slides (PDF)](./slides/topic_optimization_II/s_qp.pdf)
 
 
