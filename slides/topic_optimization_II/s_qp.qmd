@@ -21,6 +21,7 @@ header-includes:
 ```{r, echo = FALSE, eval = TRUE}
 library(tidyverse)
 library(microbenchmark)
+library(patchwork)
 ```
 
 ## Overview
@@ -34,6 +35,347 @@ Today, we cover:
 Announcements
 
 - Final project due 
+
+---
+
+
+
+## Strong duality 
+
+\fontsize{10pt}{11pt}\selectfont
+- We know that at feasible solutions for both dual and primal, the solution to the dual is always greater or equal
+- If there is a difference between the largest primal value and
+the smallest dual value it is called the "**Duality gap**".
+  - When are these values equal?
+
+**Strong Duality Theorem:** If the primal has an optimal solution, then the dual also has an optimal solution and there is no duality gap, i.e.:
+
+$$\mbox{objective of dual } = \mbox{ objective of primal}.$$
+
+- Condition for strong duality: the feasible region must be nonempty and bounded.
+- The **duality gap** is zero when strong duality holds.
+
+::: notes
+Weak duality says the dual ≥ primal for any feasible solutions. Strong duality says at the OPTIMAL solutions they're EQUAL — the gap closes. This is a much stronger result. The condition (feasible region nonempty and bounded) is the standard assumption for LP problems that have solutions. Economic interpretation: at optimality, the carpenter earns the same whether they use the materials to build furniture or sell them at the optimal shadow prices. The market has perfectly priced the resources. Strong duality is what lets interior point methods use the duality gap as a stopping criterion — when the gap is zero (or negligibly small), you're done.
+:::
+
+---
+
+
+
+
+## Complementary slackness theorem
+
+The **complementary slackness theorem** provides a necessary condition for optimality in linear programming. It states that:
+
+*If* $x^*$ *and* $y^*$ *are feasible solutions of primal and dual problems, then* $x^*$ *and* $y^*$ *are both optimal if and only if*
+
+1. $y^{*T}(b-Ax^*)=0$
+2. $(y^{*T}A-c)x^* = 0$
+
+
+
+This theorem is the foundation of the **interior point method** class of LP solvers.
+
+::: notes
+Complementary slackness is the key tool for certifying optimality. The two conditions encode a simple principle: at the optimum, every resource is either fully used OR its dual price is zero — you never pay for slack capacity. Condition 1: y*^T(b - Ax*) = 0 means for each constraint i, either y_i* = 0 (shadow price zero) or b_i - (Ax*)_i = 0 (constraint is binding). Condition 2: (y*^T A - c)x* = 0 means for each variable j, either x_j* = 0 (variable not in solution) or the dual constraint for j holds with equality. These conditions together give us a way to verify optimality without solving the problem from scratch.
+:::
+
+---
+
+## Complementary slackness theorem
+
+\fontsize{9pt}{10pt}\selectfont
+Consider a simple LP problem:
+
+\begin{align*}
+    \textit{max} \quad &z = x_1 + x_2, \\
+    \textit{s.t.} \quad &x_1 + 2x_2 \leq 100, \\
+    &2x_1 + x_2 \leq 100, \\
+    &x_1, x_2 \geq 0.
+\end{align*}
+
+Its dual problem is:
+
+
+\vspace{20mm}
+
+::: notes
+Pause here. Ask students to write out the dual. They have all the tools now. Primal has two ≤ constraints → both dual variables y1, y2 ≥ 0. Both primal variables x1, x2 ≥ 0 → both dual constraints are ≥. Dual objective coefficients are b = (100, 100). Dual constraint coefficients come from transposing A. Show the answer on the next slide.
+:::
+
+---
+
+
+## Complementary slackness theorem
+
+\fontsize{9pt}{10pt}\selectfont
+Consider a simple LP problem:
+
+\begin{align*}
+    \textit{max} \quad &z = x_1 + x_2, \\
+    \textit{s.t.} \quad &x_1 + 2x_2 \leq 100, \\
+    &2x_1 + x_2 \leq 100, \\
+    &x_1, x_2 \geq 0.
+\end{align*}
+
+Its dual problem is:
+
+\begin{align*}
+    \textit{min} \quad &z = 100y_1 + 100y_2, \\
+    \textit{s.t.} \quad &y_1 + 2y_2 \geq 1, \\
+    &2y_1 + y_2 \geq 1, \\
+    &y_1, y_2 \geq 0.
+\end{align*}
+
+---
+
+## Complementary slackness theorem
+
+\fontsize{10pt}{11pt}\selectfont
+The complementary slackness theorem states:
+
+\vspace{40mm}
+
+
+::: notes
+Before writing the CS conditions, explain what they mean geometrically. This problem has a symmetric objective (x1 + x2, equal coefficients), so the optimal will be at the intersection of both constraint boundaries — both constraints active at the optimum. That means both slacks are zero AND both dual variables can be non-zero. In the asymmetric example coming later, we'll see a case where only one constraint is active. Ask students: what do you expect the optimal x to be here, given the symmetry?
+:::
+
+---
+
+
+
+
+
+
+## Complementary slackness theorem
+
+\fontsize{10pt}{11pt}\selectfont
+The complementary slackness theorem states:
+
+\begin{align*}
+    y_1(100 - x_1 - 2x_2) &= 0, \\
+    y_2(100 - 2x_1 - x_2) &= 0, \\
+    x_1(y_1 + 2y_2 - 1) &= 0, \\
+    x_2(2y_1 + y_2 - 1) &= 0.
+\end{align*}
+
+
+At the optimal point, we have $\bf{x} = (100/3, 100/3)$, $\bf{y = (1/3, 1/3)}$. The complementary slackness holds.
+
+- All the constraints are bounded in both primal and dual
+problems.
+
+::: notes
+Walk through the verification. Optimal x = (100/3, 100/3). Check: constraint 1: 100/3 + 2(100/3) = 100 — exactly binding. Constraint 2: 2(100/3) + 100/3 = 100 — exactly binding. Both constraints active, so y1 and y2 can be non-zero. Optimal y = (1/3, 1/3). Check dual constraints: y1 + 2y2 = 1/3 + 2/3 = 1 ✓ (equality, so x1 can be non-zero). 2y1 + y2 = 2/3 + 1/3 = 1 ✓ (equality, so x2 can be non-zero). Check CS conditions: y1(100 - 100/3 - 200/3) = (1/3)(0) = 0 ✓. Everything is consistent. This symmetric case is clean — next we see an asymmetric case that's more interesting.
+:::
+
+---
+
+## Plot of constraints
+
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', fig.width = 10, fig.height = 4.5, warning = FALSE, message = FALSE}
+
+x_vals <- seq(0, 100, length.out = 100)
+y1_vals <- (100 - x_vals) / 2  # From x1 + 2x2 = 100
+y2_vals <- 100 - 2*x_vals      # From 2x1 + x2 = 100
+
+# Create a data frame for ggplot
+df <- data.frame(x1 = c(x_vals, x_vals),
+                 x2 = c(y1_vals, y2_vals),
+                 equation = rep(c("x1 + 2x2 = 100", "2x1 + x2 = 100"), each = length(x_vals)))
+
+# Plot the lines
+primal = ggplot(df, aes(x = x1, y = x2, color = equation)) +
+  geom_line(size = 1) +
+  xlim(0, 100) + ylim(0, 100) +
+  ggtitle("Primal constraints") +
+    geom_hline(yintercept = 0, linetype = 2, color = "gray") +
+  geom_vline(xintercept = 0, linetype = 2, color = "gray") +
+  theme_minimal() + theme(legend.position =  c(0.6,0.7))
+
+
+
+#### dual
+x_vals <- seq(-1, 2, length.out = 100)  # Define x range
+y1_vals <- (1 - x_vals) / 2   # From x + 2y = 1
+y2_vals <- 1 - 2*x_vals       # From 2x + y = 1
+
+# Create a data frame for ggplot
+df <- data.frame(x = c(x_vals, x_vals),
+                 y = c(y1_vals, y2_vals),
+                 equation = rep(c("y1 + 2y2 = 1", "2y1 + y2 = 1"), each = length(x_vals)))
+
+# Create the plot
+dual = ggplot(df, aes(x = x, y = y, color = equation)) +
+  geom_line(size = 1) +
+  xlim(-1, 2) + ylim(-1, 2) +
+  ggtitle("Dual constraints") +
+  labs(x = "y1", y = "y2") +
+    geom_hline(yintercept = 0, linetype = 2, color = "gray") +
+  geom_vline(xintercept = 0, linetype = 2, color = "gray") +
+  theme_minimal() +
+  theme(legend.position = c(0.6,0.7))
+
+primal + dual
+```
+
+::: notes
+[Note: activate eval=TRUE once you want this to render.] The left panel shows the primal feasible region — the two constraint lines intersect at (100/3, 100/3), which is the optimal point where both constraints are binding. The right panel shows the dual constraint lines, which also intersect at y = (1/3, 1/3). Notice that in the symmetric case, the feasible regions of both primal and dual are "nice" — the optimal is at the intersection of both active constraints in both problems.
+:::
+
+---
+
+## Complementary slackness theorem
+
+\fontsize{10pt}{11pt}\selectfont
+Modify the simple LP problem a bit:
+
+\begin{align*}
+    \textit{max} \quad &z = 3x_1 + x_2, \\
+    \textit{s.t.} \quad &x_1 + 2x_2 \leq 100, \\
+    &2x_1 + x_2 \leq 100, \\
+    &x_1, x_2 \geq 0.
+\end{align*}
+
+and its dual problem is:
+
+\begin{align*}
+    \textit{min} \quad &z = 100y_1 + 100y_2, \\
+    \textit{s.t.} \quad &y_1 + 2y_2 \geq 3, \\
+    &2y_1 + y_2 \geq 1, \\
+    &y_1, y_2 \geq 0.
+\end{align*}
+
+::: notes
+Now the objective is 3x1 + x2 — the x1 coefficient is three times larger. Intuitively this should push the optimal toward x1. Before showing the CS conditions and solution, ask students to predict: will both constraints be active at the optimum? The answer is no — only one constraint will be active, because the asymmetry in profits means we'll hit one resource limit before the other. This is the more interesting and practically relevant case.
+:::
+
+---
+
+## Complementary slackness theorem
+
+\fontsize{9pt}{10pt}\selectfont
+Now the complementary slackness theorem states:
+
+\begin{align*}
+    y_1(100 - x_1 - 2x_2) &= 0, \\
+    y_2(100 - 2x_1 - x_2) &= 0, \\
+    x_1(y_1 + 2y_2 - 3) &= 0, \\
+    x_2(2y_1 + y_2 - 1) &= 0.
+\end{align*}
+
+For this LP problem, the optimal solutions are $\bf{x} = (50, 0)$, $\bf{y = (0, 1.5)}$. Complementary slackness still holds. We observe that:
+
+- In the primal problem:
+  - The first constraint is **inactive** (slack $> 0$) at the optimum, so its shadow price $y_1 = 0$
+  - Second constraint is **active** (binding, slack $= 0$), so $y_2$ can be non-zero
+
+::: notes
+Walk through what CS tells us here. x = (50, 0), y = (0, 1.5). Check primal constraint 1: 50 + 2(0) = 50 < 100 — inactive (slack = 50). CS says y1 must be 0. Check: y1 = 0 ✓. Check primal constraint 2: 2(50) + 0 = 100 — active (binding). CS says y2 can be non-zero. Check: y2 = 1.5 ≠ 0 ✓. Key insight: constraint 1 has 50 units of slack — there's unused capacity. The shadow price y1 = 0 means relaxing constraint 1 (giving us more of resource 1) wouldn't help, because we're not using what we have.
+:::
+
+---
+
+## Complementary slackness theorem
+
+\fontsize{10pt}{11pt}\selectfont
+For this LP problem, the optimal solutions are $\bf{x} = (50, 0)$, $\bf{y = (0, 1.5)}$. Complementary slackness still holds. We observe that:
+
+- In the primal problem:
+  - The first constraint is **inactive** (slack $> 0$), so its shadow price $y_1 = 0$.
+  - The second constraint is **active** (binding, slack $= 0$), so $y_2$ can be non-zero.
+
+- In the dual problem:
+  - The first constraint is **active** (binding), so its primal variable $x_1$ can be non-zero.
+  - The second constraint is **inactive** (slack $> 0$), so its primal variable $x_2 = 0$.
+
+::: notes
+Now check the dual side. Dual constraint 1: y1 + 2y2 = 0 + 3 = 3 ≥ 3 — active, holds with equality. CS condition 3 says x1(y1 + 2y2 - 3) = 0. Since the constraint is tight (= 3), the term in parentheses is 0, so x1 can be anything non-negative — and indeed x1 = 50 ≠ 0. Dual constraint 2: 2y1 + y2 = 0 + 1.5 = 1.5 > 1 — inactive (slack = 0.5). CS condition 4 says x2(2y1 + y2 - 1) = 0. The term in parentheses is 0.5 ≠ 0, so x2 must be 0. And indeed x2 = 0. Everything is self-consistent and confirms the solution is optimal.
+:::
+
+---
+
+## Plot of constraints
+
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', fig.width = 10, fig.height = 4.5, warning = FALSE, message = FALSE}
+x_vals <- seq(0, 100, length.out = 100)
+y1_vals <- (100 - x_vals) / 2  # From x1 + 2x2 = 100
+y2_vals <- 100 - 2*x_vals      # From 2x1 + x2 = 100
+
+# Create a data frame for ggplot
+df <- data.frame(x1 = c(x_vals, x_vals),
+                 x2 = c(y1_vals, y2_vals),
+                 equation = rep(c("x1 + 2x2 = 100", "2x1 + x2 = 100"), each = length(x_vals)))
+
+# Plot the lines
+primal = ggplot(df, aes(x = x1, y = x2, color = equation)) +
+  geom_line(size = 1) +
+  xlim(0, 100) + ylim(0, 100) +
+    geom_hline(yintercept = 0, linetype = 2, color = "gray") +
+  geom_vline(xintercept = 0, linetype = 2, color = "gray") +
+  ggtitle("Primal constraints") +
+  theme_minimal() + theme(legend.position =  c(0.6,0.7))
+
+
+
+#### dual
+x_vals <- seq(-1, 2, length.out = 100)  # Define x range
+y1_vals <- (3 - x_vals) / 2   # From x + 2y = 1
+y2_vals <- 1 - 2*x_vals       # From 2x + y = 1
+
+# Create a data frame for ggplot
+df <- data.frame(x = c(x_vals, x_vals), 
+                 y = c(y1_vals, y2_vals), 
+                 equation = rep(c("y1 + 2y2 = 3", "2y1 + y2 = 1"), each = length(x_vals)))
+
+# Create the plot
+dual = ggplot(df, aes(x = x, y = y, color = equation)) +
+  geom_line(size = 1) +
+  #xlim(-1, 2) + ylim(-1, 2) +
+  ggtitle("Dual constraints") + 
+  labs(x = "y1", y = "y2") +
+  geom_hline(yintercept = 0, linetype = 2, color = "gray") +
+  geom_vline(xintercept = 0, linetype = 2, color = "gray") +
+  theme_minimal() + 
+  theme(legend.position = c(0.6,0.7))
+
+primal + dual
+```
+
+---
+
+## Economics interpretation
+
+Dual variables can be called "**shadow prices**" of the primal constraint, how objective function would increase if constraint was relaxed.
+
+- If a primal constraint is bounded, relaxing that constraint would result in a gain
+(improve the objective function), shadow price is non-zero.
+- If a primal constraint is unbounded, relaxing that constraint would not improve
+the objective function, shadow price is zero.
+
+
+::: notes
+Shadow prices are one of the most practically useful outputs of LP. The dual variable y_i tells you the marginal value of relaxing constraint i by one unit. If constraint i is active (binding), its shadow price is positive — you could improve the objective if you had a little more of resource i. If constraint i is inactive (slack > 0), its shadow price is zero — you already have more than you need, so adding more doesn't help. This connects directly to complementary slackness: inactive constraint → zero shadow price.
+:::
+
+---
+
+## Economics interpretation
+
+\fontsize{10pt}{11pt}\selectfont
+**Bakery example**: Imagine you're running a bakery, and can make a limited number of cakes because you have a limited amount of flour. Shadow price tells you how much more profit you’d gain if you had a little more flour.
+
+- If you're tight on flour, getting more flour would let you bake more cakes and make more money.   - In this case, the shadow price is nonzero because the extra resource improves your outcome.
+- If you have plenty of flour, adding more doesn’t help—you’re already making as many cakes as you can sell. In this case, the shadow price is zero because extra flour doesn’t change your profit.
+
+
+So, the dual variable (shadow price) tells you how valuable it would be to relax a constraint—meaning allowing more of that constrained resource. If relaxing the constraint helps, the shadow price is positive. If it doesn’t make a difference, the shadow price is zero.
+
+::: notes
+The bakery example makes shadow prices concrete. If you're out of flour (binding constraint), the shadow price of flour is positive — each extra bag lets you bake more and earn more. If you have leftover flour (inactive constraint), the shadow price is zero — more flour won't help because something else (oven time, staff hours) is the binding constraint. The second scenario also illustrates an important point: before investing in more capacity, always check which constraint is binding. In the carpenter example: if the labor constraint is binding but not the lumber constraint, buying more lumber doesn't help — you'd want to hire more labor instead.
+:::
 
 ---
 
@@ -360,7 +702,7 @@ to first introduce the **KKT conditions**.
 ## KKT conditions
 
 
-\fontsize{10pt}{11pt}\selectfont
+\fontsize{9pt}{10pt}\selectfont
 For LP, complementary slackness gave us conditions for optimality. **KKT conditions** generalize this to non-linear objective functions. They are necessary conditions for a solution to be optimal in a general non-linear programming problem.
 
 Consider the following problem:
@@ -475,10 +817,12 @@ Write out the primal and dual for the carpenter problem.
 
 
 The goal of regression is to understand the relationship between an outcome and covariates. Traditional regression models the conditional mean, $E(Y|X)$
+
 - Relies on normal error assumptions and homoscedasticity
 - Sensitive to outliers and skewed distributions
 
 Quantile regression:
+
 - Provides a more exhaustive description of the data
 - The collection of regressions at all quantiles would give a complete picture of outcome-covariate relationships
 
@@ -486,7 +830,9 @@ Quantile regression:
 
 ## Quantile regression
 
-```{r, echo = FALSE, fig.align = 'center', out.width = '70%', message = FALSE}
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', out.width = '70%', message = FALSE}
+
+library(quantreg)
 
 data(engel)
 
@@ -509,7 +855,7 @@ for(i in 1:length(taus)){
 
 ## Colorado cannabis and driving study
 
-```{r, echo = FALSE, fig.align = 'center', out.width = '90%'}
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', out.width = '90%'}
 knitr::include_graphics("ccds.png")
 ```
 
@@ -524,9 +870,9 @@ Digression- I'm going to show some examples in class using data from a big study
 
 ## Colorado cannabis and driving study
 
-```{r, echo = FALSE, fig.align = 'center', out.width = '90%', message = FALSE, warning = FALSE, fig.height = 6, fig.width = 10}
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', message = FALSE, warning = FALSE, fig.height = 4.5, fig.width = 10}
 
-cannabis = readRDS(here::here("Homework", "4_constrained_optimization/", "cannabis.rds"))
+cannabis = readRDS(here::here("slides", "topic_optimization_II","cannabis.rds"))
 
 p1 = cannabis %>%
   ggplot(aes(t_mmr1)) +
@@ -556,6 +902,7 @@ Probably not great data for linear regression... why?
 
 ## Quantile regression model
 
+\fontsize{10pt}{11pt}\selectfont
 Regress conditional quantiles of response on the covariates. Assume the outcome Y is continuous.
 
 - Classical model: $Q_{\tau}(Y|X)=X\beta_{\tau}$
@@ -574,6 +921,7 @@ $$Y = X\beta + \epsilon; \quad E(\epsilon|X) = 0.$$
 
 ## Pros and cons
 
+\fontsize{10pt}{11pt}\selectfont
 **Advantages**:
 
 - Regression at a sequence of quantiles provides a more complete view of data
@@ -591,6 +939,7 @@ $$Y = X\beta + \epsilon; \quad E(\epsilon|X) = 0.$$
 
 ## The loss function
 
+\fontsize{10pt}{11pt}\selectfont
 Link between estimands and loss functions:
 
 - To obtain sample mean of $\{y_1,y_2,\ldots y_n\}$ minimize $\sum_i(y_i-b)^2$
@@ -601,11 +950,12 @@ It can be shown that to obtain the sample $\tau$th quantile, one needs to minimi
 $$\hat{Q}_{\tau} = \arg\min_b \left\{ \sum_{i: y_i\ge b}\tau|y_i-b| + \sum_{i: y_i< b}(1-\tau)|y_i-b|\right\}.$$
 
 For notational simplicity, define $\rho_{\tau}(x) = x[\tau-(x<0)]$, where $(x<0)$ is an indicator equal to 1 if $x<0$ and 0 otherwise. This compactly encodes the asymmetric weighting: $\rho_\tau(x) = \tau x$ when $x \ge 0$ and $\rho_\tau(x) = (\tau-1)x$ when $x < 0$.
+
 ---
 
 ## The loss function
 
-```{r, echo = FALSE, fig.align = 'center', fig.height = 7, fig.width = 11, message = FALSE}
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', fig.height = 4.5, fig.width = 10, message = FALSE}
 quantile_loss = function(b, y, tau) {
   loss <- ifelse(y >= b, tau * (y - b), (1 - tau) * (b - y))
   return(loss)
@@ -632,6 +982,7 @@ loss %>%
 
 ## Estimator
 
+\fontsize{10pt}{11pt}\selectfont
 The linear quantile regression model is fitted by determining
 
 $$\hat{\beta}_{\tau} = \arg\min_b \sum_{i=1}^n \rho_{\tau}(y_i-x_ib)$$
@@ -656,6 +1007,7 @@ $$\hat{\beta}_{\tau}(ay, X) = a\hat{\beta}_{\tau}(y,X), \quad \hat{\beta}_{\tau}
 
 ## Asymmetric Double Exponential (ADE) distribution
 
+\fontsize{10pt}{11pt}\selectfont
 Density function for ADE is
 
 $$f(y;\mu,\sigma,\tau)= \frac{\tau(1-\tau)}{\sigma}\exp\left\{-\rho_{\tau}(\frac{y-\mu}{\sigma})\right\}$$
@@ -666,12 +1018,15 @@ $$f(y;\mu,\sigma,\tau)= \frac{\tau(1-\tau)}{\sigma}\exp\left\{-\rho_{\tau}(\frac
 - If residuals re iid $ADE(0,1,\tau)$, then the log-likelihood for $\beta_{\tau}$ is 
 
 $$l(\beta_{\tau}; Y,X,\tau)=-\sum_i^n \rho_{\tau}(y_i-x_i\beta_{\tau}) + c_0$$
+
 ---
 
 
 ## QR model fitting
 
+\fontsize{10pt}{11pt}\selectfont
 The QR estimation problem $\hat{\beta}_{\tau} = \arg\min_b \sum_{i=1}^n \rho_{\tau}(y_i-x_ib)$ can be framed as an LP problem!
+
 - First, define a set of new variables
 
 \begin{align}
@@ -682,6 +1037,7 @@ The QR estimation problem $\hat{\beta}_{\tau} = \arg\min_b \sum_{i=1}^n \rho_{\t
 \end{align}
 
 Note:
+
 - $[\cdot]_+$ and $[\cdot]_-$ mean the positive and negative part of a number
 - $x \equiv [x]_+ - [x]_-$
   - $[x]_+ = \max(x, 0)$
@@ -693,6 +1049,7 @@ Note:
 ## QR model fitting
 
 Remember the objective function is $\sum_{i = 1}^n \rho_{\tau}(y_i-x_ib)$. Notice that 
+
 - When $y_i-x_ib\ge 0$, we have $\rho_{\tau}(y_i-x_ib)=\tau u_i$, and $v_i =0$.
 - When $y_i-x_ib < 0$, we have $\rho_{\tau}(y_i-x_ib)=(1-\tau) v_i$, and $u_i = 0$.
 
@@ -704,21 +1061,21 @@ So we can write $\rho_{\tau}(y_i-x_ib)=\tau u_i + (1-\tau) v_i$.
 
 The optimization problem can then be reformulated as:
 
-\begin{align}
+\begin{align*}
     &\max \quad - \sum_{i=1}^{n} [\tau u_i + (1 - \tau) v_i] \\
     &\text{s.t.} \quad y_i = x_i b_+ - x_i b_- + u_i - v_i \\
     &\quad u_i, v_i \geq 0, \quad i = 1, \dots, n \\
     &\quad b_+, b_- \geq 0
-\end{align}
+\end{align*}
 
+This is a standard LP problem can be solved by simplex or interior point methods.
 
-This is a standard LP problem can be solved by Simplex or interior point methods.
 ---
 
 ## QR model fitting, cont
 
 
-```{r, echo = FALSE, fig.align = 'center', out.width = '90%'}
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', out.width = '80%'}
 knitr::include_graphics("qr.png")
 ```
 
@@ -729,7 +1086,7 @@ knitr::include_graphics("qr.png")
 ## QR model fitting, cont
 
 
-```{r, echo = FALSE, fig.align = 'center', out.width = '90%'}
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', out.width = '80%'}
 knitr::include_graphics("qr2.png")
 ```
 
@@ -740,7 +1097,7 @@ knitr::include_graphics("qr2.png")
 ## QR model fitting, cont
 
 
-```{r, echo = FALSE, fig.align = 'center', out.width = '90%'}
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', out.width = '80%'}
 knitr::include_graphics("qr3.png")
 ```
 
@@ -749,7 +1106,7 @@ knitr::include_graphics("qr3.png")
 
 ## QR in R
 
-```{r, echo = FALSE, fig.align = 'center', out.width = '90%', message = FALSE, warning = FALSE, fig.height = 6, fig.width = 10}
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', message = FALSE, warning = FALSE, fig.height = 4.5, fig.width = 10}
 p1 + p2
 ```
 
@@ -762,9 +1119,10 @@ Now we're going to fit this quantile regression
 
 ## QR in R
 
+\fontsize{10pt}{11pt}\selectfont
 Want to compare linear and quantile regression
 
-```{r}
+```{r, eval = TRUE}
 ols = lm(t_mmr1 ~ p_change, data = cannabis)
 
 # default method, which is a simplex method
@@ -783,10 +1141,11 @@ summary(median_regression, se = "boot")$coefficients
 
 ## QR in R
 
+\fontsize{10pt}{11pt}\selectfont
 Blue is ols, red is median regression, pink is tau = 0.9
 
 
-```{r, echo = FALSE, fig.align = 'center', out.width = '90%', message = FALSE, warning = FALSE, fig.height = 6, fig.width = 10}
+```{r, echo = FALSE, eval = TRUE,  fig.align = 'center', message = FALSE, warning = FALSE, fig.height = 4, fig.width = 10}
 p2 + 
   geom_abline(slope = coef(ols)[2], intercept = coef(ols)[1], color = "blue") +
   geom_abline(slope = coef(median_regression)[2], intercept = coef(median_regression)[1], color = "red") +
@@ -800,12 +1159,17 @@ p2 +
 
 ## LASSO
 
-Consider usual regression settings with data $(\bf{x}_i, y_i)$, where $\textbf{x}_i = (x_{i1},\ldots, x_{ip})$ is a p-vector of predictors and $y_i$ is the response for the $i$th subject.The OLS setting finds a coefficient vector to minimize the residual sum of squares:
+\fontsize{10pt}{11pt}\selectfont
+Consider usual regression settings with data $(\bf{x}_i, y_i)$, where $\textbf{x}_i = (x_{i1},\ldots, x_{ip})$ is a p-vector of predictors and $y_i$ is the response for the $i$th subject. The OLS setting finds a coefficient vector to minimize the residual sum of squares:
 
 $$\hat{\beta} = \arg\min_{\beta}\sum_i^n(y_i-x_i\beta)^2$$
+
 - Solution is the MLE assuming a Normal model:
+
 $$y_i = \textbf{x}_i\beta + \epsilon_i, \quad \epsilon_i\sim N(0, \sigma^2)$$
+
 - This is undesirable when $p$ is large because
+
 1. When p>n, model can't be fit
 2. One typically wants a more parsimonius model for interpretability
 
@@ -813,11 +1177,15 @@ $$y_i = \textbf{x}_i\beta + \epsilon_i, \quad \epsilon_i\sim N(0, \sigma^2)$$
 
 ## LASSO
 
+\fontsize{10pt}{11pt}\selectfont
 LASSO stands for "Least Absolute Shrinkage and Selection Operator", which aims for model selection when $p$ is large (works even $p > n$). The LASSO procedure will "shrink" the coefficients toward 0 and eventually force some to be exactly zero
+
 - predictors with $\beta=0$ will be selected out
 
 The LASSO estimates are defined as:
+
 $$\tilde{\beta} = \arg\min_{\beta} \left\{\sum_i^n(y_i-\textbf{x}_i\beta)^2\right\} s.t. ||\beta||_1\le \lambda$$
+
 - $||\beta||_1 = \sum_{j=1}^p|b_j|$ is the $L_1$ norm
 - $\lambda\ge 0$ is a tuning parameter controlling the strength of shrinkage 
 
@@ -833,9 +1201,10 @@ sum of the absolute values of the coefficients.
 ## Regularization side note
 
 LASSO is a regularization approach- regularization prevents overfitting by adding a penalty term to the objective function.
+
 - LASSO tries to minimize the residual sum of square, with a constraint on the sum of the absolute values of the coefficients.
 
-<br>
+
 - There are other types of regularized regressions
 - **Ridge regression**: adds an $L_2$ penalty, $\sum_jb_j^2\le \lambda$
 
@@ -843,7 +1212,7 @@ LASSO is a regularization approach- regularization prevents overfitting by addin
 
 ## LASSO vs. Ridge visualized
 
-```{r, echo = FALSE, fig.align = 'center', out.width = '120%'}
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', out.width = '100%'}
 knitr::include_graphics("lasso.png")
 ```
 
@@ -862,6 +1231,8 @@ For ridge
 
 ## LASSO model fitting
 
+
+
 The LASSO problem can be solved by quadratic programming algorithms.
 
 \begin{align}
@@ -876,18 +1247,19 @@ s.t. \quad &\sum_j|b_j|\le \lambda
 
 ## LASSO model fitting
 
+\fontsize{10pt}{11pt}\selectfont
 The trick is to convert the problem into the standard QP problem setting, i.e., to remove the absolute value operator. This is the **same decomposition used in QR** model fitting ($u_i, v_i$ for residuals), now applied to the coefficients $\beta_j$.
 
 - Let $\beta_j = \beta_j^+-\beta_j^-$, where $\beta_j^+, \beta_j^-\ge0$ (positive and negative parts)
 - Then $|\beta_j|=\beta_j^++\beta_j^-$ and the problem can be written as:
 
-\begin{align}
+\begin{align*}
 \max \quad -&\sum_i^n\left(y_i-\sum_j\beta_j^+x_{ij} + \sum_j\beta_j^-x_{ij}\right)^2\\
 s.t. \quad &\sum_j (\beta_j^++\beta_j^-)\le \lambda,\\
 &\beta_j^+, \beta_j^- \ge 0
-\end{align}
+\end{align*}
 
-<br>
+
 This is now a standard QP problem can be solved by standard QP solvers.
 
 
@@ -902,16 +1274,17 @@ Need to explain exactly what this notation means- this is the same thing as what
 
 ## A little more on LASSO
 
+\fontsize{9pt}{10pt}\selectfont
 The Lagrangian for the LASSO optimization problem is:
 
 $$L(\mathbf{\beta},\lambda) = -\sum_{i=1}^n\left (y_i-\sum_j\beta_jx_{ij}\right)^2 - \lambda\sum_{j = 1}^p|\beta_j|$$
 
 This is equivalent to the likelihood function for a Bayesian model with a double exponential (DE) prior on $\beta$s (remember ADE used in quantile regression?):
 
-\begin{align}
+\begin{align*}
 Y|X, \beta &\sim N(X\beta, \sigma^2)\\
 \beta_j &\sim DE(1/\lambda)
-\end{align}
+\end{align*}
 
 where the DE density function is 
 
@@ -925,10 +1298,33 @@ Ridge gives you a normal prior on beta
 
 ## LASSO in R
 
+\fontsize{10pt}{11pt}\selectfont
 The package `glmnet` is standard for elastic net and LASSO in R.
 
 
-```{r, fig.align = 'center', fig.height = 5, fig.width = 9, message = FALSE}
+```{r, fig.align = 'center', eval = FALSE,  fig.height = 4.5, fig.width = 9, message = FALSE}
+### Lasso results from R package "glmnet"
+library(glmnet)
+lasso_mod = glmnet(x = dplyr::select(cannabis, -id, -t_mmr1), 
+                   y = cannabis$t_mmr1)
+plot(lasso_mod, "lambda")
+```
+
+::: notes
+There are other functions for this as well
+:::
+
+
+---
+
+
+## LASSO in R
+
+\fontsize{10pt}{11pt}\selectfont
+The package `glmnet` is standard for elastic net and LASSO in R.
+
+
+```{r, fig.align = 'center', eval = TRUE, echo = FALSE, fig.height = 4.5, fig.width = 9, message = FALSE}
 ### Lasso results from R package "glmnet"
 library(glmnet)
 lasso_mod = glmnet(x = dplyr::select(cannabis, -id, -t_mmr1), 
