@@ -34,11 +34,18 @@ Today, we cover:
 
 Announcements
 
-- Final project due 
+- Final project due
+
+::: notes
+Welcome to the last stretch of optimization. We'll finish LP — specifically the interior point algorithm — and then move into quadratic programming. After that, we'll see how LP and QP show up directly in statistics: quantile regression and LASSO are both estimation problems that reduce to LP or QP. Make sure to mention the final project deadline and answer any questions about it.
+:::
 
 ---
 
+## Course evaluations
 
+
+---
 
 ## Strong duality 
 
@@ -127,6 +134,10 @@ Its dual problem is:
     &2y_1 + y_2 \geq 1, \\
     &y_1, y_2 \geq 0.
 \end{align*}
+
+::: notes
+The dual has the same constraint matrix A transposed. Objective coefficients come from b = (100, 100). The inequality direction flips: primal ≤ becomes dual ≥. Dual constraint coefficients come from the columns of A — column 1 of A is (1, 2)^T, so dual constraint 1 is y1 + 2y2 ≥ c1 = 1. Column 2 of A is (2, 1)^T, so dual constraint 2 is 2y1 + y2 ≥ c2 = 1. Students should be able to do this mechanically now — refer back to the duality slide if anyone is uncertain about the construction.
+:::
 
 ---
 
@@ -379,52 +390,92 @@ The bakery example makes shadow prices concrete. If you're out of flour (binding
 
 ---
 
+## Slack and surplus variables
+
+\fontsize{10pt}{11pt}\selectfont
+Both are non-negative variables added to convert an inequality constraint into an equality.
+
+**Slack variable**: added to a $\leq$ constraint:
+$$2x_1 + x_2 \leq 100 \quad\longrightarrow\quad 2x_1 + x_2 + \underbrace{w}_{\geq 0} = 100$$
+$w$ absorbs the difference: $w = 100 - 2x_1 - x_2$ (unused capacity). If $w = 0$, the constraint is **binding**.
+
+**Surplus variable**: subtracted from a $\geq$ constraint:
+$$y_1 + 2y_2 \geq 1 \quad\longrightarrow\quad y_1 + 2y_2 - \underbrace{z}_{\geq 0} = 1$$
+$z$ measures the excess: $z = y_1 + 2y_2 - 1$ (how far above the bound). If $z = 0$, the constraint is **binding**.
+
+::: notes
+Students typically know slack variables but surplus is less familiar. The key difference: slack is added to ≤ constraints (primal), surplus is subtracted from ≥ constraints (dual). Both play the same role — they record how far a constraint is from being active. When the slack or surplus is zero, the constraint is binding. This is exactly what complementary slackness tracks: at the optimum, a constraint is either binding (slack/surplus = 0) or its shadow price is zero — never both nonzero at the same time.
+:::
+
+---
+
 
 
 ## Primal/dual optimality conditions
 
-\fontsize{9pt}{10pt}\selectfont
-Given the primal and dual problem with slack/surplus variables added:
+\fontsize{8pt}{9pt}\selectfont
+**Goal**: collect all conditions for optimality into a single system we can solve numerically.
+
+**Step 1**: add slack/surplus variables to turn inequalities into equalities.
 
 ::: notes
 Now we set up the machinery for interior point methods. We add slack/surplus variables to convert both the primal and dual into equality-constrained form. w are slack variables for the primal (Ax + w = b). z are surplus variables for the dual (A^T y - z = c^T). Complementary slackness in matrix form: X and Z are diagonal matrices with x and z on the diagonal. The condition x_j z_j = 0 for all j becomes XZe = 0 where e is the all-ones vector. Similarly WYe = 0. Count the variables: we have x (n), y (m), w (m), z (n) — that's 2n + 2m unknowns total.
 :::
 
-
 \begin{align*}
     &\textbf{Primal:} &\quad &\textit{max} \quad c x \\
-    & &\quad &\textit{s.t.} \quad A x + w = b, \quad x, w \geq 0.
+    & &\quad &\textit{s.t.} \quad \underbrace{A x + w}_{\text{add slack } w} = b, \quad x, w \geq 0.
 \end{align*}
 
 \begin{align*}
     &\textbf{Dual:} &\quad &\textit{min} \quad b^T y \\
-    & &\quad &\textit{s.t.} \quad A^T y - z = c^T, \quad y, z \geq 0.
+    & &\quad &\textit{s.t.} \quad \underbrace{A^T y - z}_{\text{subtract surplus } z} = c^T, \quad y, z \geq 0.
 \end{align*}
 
-The *complementary slackness theorem* states that at optimal solution, we should have $x_jz_j = 0 \forall j$, and $w_iy_i = 0 \forall i$. In matrix notation, the complementary conditions can be rewritten as 
-$$XZe=0, WYe = 0$$
+\begin{center}
+\begin{tabular}{lll}
+\hline
+Variable & Size & Meaning \\
+\hline
+$w = b - Ax \geq 0$ & $m \times 1$ & primal slack (unused capacity in each constraint) \\
+$z = A^Ty - c^T \geq 0$ & $n \times 1$ & dual surplus (headroom in each dual constraint) \\
+\hline
+\end{tabular}
+\end{center}
 
-- $X,Z,W,Y$ are diagonal matrices
-- $e$ is a vector of $1$'s
+---
+
+
+## Primal/dual optimality conditions
+
+
+**Goal**: collect all conditions for optimality into a single system we can solve numerically.
+
+**Step 2**: rewrite complementary slackness in matrix form. At optimality, $x_jz_j = 0\ \forall j$ and $w_iy_i = 0\ \forall i$.
+
+$$XZe=0, \quad WYe = 0 \qquad (X,Z,W,Y \text{ diagonal; } e = \mathbf{1})$$
 
 ---
 
 ## Primal/dual optimality conditions
 
-\fontsize{10pt}{11pt}\selectfont
-We now have the optimality conditions for the primal/dual problems as:
+\fontsize{9pt}{10pt}\selectfont
+
+**Why does $XZe = 0$ encode complementary slackness?** Suppose $n = 2$:
+
+$$X = \begin{bmatrix} x_1 & 0 \\ 0 & x_2 \end{bmatrix}, \quad Z = \begin{bmatrix} z_1 & 0 \\ 0 & z_2 \end{bmatrix} \implies XZe = \begin{bmatrix} x_1 z_1 \\ x_2 z_2 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$$
+
+This forces $x_j z_j = 0$ for each $j$. The matrix form  stacks all $n$ conditions at once.
+
+Collecting everything: the **optimality conditions** are:
 
 \begin{align*}
-    A x + w - b &= 0, \\
-    A^T y - z - c^T &= 0, \\
-    XZ e &= 0, \\
-    WYe &= 0, \\
-    x, y, w, z &\geq 0.
+    A x + w - b &= 0 & &\text{(primal feasibility)} \\
+    A^T y - z - c^T &= 0 & &\text{(dual feasibility)} \\
+    XZ e &= 0 & &\text{(CS: each } x_j z_j = 0) \\
+    WYe &= 0 & &\text{(CS: each } w_i y_i = 0) \\
+    x, y, w, z &\geq 0 & &\text{(non-negativity)}
 \end{align*}
-
-- The first two conditions are simply the constraints for primal/dual problems
-- The next two are complementary slackness
-- The last one is the non-negativity constraint
 
 ::: notes
 Walk through each condition. Conditions 1 and 2 are just primal and dual feasibility — the constraints must be satisfied. Conditions 3 and 4 are complementary slackness in matrix form — XZe = 0 means x_j z_j = 0 for each j, and WYe = 0 means w_i y_i = 0 for each i. Condition 5 is non-negativity. Together these are necessary AND sufficient for optimality (by strong duality). Count: conditions 1 gives m equations, condition 2 gives n equations, conditions 3 gives n equations, condition 4 gives m equations. Total: 2n + 2m equations. Same as the number of unknowns — square system!
@@ -436,21 +487,17 @@ Walk through each condition. Conditions 1 and 2 are just primal and dual feasibi
 ## Primal/dual optimality conditions
 
 \fontsize{10pt}{11pt}\selectfont
-We now have the optimality conditions for the primal/dual problems as:
 
-\begin{align*}
-    A x + w - b &= 0, \\
-    A^T y - z - c^T &= 0, \\
-    XZ e &= 0, \\
-    WYe &= 0, \\
-    x, y, w, z &\geq 0.
-\end{align*}
+Ignoring non-negativity, conditions 1--4 give $2n + 2m$ equations in $2n + 2m$ unknowns:
 
+| Condition | Equations | Unknowns involved |
+|-----------|-----------|------------------|
+| Primal feasibility | $m$ | $x, w$ |
+| Dual feasibility | $n$ | $y, z$ |
+| CS ($XZe = 0$) | $n$ | $x, z$ |
+| CS ($WYe = 0$) | $m$ | $w, y$ |
 
-
-Ignoring the non-negativity constraints, this is a set of $2n + 2m$ equations with
-$2n + 2m$ unknowns ($n$ and $m$ are the number of unknowns and constraints in the
-primal problem), which can be solved using Newton's method.
+**Why is this nonlinear?** Conditions 1--2 are linear, but conditions 3--4 involve products ($x_j z_j$, $w_i y_i$). This is a \textbf{nonlinear} square system $\Rightarrow$ use \textbf{Newton's method}.
 
 ::: notes
 Key insight: if we ignore the non-negativity constraint (condition 5) for a moment, we have a square nonlinear system of 2n + 2m equations in 2n + 2m unknowns. Nonlinear because of the complementary slackness terms XZe and WYe — these are products of variables. We know how to solve nonlinear square systems: Newton's method. The challenge is enforcing non-negativity throughout the iterations. This is what makes interior point methods more sophisticated than naive Newton — they take steps that keep all variables strictly positive.
@@ -487,23 +534,25 @@ We package the five optimality conditions into a vector function F. The domain a
 
 ## Primal-dual interior point method
 
-\fontsize{10pt}{11pt}\selectfont
-Applying Newton’s method, if at iteration $k$ the variables are $(x^k, y^k, w^k, z^k)$,
-we obtain a search direction
-$(\delta x, \delta y, \delta w, \delta z)$
-by solving the linear equations:
+\fontsize{9pt}{10pt}\selectfont
+At iteration $k$, solve $F’(\cdot)\,\delta = -F(\cdot)$ for the search direction $(\delta x, \delta y, \delta w, \delta z)$.
 
-$$
-F’(x^k, y^k, w^k, z^k)
+The Jacobian $F’$ (differentiate each block of $F$ w.r.t. each variable group):
+
+$$F’ = \frac{\partial F}{\partial (x,y,w,z)} =
 \begin{bmatrix}
-    \delta x \\
-    \delta y \\
-    \delta w \\
-    \delta z
-\end{bmatrix}
-=
--F(x^k, y^k, w^k, z^k).
-$$
+    A & 0 & I & 0 \\
+    0 & A^T & 0 & -I \\
+    Z^k & 0 & 0 & X^k \\
+    0 & W^k & Y^k & 0
+\end{bmatrix}$$
+
+- Rows 1--2: linear in all variables $\Rightarrow$ constant Jacobian blocks ($A$, $I$)
+- Rows 3--4: nonlinear products $\Rightarrow$ Jacobian blocks depend on current iterate ($X^k$, $Z^k$, ...)
+
+So the Newton step solves:
+
+$$\begin{bmatrix} A & 0 & I & 0 \\ 0 & A^T & 0 & -I \\ Z^k & 0 & 0 & X^k \\ 0 & W^k & Y^k & 0 \end{bmatrix} \begin{bmatrix} \delta x \\ \delta y \\ \delta w \\ \delta z \end{bmatrix} = -F(x^k, y^k, w^k, z^k)$$
 
 ::: notes
 This is Newton’s method written out explicitly. F’ is the Jacobian of F with respect to all the variables — a (2n+2m) × (2n+2m) matrix. The Newton step solves a linear system (Jacobian × direction = -F) to find the search direction (δx, δy, δw, δz). Notice that if we’re already primal and dual feasible (conditions 1 and 2 satisfied), the first two blocks of F are zero, and the Newton equation simplifies significantly — we only need to deal with the complementary slackness blocks. In practice, solvers maintain primal and dual feasibility throughout and only worry about reducing XZe and WYe to zero.
@@ -535,23 +584,25 @@ The update formula. After solving for the search direction, take a step of size 
 ## An improved algorithm
 
 
-\fontsize{10pt}{11pt}\selectfont
-The algorithm in its current setup is not ideal because often the steps are small to
-avoid violating the positivity constraints. Instead:
+\fontsize{7pt}{8pt}\selectfont
+**Problem**: near the optimum, some $x_j$ or $z_j \to 0$. The step size $\alpha$ must be tiny to keep all variables positive $\Rightarrow$ slow convergence.
 
-- The value of $XZe + WYe$ represents the duality gap
-- Instead of trying to eliminate the duality gap (set it to 0), reduce the duality gap by some factor in each step
+**1D intuition**: want to solve $xz = 0$ with $x, z > 0$. Newton step takes us to the boundary ($x=0$ or $z=0$), so $\alpha \to 0$. Instead, aim for $xz = \mu > 0$ and shrink $\mu$ each iteration:
 
-We replace the complementary slackness by:
+$$\mu = 1 \;\longrightarrow\; \mu = 0.1 \;\longrightarrow\; \mu = 0.01 \;\longrightarrow\; \cdots \;\longrightarrow\; 0$$
+
+Each target keeps us away from the boundary $\Rightarrow$ larger steps allowed.
+
+**Fix**: replace complementary slackness conditions with a relaxed target $\mu > 0$:
 
 \begin{align}
 XZe &= \mu_xe\\
 WYe &= \mu_ye
 \end{align}
 
-When $\mu_x, \mu_y\to 0$ as $k\to\infty$ the solution from this system will converge to the optimal solution of the original LP problem. Good selections of $\mu$ are $\mu_x^{k+1}=(x^k)^Tz^k/n$ and $\mu_y^{k+1}=(w^k)^Ty^k/m$
-
-- $n$ and $m$ are the dimensions of $x$ and $y$
+As $\mu_x, \mu_y\to 0$, this converges to the original optimality conditions. Set:
+$$\mu_x^{k+1}=\frac{(x^k)^Tz^k}{n}, \quad \mu_y^{k+1}=\frac{(w^k)^Ty^k}{m}$$
+(average complementarity at iteration $k$ — small when near optimal)
 
 ::: notes
 The basic algorithm has a practical problem: near the boundary, the steps become tiny (to avoid violating non-negativity), so convergence slows dramatically. The fix: instead of driving XZe → 0 exactly, aim for XZe = μe where μ > 0 is a small positive number. This keeps the iterates away from the boundary and allows larger steps. μ is called the "centering parameter" — larger μ pushes you toward the center of the feasible region, smaller μ pushes toward the boundary (and toward optimality). The recommended choice for μ is the current average complementarity: (x^T z)/n and (w^T y)/m. These are the mean of the x_j z_j products — when all of these are small, we're near the optimal.
@@ -598,6 +649,774 @@ The full matrix system for the Newton step at each iteration. The 4×4 block str
 
 ---
 
+## Introduction to quadratic programming
+
+
+\fontsize{10pt}{11pt}\selectfont
+We have discussed linear programming, where both the objective function and
+constraints are linear functions of the unknowns.
+
+The **quadratic programming** (QP) problem has a quadratic objective function and
+linear constraints:
+
+\begin{align*}
+        \max \quad &f(x) = \frac12 x^TBx + cx\\
+        s.t. \quad &Ax \le b, x\ge 0  
+    \end{align*}
+
+The algorithm for solving QP problem is very similar to that for LP. But first we need
+to first introduce the **KKT conditions**.
+
+::: notes
+Transition from LP to QP. The only difference is the objective: LP has linear objective c^T x, QP has a quadratic objective (1/2)x^T B x + cx. Constraints remain linear. This makes QP much more widely applicable in statistics — many statistical estimators minimize quadratic loss. The matrix B is typically symmetric; for a maximization problem, B should be negative semidefinite so the objective is concave and we get a unique global maximum. The interior point algorithm from LP carries over almost directly — we just get a different Jacobian in the Newton step.
+:::
+
+---
+
+## KKT conditions
+
+
+\fontsize{9pt}{10pt}\selectfont
+For LP, complementary slackness gave us conditions for optimality. **KKT conditions** generalize this to non-linear objective functions. They are necessary conditions for a solution to be optimal in a general non-linear programming problem.
+
+Consider the following problem:
+
+\begin{align*}
+        \max \quad &f(x)\\
+        s.t. \quad &g_i(x) \le 0, i = 1,\ldots,I\\
+        &h_j(x)=0, j = 1,\ldots, J
+    \end{align*}
+
+The Lagrangian is: $L(x,y,z) = f(x) - \sum_iy_ig_i(x) - \sum_jz_jh_j(x)$. Then at the optimal solution, the following **KKT** conditions must be satisfied:
+
+- Primal feasibility: $g_i(x^*)\le 0, h_j(x^*)=0$
+- Dual feasibility: $y_i\ge 0$
+- Complementary slackness: $y_ig_i(x^*)=0$
+- Stationary: $\nabla f(x^*)-\sum_iy_i\nabla g_i(x)-\sum_jz_j\nabla h_j(x) = 0$
+
+::: notes
+KKT conditions are the generalization of complementary slackness to nonlinear programming. For LP, the objective was linear so ∇f = c (a constant). For QP and beyond, ∇f depends on x. The four conditions: (1) Primal feasibility — the constraints must hold at x*. (2) Dual feasibility — multipliers for inequality constraints must be non-negative. (3) Complementary slackness — same idea as LP: inactive constraint implies zero dual variable. (4) Stationarity — the gradient of the Lagrangian with respect to x is zero at the optimum. For convex problems (convex f, convex feasible set), KKT conditions are both necessary AND sufficient for a global optimum. QP with a positive semidefinite B is convex.
+:::
+
+---
+
+## Optimal solution for QP
+
+
+\fontsize{10pt}{11pt}\selectfont
+The Lagrangian for the QP problem is
+
+$$L(x,\mu,\lambda) = \frac12 x^TBx + cx - y^T(Ax-b)+z^Tx$$
+
+The KKT conditions for the QP problem are:
+
+- Primal feasibility: $Ax\le b, x\ge 0$
+- Dual feasibility: $y\ge 0, z\ge 0$ ($z$ multiplies the constraint $x\ge 0$, written as $-x\le 0$, so it requires the same non-negativity as $y$)
+- Complementary slackness: $Y(Ax-b)=0, Zx = 0$
+- Stationary: $Bx+c-A^Ty+z = 0$
+
+Here, $Y$ and $Z$ are diagonal matrices with $y$ and $z$ at the diagonal.  This can be solved using an interior point method.
+
+::: notes
+Apply KKT to the QP problem specifically. The Lagrangian uses y for the constraints Ax ≤ b and z for the non-negativity constraints x ≥ 0 (written as -x ≤ 0). Stationarity gives Bx + c - A^T y + z = 0 — note the Bx term, which is what makes QP different from LP (where B = 0 and stationarity reduces to dual feasibility). Complementary slackness: Y(Ax - b) = 0 means inactive constraint i implies y_i = 0. Zx = 0 means x_j = 0 or z_j = 0. Same structure as LP complementary slackness — interior point will exploit this just as before.
+:::
+
+---
+
+## Optimal solution for QP
+
+
+\fontsize{10pt}{11pt}\selectfont
+To be specific, define slack variable $w=b-Ax$, the optimality conditions become
+
+\begin{align*}
+    A x - b + w &= 0, \\
+    B x + c - A^T y + z &= 0, \\
+    Z x &= 0, \\
+    Y w &= 0, \\
+    x, y, z, w &\geq 0.
+\end{align*}
+
+The unknowns are $x, y, z, w$. We can then obtain the Jacobians, form the Newton
+equation and solve for the optimal solution iteratively.
+
+::: notes
+Add slack variable w = b - Ax to convert Ax ≤ b into an equality constraint Ax - b + w = 0, exactly as we did for LP. The system is now square: Ax - b + w = 0 (m equations), Bx + c - A^T y + z = 0 (n equations), Zx = 0 (n equations, complementary slackness for x), Yw = 0 (m equations, complementary slackness for w), plus non-negativity. Unknowns: x (n), y (m), z (n), w (m) — total 2n + 2m, matching the equation count. This is a nonlinear square system — Newton's method, with the same step-size control to maintain non-negativity, solves it. The only difference from LP is the Bx term in the second condition.
+:::
+
+---
+
+
+## QP in R
+
+
+\fontsize{10pt}{11pt}\selectfont
+The `quadprog` package provides functions (`solve.QP.compact`) to solve quadratic
+programming problem. Pay attention to the definition of function parameters. They are slightly different from what I have used in the standard form!  
+
+- Solve $\min \frac12 (x_1^2 + x_2^2)$ s.t. $2x_1+x_2\ge 1$:
+
+```{r, eval = FALSE}
+library(quadprog)
+Dmat = diag(rep(1,2))
+dvec = rep(0,2)
+Amat = matrix(c(2,1))
+solve.QP(Dmat=Dmat, dvec=dvec, Amat=Amat, bvec=c(1))
+```
+
+::: notes
+Quick demo of the quadprog package. Note: quadprog solves minimization by default — hence min (1/2)(x1^2 + x2^2). Dmat is the matrix B (must be positive definite for minimization). dvec is the linear term (zero here — pure quadratic objective). Amat and bvec encode the constraint 2x1 + x2 ≥ 1. Geometrically this finds the point on the line 2x1 + x2 = 1 closest to the origin — a simple projection problem. Answer: x = (2/5, 1/5). Important: quadprog's parameter conventions differ from our standard form notation — always read the documentation carefully when using a new solver.
+:::
+
+---
+
+## Review
+
+
+\fontsize{10pt}{11pt}\selectfont
+We have now covered:
+
+- LP problem set up
+- Simplex methods
+- Duality
+- Interior point algorithms
+- Quadratic programming
+
+Now you should be able to formulate an LP/QP problem and solve it. But how are these useful in statistics?
+
+- Remember that LP is an optimization algorithm
+- There are plenty of optimization problems in statistics, e.g. MLE
+- It's just a matter of formulating the objective function and constraints.
+
+::: notes
+Quick recap before the applied examples. We've built up from scratch: LP formulation → simplex (combinatorial, hitting corner points) → duality (shadow prices, primal-dual symmetry) → interior point (Newton on the KKT system, scales to large problems) → QP (same structure, quadratic objective). Everything is connected. The punchline for the rest of today: many statistical estimation problems ARE optimization problems. Once you can write down an objective function and constraints, you can hand it to a solver. The examples coming up (QR and LASSO) make this concrete.
+:::
+
+---
+
+## Lab problem
+
+Write out the primal and dual for the carpenter problem.
+
+- Check the set of feasible solutions (corner points).  
+  - What are the values of the objective functions of the primal and dual at each vertex?
+  - Does weak duality appear to hold?
+
+::: notes
+The carpenter problem: a carpenter makes tables and chairs, limited by lumber and labor hours. Set up the primal (maximize profit), identify the corner points of the feasible region by solving pairwise constraint intersections, and evaluate both the primal and dual objectives at each corner. Students should observe that the dual objective ≥ primal objective at every feasible point (weak duality). At the optimal corner, they should be equal (strong duality). This is a good concrete numerical verification before abstract theory, and also reinforces how to find corner points of a feasible polytope.
+:::
+
+---
+
+
+
+## Quantile regression
+
+
+The goal of regression is to understand the relationship between an outcome and covariates. Traditional regression models the conditional mean, $E(Y|X)$
+
+- Relies on normal error assumptions and homoscedasticity
+- Sensitive to outliers and skewed distributions
+
+Quantile regression:
+
+- Provides a more exhaustive description of the data
+- The collection of regressions at all quantiles would give a complete picture of outcome-covariate relationships
+
+::: notes
+Motivate quantile regression. Traditional linear regression models E(Y|X) — one number summarizing the conditional distribution. But often we care about other parts: healthcare costs (upper tail), housing affordability (lower tail), or detecting whether a treatment shifts the entire distribution vs. just the mean. Quantile regression lets you model any conditional quantile Q_τ(Y|X). Running it at τ = 0.1, 0.25, 0.5, 0.75, 0.9 gives a richer description of how Y relates to X across the whole distribution. The next slide shows what this looks like on real data.
+:::
+
+---
+
+## Quantile regression
+
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', out.width = '70%', message = FALSE}
+
+library(quantreg)
+
+data(engel)
+
+attach(engel)
+plot(income,foodexp,xlab="Household Income",ylab="Food Expenditure",type = "n", cex=.5)
+points(income,foodexp,cex=.5,col="blue")
+xx <- seq(min(engel$income),max(engel$income),100)
+taus <- c(.05,.1,.25, .5, .75,.9,.95)
+
+f <- coef(rq((foodexp)~(income),tau=taus, data = engel))
+yy <- cbind(1,xx)%*%f
+for(i in 1:length(taus)){
+        lines(xx,yy[,i],col = "gray")
+        }
+
+
+```
+
+::: notes
+The Engel data: food expenditure vs. household income. Each gray line is a fitted quantile regression at a different quantile (5th, 10th, 25th, 50th, 75th, 90th, 95th percentile). Notice the lines are not parallel — the spread increases with income. Higher-income households vary more in food spending. A single OLS line would only give the conditional mean and completely miss this heteroscedasticity. Quantile regression captures how the entire distribution of food expenditure changes with income, not just the average.
+:::
+
+---
+
+## Colorado cannabis and driving study
+
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', out.width = '90%'}
+knitr::include_graphics("ccds.png")
+```
+
+
+
+
+::: notes
+Digression- I'm going to show some examples in class using data from a big study I'm a part of.  You'll also use this dataset in your homework
+:::
+
+---
+
+## Colorado cannabis and driving study
+
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', message = FALSE, warning = FALSE, fig.height = 4.5, fig.width = 10}
+
+cannabis = readRDS(here::here("slides", "topic_optimization_II","cannabis.rds"))
+
+p1 = cannabis %>%
+  ggplot(aes(t_mmr1)) +
+  geom_histogram(bins = 8) +
+  ggtitle("THC molar metabolite ratio") +
+  xlab("Molar metabolite ratio")
+
+p2 = cannabis %>%
+  ggplot(aes(p_change,t_mmr1)) +
+  labs(x = "percent change in pupil diameter after light flash", 
+       y = "THC molar metabolite ratio") +
+  geom_point()
+
+
+p1 + p2
+```
+
+
+
+
+::: notes
+MMR tells you about acute cannabis impairment
+Probably not great data for linear regression... why?
+:::
+
+---
+
+## Quantile regression model
+
+\fontsize{10pt}{11pt}\selectfont
+Regress conditional quantiles of response on the covariates. Assume the outcome Y is continuous.
+
+- Classical model: $Q_{\tau}(Y|X)=X\beta_{\tau}$
+- $Q_{\tau}(Y|X)$ is the $\tau$th conditional quantile of $Y$ given $X$
+
+
+The above model is equivalent to specifying
+
+$$Y = X\beta_{\tau} + \epsilon; \quad Q_{\tau}(\epsilon|X) = 0.$$
+
+In comparison, mean regression is:
+
+$$Y = X\beta + \epsilon; \quad E(\epsilon|X) = 0.$$
+
+::: notes
+The model Q_τ(Y|X) = Xβ_τ is simple but important. Note β_τ changes with τ — a separate coefficient vector for each quantile. In OLS, β is a single vector (same for all quantiles under homoscedasticity). The error characterization Q_τ(ε|X) = 0 means the τth quantile of the residuals is zero — a weaker condition than E(ε|X) = 0. Quantile regression is more general: median regression (τ = 0.5) is the robust alternative to OLS, and if the errors are symmetric and homoscedastic, all quantile fits will be parallel lines — you'd get the same story as OLS. The interesting cases are when they're not.
+:::
+
+---
+
+## Pros and cons
+
+\fontsize{10pt}{11pt}\selectfont
+**Advantages**:
+
+- Regression at a sequence of quantiles provides a more complete view of data
+- Inference is robust to outliers
+- Estimation is more efficient when residual normality is highly violated
+- Allows interpretation in the outcome's original scale of measurement
+
+**Disadvantages**:
+
+- To be useful, needs to regress on a set of quantiles: computational burden
+- Solution has no closed form
+- Adaptation to non-continuous outcomes is difficult
+
+::: notes
+Hit the key advantages. Completeness: fitting at multiple quantiles gives a richer picture than the conditional mean alone. Robustness: the loss function (coming up next) is based on absolute values, not squared errors, so outliers have bounded influence. Efficiency: when error distributions have heavy tails, QR can be more efficient than OLS. Original scale: unlike log transformations, QR coefficients stay in the original Y scale. On the downside: computational burden (solve a separate LP for each τ), no closed form unlike OLS, and extending to discrete or censored outcomes is non-trivial. In practice the computational cost is manageable with modern solvers.
+:::
+
+---
+
+## The loss function
+
+\fontsize{10pt}{11pt}\selectfont
+Link between estimands and loss functions:
+
+- To obtain sample mean of $\{y_1,y_2,\ldots y_n\}$ minimize $\sum_i(y_i-b)^2$
+- To obtain sample median of $\{y_1,y_2,\ldots y_n\}$ minimize $\sum_i|y_i-b|$
+
+It can be shown that to obtain the sample $\tau$th quantile, one needs to minimize asymmetric absolute loss, that is, compute
+
+$$\hat{Q}_{\tau} = \arg\min_b \left\{ \sum_{i: y_i\ge b}\tau|y_i-b| + \sum_{i: y_i< b}(1-\tau)|y_i-b|\right\}.$$
+
+For notational simplicity, define $\rho_{\tau}(x) = x[\tau-(x<0)]$, where $(x<0)$ is an indicator equal to 1 if $x<0$ and 0 otherwise. This compactly encodes the asymmetric weighting: $\rho_\tau(x) = \tau x$ when $x \ge 0$ and $\rho_\tau(x) = (\tau-1)x$ when $x < 0$.
+
+::: notes
+The check function ρ_τ is the key innovation. To get the sample mean: minimize squared loss — symmetric, equal weight on positive and negative residuals. To get the median: minimize absolute loss — also symmetric, but linear. To get the τth quantile: use asymmetric absolute loss. Upward residuals (y > b) get weight τ, downward (y < b) get weight 1-τ. At τ = 0.5 weights are equal → median. At τ = 0.9, upward residuals get 9× more weight than downward → the minimizer slides up to the 90th percentile. The compact ρ_τ notation: when x ≥ 0, ρ_τ(x) = τx; when x < 0, ρ_τ(x) = (τ-1)x = -(1-τ)|x|.
+:::
+
+---
+
+## The loss function
+
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', fig.height = 4.5, fig.width = 10, message = FALSE}
+quantile_loss = function(b, y, tau) {
+  loss <- ifelse(y >= b, tau * (y - b), (1 - tau) * (b - y))
+  return(loss)
+}
+
+set.seed(2123)
+y = rnorm(100)
+
+tau = c(.1,.25, .5, .75, .9)
+loss = map_dfc(tau, quantile_loss, b = 0, y = y)
+colnames(loss) = paste0("tau_", tau)
+
+loss %>%
+  mutate(y = y) %>%
+  pivot_longer(tau_0.1:tau_0.9, names_to = "tau", values_to = "loss", 
+              names_prefix = "tau_") %>%
+  mutate(tau = factor(tau)) %>%
+  ggplot(aes(y, loss, group = tau)) + 
+  geom_line(aes(color = tau, linetype = tau)) +
+  theme_minimal()
+```
+
+::: notes
+The plot shows ρ_τ(y) at b = 0 for different τ values. All curves are piecewise linear with a kink at y = 0. At τ = 0.5, the two arms have equal slope — symmetric V-shape, same as absolute value loss. At τ = 0.9, the right arm (y > 0) is steep (slope 0.9) and the left arm (y < 0) is shallow (slope 0.1). The minimum of the sum of these loss values over data gives the τth quantile. Key insight: this piecewise-linear, non-differentiable objective means standard gradient methods fail at the kink. We need LP methods — and that LP reformulation is exactly what's coming up.
+:::
+
+---
+
+## Estimator
+
+\fontsize{10pt}{11pt}\selectfont
+The linear quantile regression model is fitted by determining
+
+$$\hat{\beta}_{\tau} = \arg\min_b \sum_{i=1}^n \rho_{\tau}(y_i-x_ib)$$
+
+The estimator has all "expected" properties:
+
+- Scale equivariance: 
+$$\hat{\beta}_{\tau}(ay, X) = a\hat{\beta}_{\tau}(y,X), \quad \hat{\beta}_{\tau}(-ay, X) = -a\hat{\beta}_{1-\tau}(y,X)$$
+
+- Shift (or regression) equivariance: $\hat{\beta}_{\tau}(y+\gamma, X) = \hat{\beta}_{\tau}(y,X)+\gamma$
+
+- Equivariance to reparametrization of design: $\hat{\beta}_{\tau}(y, XA) = A^{-1}\hat{\beta}_{\tau}(y,X)$
+
+
+::: notes
+- Scale equivariance in quantile regression means that if all input values are multiplied by a constant, the predicted quantiles are also multiplied by the same constant, preserving the relative distribution of the response variable.
+- Shift equivariance in quantile regression means that if a constant is added to all input values, the predicted quantiles are also shifted by the same constant, preserving the relative spacing between them.
+- Equivariance to reparameterization of the design in quantile regression means that if the predictor variables undergo a linear transformation (e.g., rescaling or shifting), the estimated quantiles transform accordingly, ensuring that the quantile function remains consistent with the new parameterization of the predictors.
+:::
+
+---
+
+## Asymmetric Double Exponential (ADE) distribution
+
+\fontsize{10pt}{11pt}\selectfont
+Density function for ADE is
+
+$$f(y;\mu,\sigma,\tau)= \frac{\tau(1-\tau)}{\sigma}\exp\left\{-\rho_{\tau}(\frac{y-\mu}{\sigma})\right\}$$
+
+
+- Least squares estimator $\iff$ MLE if residuals are Normal
+- QR estimator $\iff$ MLE if residuals are ADE
+- If residuals re iid $ADE(0,1,\tau)$, then the log-likelihood for $\beta_{\tau}$ is 
+
+$$l(\beta_{\tau}; Y,X,\tau)=-\sum_i^n \rho_{\tau}(y_i-x_i\beta_{\tau}) + c_0$$
+
+::: notes
+The ADE distribution is the quantile regression analogue of the Normal for OLS. Just as assuming Normal errors makes OLS = MLE, assuming ADE errors makes QR = MLE. The ADE density has the check function ρ_τ in the exponent, and the parameter τ controls the asymmetry. When τ = 0.5, ADE reduces to the symmetric double exponential (Laplace) distribution — median regression is then MLE under Laplace errors, which is why it's robust (Laplace has heavier tails than Normal). We'll revisit this Laplace connection when we get to LASSO: LASSO corresponds to a Bayesian model with a Laplace prior on the coefficients.
+:::
+
+---
+
+
+## QR model fitting
+
+\fontsize{9pt}{10pt}\selectfont
+The QR estimation problem $\hat{\beta}_{\tau} = \arg\min_b \sum_{i=1}^n \rho_{\tau}(y_i-x_ib)$ can be framed as an LP problem!
+
+- First, define a set of new variables
+
+\begin{align}
+    u_i &\equiv [y_i - x_i b]_+ \\
+    v_i &\equiv [y_i - x_i b]_- \\
+    b_+ &\equiv [b]_+ \\
+    b_- &\equiv [b]_-
+\end{align}
+
+Note:
+
+- $[\cdot]_+$ and $[\cdot]_-$ mean the positive and negative part of a number
+- $x \equiv [x]_+ - [x]_-$
+  - $[x]_+ = \max(x, 0)$
+  - $[x]_- = \max(-x, 0)$
+
+::: notes
+We're reformulating QR as an LP by splitting residuals into positive and negative parts. u_i captures how much y_i exceeds x_i b (when the residual is positive); v_i captures how much x_i b exceeds y_i (when the residual is negative). At any point, exactly one of u_i, v_i is nonzero. Similarly, b+ and b- split the coefficient vector into non-negative parts. This decomposition is the trick that removes the non-differentiability: instead of an absolute value we get two non-negative variables. The same decomposition will appear again in LASSO for the coefficients β.
+:::
+
+---
+
+
+## QR model fitting
+
+Remember the objective function is $\sum_{i = 1}^n \rho_{\tau}(y_i-x_ib)$. Notice that 
+
+- When $y_i-x_ib\ge 0$, we have $\rho_{\tau}(y_i-x_ib)=\tau u_i$, and $v_i =0$.
+- When $y_i-x_ib < 0$, we have $\rho_{\tau}(y_i-x_ib)=(1-\tau) v_i$, and $u_i = 0$.
+
+So we can write $\rho_{\tau}(y_i-x_ib)=\tau u_i + (1-\tau) v_i$.
+
+::: notes
+Key algebraic step — this is where the non-differentiability disappears. When y_i - x_i b ≥ 0: u_i = y_i - x_i b, v_i = 0, so ρ_τ = τ·u_i + (1-τ)·0 = τu_i. When y_i - x_i b < 0: v_i = x_i b - y_i, u_i = 0, so ρ_τ = (1-τ)·v_i + τ·0. In both cases, ρ_τ(y_i - x_i b) = τu_i + (1-τ)v_i. The sum of ρ_τ over all observations becomes τ∑u_i + (1-τ)∑v_i — a linear objective in the new variables. This is the bridge to LP.
+:::
+
+---
+
+## QR model fitting
+
+The optimization problem can then be reformulated as:
+
+\begin{align*}
+    &\max \quad - \sum_{i=1}^{n} [\tau u_i + (1 - \tau) v_i] \\
+    &\text{s.t.} \quad y_i = x_i b_+ - x_i b_- + u_i - v_i \\
+    &\quad u_i, v_i \geq 0, \quad i = 1, \dots, n \\
+    &\quad b_+, b_- \geq 0
+\end{align*}
+
+This is a standard LP problem can be solved by simplex or interior point methods.
+
+::: notes
+The full LP form. The objective is linear in (u, v, b+, b-). Constraints are: the residual decomposition y_i = x_i b+ - x_i b- + u_i - v_i for each i (n equality constraints), plus non-negativity on all variables. Total variables: n values of u, n values of v, p values of b+, p values of b- — total 2n + 2p. This can be handed directly to a simplex or interior point LP solver. The `rq()` function in R does exactly this internally. Method "br" is the Barrodale-Roberts simplex method adapted for QR; method "fn" uses an interior point approach. Both solve the same LP — they just use different algorithms.
+:::
+
+---
+
+## QR model fitting, cont
+
+
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', out.width = '70%'}
+knitr::include_graphics("qr.png")
+```
+
+::: notes
+This figure illustrates the LP geometry of quantile regression. The piecewise-linear loss function creates a polytope structure where the optimal solution is at a vertex — exactly the setting where simplex methods excel. The residuals split cleanly into positive (u) and negative (v) parts at each candidate solution.
+:::
+
+---
+
+
+## QR model fitting, cont
+
+
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', out.width = '70%'}
+knitr::include_graphics("qr2.png")
+```
+
+::: notes
+Continuation of the LP reformulation visualization. Notice how the objective function in (u, v, b+, b-) space is a linear function over a polytope — the simplex method moves along edges of this polytope until it finds the optimal vertex. Interior point methods would follow a central path through the interior of this polytope.
+:::
+
+---
+
+
+## QR model fitting, cont
+
+
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', out.width = '70%'}
+knitr::include_graphics("qr3.png")
+```
+
+::: notes
+Final figure in the QR fitting sequence. The LP reformulation is complete — what started as a non-differentiable minimization problem is now a standard LP that any solver can handle. This is a template: whenever you have an optimization problem with absolute values, check whether the same u/v splitting trick applies.
+:::
+
+---
+
+## QR in R
+
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', message = FALSE, warning = FALSE, fig.height = 4.5, fig.width = 10}
+p1 + p2
+```
+
+::: notes
+Now we're going to fit this quantile regression
+:::
+
+---
+
+
+## QR in R
+
+\fontsize{9pt}{10pt}\selectfont
+Want to compare linear and quantile regression
+
+```{r, eval = TRUE}
+ols = lm(t_mmr1 ~ p_change, data = cannabis)
+
+# default method, which is a simplex method
+median_regression = rq(t_mmr1 ~ p_change, tau = 0.5, data = cannabis, 
+                       method = "br")
+qr.9 = rq(t_mmr1 ~ p_change, tau = 0.9, data = cannabis, 
+          method = "br")
+
+summary(ols)$coefficients
+summary(median_regression, se = "boot")$coefficients
+```
+
+::: notes
+Walk through the code. `lm` fits OLS. `rq` with tau = 0.5 fits median regression. Method "br" is Barrodale-Roberts, a simplex method adapted for QR — the default and typically fastest for small datasets. We use bootstrap SE (`se = "boot"`) rather than the asymptotic formula because the asymptotic SE requires estimating the sparsity function (density at the quantile), which is more complex. Bootstrap is more robust. Compare the coefficients: does the median regression slope differ from OLS? For the skewed THC data, we expect it to.
+:::
+
+---
+
+## QR in R
+
+\fontsize{10pt}{11pt}\selectfont
+Blue is ols, red is median regression, pink is tau = 0.9
+
+
+```{r, echo = FALSE, eval = TRUE,  fig.align = 'center', message = FALSE, warning = FALSE, fig.height = 4, fig.width = 10}
+p2 + 
+  geom_abline(slope = coef(ols)[2], intercept = coef(ols)[1], color = "blue") +
+  geom_abline(slope = coef(median_regression)[2], intercept = coef(median_regression)[1], color = "red") +
+  geom_abline(slope = coef(qr.9)[2], intercept = coef(qr.9)[1], color = "pink")
+
+
+```
+
+::: notes
+Three regression lines overlaid on the scatterplot. Blue (OLS) minimizes squared error — sensitive to high outliers in the THC data. Red (median regression, τ = 0.5) minimizes absolute error — more robust. Pink (τ = 0.9) fits the upper tail of THC values — captures high-impairment subjects. For skewed data like THC metabolite ratios, OLS can be pulled upward by extreme values. Ask students: for assessing whether p_change is associated with high THC levels (upper tail, most impaired subjects), which regression would you report?
+:::
+
+---
+
+
+## LASSO
+
+\fontsize{10pt}{11pt}\selectfont
+Consider usual regression settings with data $(\bf{x}_i, y_i)$, where $\textbf{x}_i = (x_{i1},\ldots, x_{ip})$ is a p-vector of predictors and $y_i$ is the response for the $i$th subject. The OLS setting finds a coefficient vector to minimize the residual sum of squares:
+
+$$\hat{\beta} = \arg\min_{\beta}\sum_i^n(y_i-x_i\beta)^2$$
+
+- Solution is the MLE assuming a Normal model:
+
+$$y_i = \textbf{x}_i\beta + \epsilon_i, \quad \epsilon_i\sim N(0, \sigma^2)$$
+
+- This is undesirable when $p$ is large because
+
+1. When p>n, model can't be fit
+2. One typically wants a more parsimonius model for interpretability
+
+::: notes
+Setup for LASSO. OLS works well when p << n and all predictors matter. But modern high-dimensional data is common: genomics (20,000 genes, 200 patients), text analysis, high-dimensional biomarkers like in the cannabis study. When p > n, OLS has infinitely many solutions — the system is underdetermined and (X^T X) is not invertible. Even when p < n, if p is large relative to n, OLS overfits. We want a method that simultaneously selects a sparse set of predictors (variable selection) and estimates their coefficients. LASSO does both in one step.
+:::
+
+---
+
+## LASSO
+
+\fontsize{10pt}{11pt}\selectfont
+LASSO stands for "Least Absolute Shrinkage and Selection Operator", which aims for model selection when $p$ is large (works even $p > n$). The LASSO procedure will "shrink" the coefficients toward 0 and eventually force some to be exactly zero
+
+- predictors with $\beta=0$ will be selected out
+
+The LASSO estimates are defined as:
+
+$$\tilde{\beta} = \arg\min_{\beta} \left\{\sum_i^n(y_i-\textbf{x}_i\beta)^2\right\} s.t. ||\beta||_1\le \lambda$$
+
+- $||\beta||_1 = \sum_{j=1}^p|b_j|$ is the $L_1$ norm
+- $\lambda\ge 0$ is a tuning parameter controlling the strength of shrinkage 
+
+**What kind of optimization problem does this look like?**
+
+::: notes
+So LASSO tries to minimize the residual sum of squares, with a constraint on the
+sum of the absolute values of the coefficients.
+:::
+
+---
+
+## Regularization side note
+
+LASSO is a regularization approach- regularization prevents overfitting by adding a penalty term to the objective function.
+
+- LASSO tries to minimize the residual sum of square, with a constraint on the sum of the absolute values of the coefficients.
+
+
+- There are other types of regularized regressions
+- **Ridge regression**: adds an $L_2$ penalty, $\sum_jb_j^2\le \lambda$
+
+::: notes
+Regularization adds a penalty for model complexity, preventing overfitting. LASSO uses the L1 norm (sum of absolute values), Ridge uses the L2 norm (sum of squares). The key geometric difference: the L1 constraint region is a diamond with sharp corners, so the objective function contours tend to first touch the constraint boundary at a corner where a variable is exactly zero — producing sparse solutions. The L2 constraint region is a sphere with no corners, so all coefficients shrink but none hit zero exactly. Elastic net combines both penalties, inheriting LASSO's sparsity and Ridge's grouping behavior. λ is chosen by cross-validation.
+:::
+
+---
+
+## LASSO vs. Ridge visualized
+
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', out.width = '100%'}
+knitr::include_graphics("lasso.png")
+```
+
+
+::: notes
+Standard lasso picture. The diamond-shaped region (blue) is the constraint imposed by the L1 penalty.
+- The elliptical contours (red) represent the objective function of least squares regression.
+- Because of the sharp corners of the diamond, the solution (where the contours first touch the constraint) often lies on an axis, meaning some coefficients are exactly zero (sparse solution).
+
+For ridge
+- The circular region (blue) is the constraint imposed by the L2 penalty.
+- The smooth shape does not favor solutions on the axes, meaning all coefficients remain nonzero but shrink toward zero.
+:::
+
+---
+
+## LASSO model fitting
+
+
+
+The LASSO problem can be solved by quadratic programming algorithms.
+
+\begin{align}
+\max \quad -&\sum_i^n\left(y_i-\sum_j\beta_jx_{ij}\right)^2\\
+s.t. \quad &\sum_j|b_j|\le \lambda
+\end{align}
+
+- **Issue**: not in standard LP/QP form, since the constraints have the absolute value operator
+
+::: notes
+The LASSO objective is quadratic (sum of squared residuals) — that's the QP part. But the constraint ‖β‖₁ ≤ λ involves absolute values, which aren't linear. Standard LP/QP solvers require linear constraints. Pause here and ask students: how do we remove the absolute value? They've already seen this exact trick in QR model fitting — the same β+ / β- decomposition applies. The next slide shows it applied to the coefficients.
+:::
+
+---
+
+
+## LASSO model fitting
+
+\fontsize{10pt}{11pt}\selectfont
+The trick is to convert the problem into the standard QP problem setting, i.e., to remove the absolute value operator. This is the **same decomposition used in QR** model fitting ($u_i, v_i$ for residuals), now applied to the coefficients $\beta_j$.
+
+- Let $\beta_j = \beta_j^+-\beta_j^-$, where $\beta_j^+, \beta_j^-\ge0$ (positive and negative parts)
+- Then $|\beta_j|=\beta_j^++\beta_j^-$ and the problem can be written as:
+
+\begin{align*}
+\max \quad -&\sum_i^n\left(y_i-\sum_j\beta_j^+x_{ij} + \sum_j\beta_j^-x_{ij}\right)^2\\
+s.t. \quad &\sum_j (\beta_j^++\beta_j^-)\le \lambda,\\
+&\beta_j^+, \beta_j^- \ge 0
+\end{align*}
+
+
+This is now a standard QP problem can be solved by standard QP solvers.
+
+
+::: notes
+Need to explain exactly what this notation means- this is the same thing as what we did for quantile regression.
+- this notation essentially stores the magnitude and sign of the value separately
+- note that the variables here are $\beta$ not x
+:::
+
+---
+
+
+## A little more on LASSO
+
+\fontsize{9pt}{10pt}\selectfont
+The Lagrangian for the LASSO optimization problem is:
+
+$$L(\mathbf{\beta},\lambda) = -\sum_{i=1}^n\left (y_i-\sum_j\beta_jx_{ij}\right)^2 - \lambda\sum_{j = 1}^p|\beta_j|$$
+
+This is equivalent to the likelihood function for a Bayesian model with a double exponential (DE) prior on $\beta$s (remember ADE used in quantile regression?):
+
+\begin{align*}
+Y|X, \beta &\sim N(X\beta, \sigma^2)\\
+\beta_j &\sim DE(1/\lambda)
+\end{align*}
+
+where the DE density function is 
+
+$$f(x,\tau) = \frac1{2\tau}\exp\left(\frac{-|x|}{\tau}\right)$$
+
+::: notes
+The LASSO Lagrangian is exactly the log-posterior of a Bayesian regression with a double exponential (Laplace) prior on the coefficients. This is why LASSO produces sparse solutions — the Laplace prior has sharp peaks at zero, pulling coefficients exactly to zero. In contrast, Ridge regression corresponds to a Normal prior on beta: the Normal prior has no such sharp peak, so it shrinks coefficients toward zero but never exactly to zero. This Bayesian connection also tells us how to choose λ: it corresponds to the prior precision, which can be set by empirical Bayes or cross-validation.
+:::
+
+---
+
+## LASSO in R
+
+\fontsize{10pt}{11pt}\selectfont
+The package `glmnet` is standard for elastic net and LASSO in R.
+
+
+```{r, fig.align = 'center', eval = FALSE,  fig.height = 4.5, fig.width = 9, message = FALSE}
+### Lasso results from R package "glmnet"
+library(glmnet)
+lasso_mod = glmnet(x = dplyr::select(cannabis, -id, -t_mmr1), 
+                   y = cannabis$t_mmr1)
+plot(lasso_mod, "lambda")
+```
+
+::: notes
+There are other functions for this as well
+:::
+
+
+---
+
+
+## LASSO in R
+
+\fontsize{10pt}{11pt}\selectfont
+The package `glmnet` is standard for elastic net and LASSO in R.
+
+
+```{r, fig.align = 'center', eval = TRUE, echo = FALSE, fig.height = 4.5, fig.width = 9, message = FALSE}
+### Lasso results from R package "glmnet"
+library(glmnet)
+lasso_mod = glmnet(x = dplyr::select(cannabis, -id, -t_mmr1), 
+                   y = cannabis$t_mmr1)
+plot(lasso_mod, "lambda")
+```
+
+::: notes
+There are other functions for this as well
+:::
+
+
+---
+
+## Resources
+
+- [Hao Wu's lecture with matrix representation of Simplex algorithm](https://www.haowulab.org/teaching/statcomp/Notes/lp1.pdf)
+
+
+**Some videos**
+
+
+- [convexity explained, and duality](https://www.youtube.com/watch?v=d0CF3d5aEGc&ab_channel=VisuallyExplained)
+- [KKT conditions explained](https://www.youtube.com/watch?v=uh1Dk68cfWs&ab_channel=VisuallyExplained)
+- [Simple explanation of Lagrangian](https://www.youtube.com/watch?v=GR4ff0dTLTw&ab_channel=MATLAB)
+
+
+---
 
 
 ## Lagrange multipliers
@@ -678,677 +1497,5 @@ Walk through the Lagrangian. We use y as the multiplier for the equality constra
 :::
 
 ---
-
-## Introduction to quadratic programming
-
-
-\fontsize{10pt}{11pt}\selectfont
-We have discussed linear programming, where both the objective function and
-constraints are linear functions of the unknowns.
-
-The **quadratic programming** (QP) problem has a quadratic objective function and
-linear constraints:
-
-\begin{align*}
-        \max \quad &f(x) = \frac12 x^TBx + cx\\
-        s.t. \quad &Ax \le b, x\ge 0  
-    \end{align*}
-
-The algorithm for solving QP problem is very similar to that for LP. But first we need
-to first introduce the **KKT conditions**.
-
----
-
-## KKT conditions
-
-
-\fontsize{9pt}{10pt}\selectfont
-For LP, complementary slackness gave us conditions for optimality. **KKT conditions** generalize this to non-linear objective functions. They are necessary conditions for a solution to be optimal in a general non-linear programming problem.
-
-Consider the following problem:
-
-\begin{align*}
-        \max \quad &f(x)\\
-        s.t. \quad &g_i(x) \le 0, i = 1,\ldots,I\\
-        &h_j(x)=0, j = 1,\ldots, J
-    \end{align*}
-
-The Lagrangian is: $L(x,y,z) = f(x) - \sum_iy_ig_i(x) - \sum_jz_jh_j(x)$. Then at the optimal solution, the following **KKT** conditions must be satisfied:
-
-- Primal feasibility: $g_i(x^*)\le 0, h_j(x^*)=0$
-- Dual feasibility: $y_i\ge 0$
-- Complementary slackness: $y_ig_i(x^*)=0$
-- Stationary: $\nabla f(x^*)-\sum_iy_i\nabla g_i(x)-\sum_jz_j\nabla h_j(x) = 0$
-
----
-
-## Optimal solution for QP
-
-
-\fontsize{10pt}{11pt}\selectfont
-The Lagrangian for the QP problem is
-
-$$L(x,\mu,\lambda) = \frac12 x^TBx + cx - y^T(Ax-b)+z^Tx$$
-
-The KKT conditions for the QP problem are:
-
-- Primal feasibility: $Ax\le b, x\ge 0$
-- Dual feasibility: $y\ge 0, z\ge 0$ ($z$ multiplies the constraint $x\ge 0$, written as $-x\le 0$, so it requires the same non-negativity as $y$)
-- Complementary slackness: $Y(Ax-b)=0, Zx = 0$
-- Stationary: $Bx+c-A^Ty+z = 0$
-
-Here, $Y$ and $Z$ are diagonal matrices with $y$ and $z$ at the diagonal.  This can be solved using an interior point method.
-
----
-
-## Optimal solution for QP
-
-
-\fontsize{10pt}{11pt}\selectfont
-To be specific, define slack variable $w=b-Ax$, the optimality conditions become
-
-\begin{align*}
-    A x - b + w &= 0, \\
-    B x + c - A^T y + z &= 0, \\
-    Z x &= 0, \\
-    Y w &= 0, \\
-    x, y, z, w &\geq 0.
-\end{align*}
-
-The unknowns are $x, y, z, w$. We can then obtain the Jacobians, form the Newton
-equation and solve for the optimal solution iteratively.
-
----
-
-
-## QP in R
-
-
-\fontsize{10pt}{11pt}\selectfont
-The `quadprog` package provides functions (`solve.QP.compact`) to solve quadratic
-programming problem. Pay attention to the definition of function parameters. They are slightly different from what I have used in the standard form!  
-
-- Solve $\min \frac12 (x_1^2 + x_2^2)$ s.t. $2x_1+x_2\ge 1$:
-
-```{r, eval = FALSE}
-library(quadprog)
-Dmat = diag(rep(1,2))
-dvec = rep(0,2)
-Amat = matrix(c(2,1))
-solve.QP(Dmat=Dmat, dvec=dvec, Amat=Amat, bvec=c(1))
-```
-
-
----
-
-## Review
-
-
-\fontsize{10pt}{11pt}\selectfont
-We have now covered:
-
-- LP problem set up
-- Simplex methods
-- Duality
-- Interior point algorithms
-- Quadratic programming
-
-Now you should be able to formulate an LP/QP problem and solve it. But how are these useful in statistics?
-
-- Remember that LP is an optimization algorithm
-- There are plenty of optimization problems in statistics, e.g. MLE
-- It's just a matter of formulating the objective function and constraints.
-
----
-
-## Lab problem
-
-Write out the primal and dual for the carpenter problem.
-
-- Check the set of feasible solutions (corner points).  
-  - What are the values of the objective functions of the primal and dual at each vertex? 
-  - Does weak duality appear to hold?
-
----
-
-
-
-## Quantile regression
-
-
-The goal of regression is to understand the relationship between an outcome and covariates. Traditional regression models the conditional mean, $E(Y|X)$
-
-- Relies on normal error assumptions and homoscedasticity
-- Sensitive to outliers and skewed distributions
-
-Quantile regression:
-
-- Provides a more exhaustive description of the data
-- The collection of regressions at all quantiles would give a complete picture of outcome-covariate relationships
-
----
-
-## Quantile regression
-
-```{r, echo = FALSE, eval = TRUE, fig.align = 'center', out.width = '70%', message = FALSE}
-
-library(quantreg)
-
-data(engel)
-
-attach(engel)
-plot(income,foodexp,xlab="Household Income",ylab="Food Expenditure",type = "n", cex=.5)
-points(income,foodexp,cex=.5,col="blue")
-xx <- seq(min(engel$income),max(engel$income),100)
-taus <- c(.05,.1,.25, .5, .75,.9,.95)
-
-f <- coef(rq((foodexp)~(income),tau=taus, data = engel))
-yy <- cbind(1,xx)%*%f
-for(i in 1:length(taus)){
-        lines(xx,yy[,i],col = "gray")
-        }
-
-
-```
-
----
-
-## Colorado cannabis and driving study
-
-```{r, echo = FALSE, eval = TRUE, fig.align = 'center', out.width = '90%'}
-knitr::include_graphics("ccds.png")
-```
-
-
-
-
-::: notes
-Digression- I'm going to show some examples in class using data from a big study I'm a part of.  You'll also use this dataset in your homework
-:::
-
----
-
-## Colorado cannabis and driving study
-
-```{r, echo = FALSE, eval = TRUE, fig.align = 'center', message = FALSE, warning = FALSE, fig.height = 4.5, fig.width = 10}
-
-cannabis = readRDS(here::here("slides", "topic_optimization_II","cannabis.rds"))
-
-p1 = cannabis %>%
-  ggplot(aes(t_mmr1)) +
-  geom_histogram(bins = 8) +
-  ggtitle("THC molar metabolite ratio") +
-  xlab("Molar metabolite ratio")
-
-p2 = cannabis %>%
-  ggplot(aes(p_change,t_mmr1)) +
-  labs(x = "percent change in pupil diameter after light flash", 
-       y = "THC molar metabolite ratio") +
-  geom_point()
-
-
-p1 + p2
-```
-
-
-
-
-::: notes
-MMR tells you about acute cannabis impairment
-Probably not great data for linear regression... why?
-:::
-
----
-
-## Quantile regression model
-
-\fontsize{10pt}{11pt}\selectfont
-Regress conditional quantiles of response on the covariates. Assume the outcome Y is continuous.
-
-- Classical model: $Q_{\tau}(Y|X)=X\beta_{\tau}$
-- $Q_{\tau}(Y|X)$ is the $\tau$th conditional quantile of $Y$ given $X$
-
-
-The above model is equivalent to specifying
-
-$$Y = X\beta_{\tau} + \epsilon; \quad Q_{\tau}(\epsilon|X) = 0.$$
-
-In comparison, mean regression is:
-
-$$Y = X\beta + \epsilon; \quad E(\epsilon|X) = 0.$$
-
----
-
-## Pros and cons
-
-\fontsize{10pt}{11pt}\selectfont
-**Advantages**:
-
-- Regression at a sequence of quantiles provides a more complete view of data
-- Inference is robust to outliers
-- Estimation is more efficient when residual normality is highly violated
-- Allows interpretation in the outcome's original scale of measurement
-
-**Disadvantages**:
-
-- To be useful, needs to regress on a set of quantiles: computational burden
-- Solution has no closed form
-- Adaptation to non-continuous outcomes is difficult
-
----
-
-## The loss function
-
-\fontsize{10pt}{11pt}\selectfont
-Link between estimands and loss functions:
-
-- To obtain sample mean of $\{y_1,y_2,\ldots y_n\}$ minimize $\sum_i(y_i-b)^2$
-- To obtain sample median of $\{y_1,y_2,\ldots y_n\}$ minimize $\sum_i|y_i-b|$
-
-It can be shown that to obtain the sample $\tau$th quantile, one needs to minimize asymmetric absolute loss, that is, compute
-
-$$\hat{Q}_{\tau} = \arg\min_b \left\{ \sum_{i: y_i\ge b}\tau|y_i-b| + \sum_{i: y_i< b}(1-\tau)|y_i-b|\right\}.$$
-
-For notational simplicity, define $\rho_{\tau}(x) = x[\tau-(x<0)]$, where $(x<0)$ is an indicator equal to 1 if $x<0$ and 0 otherwise. This compactly encodes the asymmetric weighting: $\rho_\tau(x) = \tau x$ when $x \ge 0$ and $\rho_\tau(x) = (\tau-1)x$ when $x < 0$.
-
----
-
-## The loss function
-
-```{r, echo = FALSE, eval = TRUE, fig.align = 'center', fig.height = 4.5, fig.width = 10, message = FALSE}
-quantile_loss = function(b, y, tau) {
-  loss <- ifelse(y >= b, tau * (y - b), (1 - tau) * (b - y))
-  return(loss)
-}
-
-set.seed(2123)
-y = rnorm(100)
-
-tau = c(.1,.25, .5, .75, .9)
-loss = map_dfc(tau, quantile_loss, b = 0, y = y)
-colnames(loss) = paste0("tau_", tau)
-
-loss %>%
-  mutate(y = y) %>%
-  pivot_longer(tau_0.1:tau_0.9, names_to = "tau", values_to = "loss", 
-              names_prefix = "tau_") %>%
-  mutate(tau = factor(tau)) %>%
-  ggplot(aes(y, loss, group = tau)) + 
-  geom_line(aes(color = tau, linetype = tau)) +
-  theme_minimal()
-```
-
----
-
-## Estimator
-
-\fontsize{10pt}{11pt}\selectfont
-The linear quantile regression model is fitted by determining
-
-$$\hat{\beta}_{\tau} = \arg\min_b \sum_{i=1}^n \rho_{\tau}(y_i-x_ib)$$
-
-The estimator has all "expected" properties:
-
-- Scale equivariance: 
-$$\hat{\beta}_{\tau}(ay, X) = a\hat{\beta}_{\tau}(y,X), \quad \hat{\beta}_{\tau}(-ay, X) = -a\hat{\beta}_{1-\tau}(y,X)$$
-
-- Shift (or regression) equivariance: $\hat{\beta}_{\tau}(y+\gamma, X) = \hat{\beta}_{\tau}(y,X)+\gamma$
-
-- Equivariance to reparametrization of design: $\hat{\beta}_{\tau}(y, XA) = A^{-1}\hat{\beta}_{\tau}(y,X)$
-
-
-::: notes
-- Scale equivariance in quantile regression means that if all input values are multiplied by a constant, the predicted quantiles are also multiplied by the same constant, preserving the relative distribution of the response variable.
-- Shift equivariance in quantile regression means that if a constant is added to all input values, the predicted quantiles are also shifted by the same constant, preserving the relative spacing between them.
-- Equivariance to reparameterization of the design in quantile regression means that if the predictor variables undergo a linear transformation (e.g., rescaling or shifting), the estimated quantiles transform accordingly, ensuring that the quantile function remains consistent with the new parameterization of the predictors.
-:::
-
----
-
-## Asymmetric Double Exponential (ADE) distribution
-
-\fontsize{10pt}{11pt}\selectfont
-Density function for ADE is
-
-$$f(y;\mu,\sigma,\tau)= \frac{\tau(1-\tau)}{\sigma}\exp\left\{-\rho_{\tau}(\frac{y-\mu}{\sigma})\right\}$$
-
-
-- Least squares estimator $\iff$ MLE if residuals are Normal
-- QR estimator $\iff$ MLE if residuals are ADE
-- If residuals re iid $ADE(0,1,\tau)$, then the log-likelihood for $\beta_{\tau}$ is 
-
-$$l(\beta_{\tau}; Y,X,\tau)=-\sum_i^n \rho_{\tau}(y_i-x_i\beta_{\tau}) + c_0$$
-
----
-
-
-## QR model fitting
-
-\fontsize{10pt}{11pt}\selectfont
-The QR estimation problem $\hat{\beta}_{\tau} = \arg\min_b \sum_{i=1}^n \rho_{\tau}(y_i-x_ib)$ can be framed as an LP problem!
-
-- First, define a set of new variables
-
-\begin{align}
-    u_i &\equiv [y_i - x_i b]_+ \\
-    v_i &\equiv [y_i - x_i b]_- \\
-    b_+ &\equiv [b]_+ \\
-    b_- &\equiv [b]_-
-\end{align}
-
-Note:
-
-- $[\cdot]_+$ and $[\cdot]_-$ mean the positive and negative part of a number
-- $x \equiv [x]_+ - [x]_-$
-  - $[x]_+ = \max(x, 0)$
-  - $[x]_- = \max(-x, 0)$
-
----
-
-
-## QR model fitting
-
-Remember the objective function is $\sum_{i = 1}^n \rho_{\tau}(y_i-x_ib)$. Notice that 
-
-- When $y_i-x_ib\ge 0$, we have $\rho_{\tau}(y_i-x_ib)=\tau u_i$, and $v_i =0$.
-- When $y_i-x_ib < 0$, we have $\rho_{\tau}(y_i-x_ib)=(1-\tau) v_i$, and $u_i = 0$.
-
-So we can write $\rho_{\tau}(y_i-x_ib)=\tau u_i + (1-\tau) v_i$.
-
----
-
-## QR model fitting
-
-The optimization problem can then be reformulated as:
-
-\begin{align*}
-    &\max \quad - \sum_{i=1}^{n} [\tau u_i + (1 - \tau) v_i] \\
-    &\text{s.t.} \quad y_i = x_i b_+ - x_i b_- + u_i - v_i \\
-    &\quad u_i, v_i \geq 0, \quad i = 1, \dots, n \\
-    &\quad b_+, b_- \geq 0
-\end{align*}
-
-This is a standard LP problem can be solved by simplex or interior point methods.
-
----
-
-## QR model fitting, cont
-
-
-```{r, echo = FALSE, eval = TRUE, fig.align = 'center', out.width = '80%'}
-knitr::include_graphics("qr.png")
-```
-
-
----
-
-
-## QR model fitting, cont
-
-
-```{r, echo = FALSE, eval = TRUE, fig.align = 'center', out.width = '80%'}
-knitr::include_graphics("qr2.png")
-```
-
-
----
-
-
-## QR model fitting, cont
-
-
-```{r, echo = FALSE, eval = TRUE, fig.align = 'center', out.width = '80%'}
-knitr::include_graphics("qr3.png")
-```
-
-
----
-
-## QR in R
-
-```{r, echo = FALSE, eval = TRUE, fig.align = 'center', message = FALSE, warning = FALSE, fig.height = 4.5, fig.width = 10}
-p1 + p2
-```
-
-::: notes
-Now we're going to fit this quantile regression
-:::
-
----
-
-
-## QR in R
-
-\fontsize{10pt}{11pt}\selectfont
-Want to compare linear and quantile regression
-
-```{r, eval = TRUE}
-ols = lm(t_mmr1 ~ p_change, data = cannabis)
-
-# default method, which is a simplex method
-median_regression = rq(t_mmr1 ~ p_change, tau = 0.5, data = cannabis, 
-                       method = "br")
-qr.9 = rq(t_mmr1 ~ p_change, tau = 0.9, data = cannabis, 
-          method = "br")
-
-summary(ols)$coefficients
-summary(median_regression, se = "boot")$coefficients
-```
-
-
-
----
-
-## QR in R
-
-\fontsize{10pt}{11pt}\selectfont
-Blue is ols, red is median regression, pink is tau = 0.9
-
-
-```{r, echo = FALSE, eval = TRUE,  fig.align = 'center', message = FALSE, warning = FALSE, fig.height = 4, fig.width = 10}
-p2 + 
-  geom_abline(slope = coef(ols)[2], intercept = coef(ols)[1], color = "blue") +
-  geom_abline(slope = coef(median_regression)[2], intercept = coef(median_regression)[1], color = "red") +
-  geom_abline(slope = coef(qr.9)[2], intercept = coef(qr.9)[1], color = "pink") 
-
-
-```
-
----
-
-
-## LASSO
-
-\fontsize{10pt}{11pt}\selectfont
-Consider usual regression settings with data $(\bf{x}_i, y_i)$, where $\textbf{x}_i = (x_{i1},\ldots, x_{ip})$ is a p-vector of predictors and $y_i$ is the response for the $i$th subject. The OLS setting finds a coefficient vector to minimize the residual sum of squares:
-
-$$\hat{\beta} = \arg\min_{\beta}\sum_i^n(y_i-x_i\beta)^2$$
-
-- Solution is the MLE assuming a Normal model:
-
-$$y_i = \textbf{x}_i\beta + \epsilon_i, \quad \epsilon_i\sim N(0, \sigma^2)$$
-
-- This is undesirable when $p$ is large because
-
-1. When p>n, model can't be fit
-2. One typically wants a more parsimonius model for interpretability
-
----
-
-## LASSO
-
-\fontsize{10pt}{11pt}\selectfont
-LASSO stands for "Least Absolute Shrinkage and Selection Operator", which aims for model selection when $p$ is large (works even $p > n$). The LASSO procedure will "shrink" the coefficients toward 0 and eventually force some to be exactly zero
-
-- predictors with $\beta=0$ will be selected out
-
-The LASSO estimates are defined as:
-
-$$\tilde{\beta} = \arg\min_{\beta} \left\{\sum_i^n(y_i-\textbf{x}_i\beta)^2\right\} s.t. ||\beta||_1\le \lambda$$
-
-- $||\beta||_1 = \sum_{j=1}^p|b_j|$ is the $L_1$ norm
-- $\lambda\ge 0$ is a tuning parameter controlling the strength of shrinkage 
-
-**What kind of optimization problem does this look like?**
-
-::: notes
-So LASSO tries to minimize the residual sum of squares, with a constraint on the
-sum of the absolute values of the coefficients.
-:::
-
----
-
-## Regularization side note
-
-LASSO is a regularization approach- regularization prevents overfitting by adding a penalty term to the objective function.
-
-- LASSO tries to minimize the residual sum of square, with a constraint on the sum of the absolute values of the coefficients.
-
-
-- There are other types of regularized regressions
-- **Ridge regression**: adds an $L_2$ penalty, $\sum_jb_j^2\le \lambda$
-
----
-
-## LASSO vs. Ridge visualized
-
-```{r, echo = FALSE, eval = TRUE, fig.align = 'center', out.width = '100%'}
-knitr::include_graphics("lasso.png")
-```
-
-
-::: notes
-Standard lasso picture. The diamond-shaped region (blue) is the constraint imposed by the L1 penalty.
-- The elliptical contours (red) represent the objective function of least squares regression.
-- Because of the sharp corners of the diamond, the solution (where the contours first touch the constraint) often lies on an axis, meaning some coefficients are exactly zero (sparse solution).
-
-For ridge
-- The circular region (blue) is the constraint imposed by the L2 penalty.
-- The smooth shape does not favor solutions on the axes, meaning all coefficients remain nonzero but shrink toward zero.
-:::
-
----
-
-## LASSO model fitting
-
-
-
-The LASSO problem can be solved by quadratic programming algorithms.
-
-\begin{align}
-\max \quad -&\sum_i^n\left(y_i-\sum_j\beta_jx_{ij}\right)^2\\
-s.t. \quad &\sum_j|b_j|\le \lambda
-\end{align}
-
-- **Issue**: not in standard LP/QP form, since the constraints have the absolute value operator
-
----
-
-
-## LASSO model fitting
-
-\fontsize{10pt}{11pt}\selectfont
-The trick is to convert the problem into the standard QP problem setting, i.e., to remove the absolute value operator. This is the **same decomposition used in QR** model fitting ($u_i, v_i$ for residuals), now applied to the coefficients $\beta_j$.
-
-- Let $\beta_j = \beta_j^+-\beta_j^-$, where $\beta_j^+, \beta_j^-\ge0$ (positive and negative parts)
-- Then $|\beta_j|=\beta_j^++\beta_j^-$ and the problem can be written as:
-
-\begin{align*}
-\max \quad -&\sum_i^n\left(y_i-\sum_j\beta_j^+x_{ij} + \sum_j\beta_j^-x_{ij}\right)^2\\
-s.t. \quad &\sum_j (\beta_j^++\beta_j^-)\le \lambda,\\
-&\beta_j^+, \beta_j^- \ge 0
-\end{align*}
-
-
-This is now a standard QP problem can be solved by standard QP solvers.
-
-
-::: notes
-Need to explain exactly what this notation means- this is the same thing as what we did for quantile regression.
-- this notation essentially stores the magnitude and sign of the value separately
-- note that the variables here are $\beta$ not x
-:::
-
----
-
-
-## A little more on LASSO
-
-\fontsize{9pt}{10pt}\selectfont
-The Lagrangian for the LASSO optimization problem is:
-
-$$L(\mathbf{\beta},\lambda) = -\sum_{i=1}^n\left (y_i-\sum_j\beta_jx_{ij}\right)^2 - \lambda\sum_{j = 1}^p|\beta_j|$$
-
-This is equivalent to the likelihood function for a Bayesian model with a double exponential (DE) prior on $\beta$s (remember ADE used in quantile regression?):
-
-\begin{align*}
-Y|X, \beta &\sim N(X\beta, \sigma^2)\\
-\beta_j &\sim DE(1/\lambda)
-\end{align*}
-
-where the DE density function is 
-
-$$f(x,\tau) = \frac1{2\tau}\exp\left(\frac{-|x|}{\tau}\right)$$
-
-::: notes
-Ridge gives you a normal prior on beta
-:::
-
----
-
-## LASSO in R
-
-\fontsize{10pt}{11pt}\selectfont
-The package `glmnet` is standard for elastic net and LASSO in R.
-
-
-```{r, fig.align = 'center', eval = FALSE,  fig.height = 4.5, fig.width = 9, message = FALSE}
-### Lasso results from R package "glmnet"
-library(glmnet)
-lasso_mod = glmnet(x = dplyr::select(cannabis, -id, -t_mmr1), 
-                   y = cannabis$t_mmr1)
-plot(lasso_mod, "lambda")
-```
-
-::: notes
-There are other functions for this as well
-:::
-
-
----
-
-
-## LASSO in R
-
-\fontsize{10pt}{11pt}\selectfont
-The package `glmnet` is standard for elastic net and LASSO in R.
-
-
-```{r, fig.align = 'center', eval = TRUE, echo = FALSE, fig.height = 4.5, fig.width = 9, message = FALSE}
-### Lasso results from R package "glmnet"
-library(glmnet)
-lasso_mod = glmnet(x = dplyr::select(cannabis, -id, -t_mmr1), 
-                   y = cannabis$t_mmr1)
-plot(lasso_mod, "lambda")
-```
-
-::: notes
-There are other functions for this as well
-:::
-
-
----
-
-## Resources
-
-- [Hao Wu's lecture with matrix represenation of Simplex algorithm](https://www.haowulab.org/teaching/statcomp/Notes/lp1.pdf)
-
-
-**Some videos**
-
-
-- [convexity explained, and duality](https://www.youtube.com/watch?v=d0CF3d5aEGc&ab_channel=VisuallyExplained)
-- [KKT conditions explained](https://www.youtube.com/watch?v=uh1Dk68cfWs&ab_channel=VisuallyExplained)
-- [Simple explanation of Lagrangian](https://www.youtube.com/watch?v=GR4ff0dTLTw&ab_channel=MATLAB)
 
 
