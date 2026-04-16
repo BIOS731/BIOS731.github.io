@@ -382,7 +382,7 @@ Shadow prices are one of the most practically useful outputs of LP. The dual var
 - If you have plenty of flour, adding more doesn’t help—you’re already making as many cakes as you can sell. In this case, the shadow price is zero because extra flour doesn’t change your profit.
 
 
-So, the dual variable (shadow price) tells you how valuable it would be to relax a constraint—meaning allowing more of that constrained resource. If relaxing the constraint helps, the shadow price is positive. If it doesn’t make a difference, the shadow price is zero.
+So, the dual variable (shadow price) tells you how valuable it would be to relax a constraint. Allowing more of that constrained resource. If relaxing the constraint helps, the shadow price is positive. If it doesn’t make a difference, the shadow price is zero.
 
 ::: notes
 The bakery example makes shadow prices concrete. If you're out of flour (binding constraint), the shadow price of flour is positive — each extra bag lets you bake more and earn more. If you have leftover flour (inactive constraint), the shadow price is zero — more flour won't help because something else (oven time, staff hours) is the binding constraint. The second scenario also illustrates an important point: before investing in more capacity, always check which constraint is binding. In the carpenter example: if the labor constraint is binding but not the lumber constraint, buying more lumber doesn't help — you'd want to hire more labor instead.
@@ -448,9 +448,6 @@ $z = A^Ty - c^T \geq 0$ & $n \times 1$ & dual surplus (headroom in each dual con
 
 ## Primal/dual optimality conditions
 
-
-**Goal**: collect all conditions for optimality into a single system we can solve numerically.
-
 **Step 2**: rewrite complementary slackness in matrix form. At optimality, $x_jz_j = 0\ \forall j$ and $w_iy_i = 0\ \forall i$.
 
 $$XZe=0, \quad WYe = 0 \qquad (X,Z,W,Y \text{ diagonal; } e = \mathbf{1})$$
@@ -497,7 +494,7 @@ Ignoring non-negativity, conditions 1--4 give $2n + 2m$ equations in $2n + 2m$ u
 | CS ($XZe = 0$) | $n$ | $x, z$ |
 | CS ($WYe = 0$) | $m$ | $w, y$ |
 
-**Why is this nonlinear?** Conditions 1--2 are linear, but conditions 3--4 involve products ($x_j z_j$, $w_i y_i$). This is a \textbf{nonlinear} square system $\Rightarrow$ use \textbf{Newton's method}.
+Can use Newton's method to solve this system.
 
 ::: notes
 Key insight: if we ignore the non-negativity constraint (condition 5) for a moment, we have a square nonlinear system of 2n + 2m equations in 2n + 2m unknowns. Nonlinear because of the complementary slackness terms XZe and WYe — these are products of variables. We know how to solve nonlinear square systems: Newton's method. The challenge is enforcing non-negativity throughout the iterations. This is what makes interior point methods more sophisticated than naive Newton — they take steps that keep all variables strictly positive.
@@ -505,16 +502,32 @@ Key insight: if we ignore the non-negativity constraint (condition 5) for a mome
 
 ---
 
+## Two strategies for solving LP
+
+\fontsize{10pt}{11pt}\selectfont
+
+|  | **Simplex** | **Interior point** |
+|--|-------------|-------------------|
+| Path | Walks along edges of the feasible region, vertex to vertex | Stays inside feasible region and follows a curved path |
+| Worst for | Exponential (rarely in practice) | Polynomial ~20–50 iterations regardless of problem size |
+| Best for | Small–medium problems | Large-scale problems |
+
+**Interior point strategy**:
+
+1. Express all optimality conditions as a system $F(x,y,w,z) = 0$
+2. Apply Newton’s method to drive $F \to 0$
+3. At each step, shrink the step size to keep all variables $> 0$ (stay in the interior)
+
+::: notes
+The name "interior point" comes from the path the algorithm takes: unlike simplex, which moves along the boundary (edges and vertices), interior point always stays strictly inside the feasible region. The key insight is that the optimality conditions (primal feasibility + dual feasibility + complementary slackness) can all be written as a single nonlinear system F = 0, and Newton’s method can solve it efficiently. The non-negativity constraints are the one complication — they force us to be careful about step sizes.
+:::
+
+---
+
 ## Primal-dual interior point method
 
 \fontsize{10pt}{11pt}\selectfont
-The primal-dual interior point method finds the primal-dual optimal solution $(x^*, y^*, w^*, z^*)$ by applying Newton’s method to the primal-dual optimality conditions.
-
-- The direction and length of the steps are modified in each step so that the
-non-negativity condition is strictly satisfied in each iteration.
-
-To be specific, define the following function $F:R^{2n+2m}\to R^{2n + 2m}$:
-
+The primal-dual interior point method finds $(x^*, y^*, w^*, z^*)$ by solving $F = 0$, where $F$ packages all four optimality conditions into one vector function:
 
 $$\mathbf{F}(x, y, w, z) =
 \begin{bmatrix}
@@ -522,9 +535,15 @@ $$\mathbf{F}(x, y, w, z) =
     \mathbf{A}^T y - \mathbf{z} - \mathbf{c}^T \\
     XZ e \\
     WYe
-\end{bmatrix}$$
+\end{bmatrix}
+\begin{array}{l}
+    \leftarrow \text{primal feasibility} \\
+    \leftarrow \text{dual feasibility} \\
+    \leftarrow \text{CS: each } x_jz_j = 0\\
+    \leftarrow \text{CS: each } w_iy_i = 0
+\end{array}$$
 
-The goal is to find solution for $F = 0$.
+$F = 0$ is exactly the optimality conditions. We use Newton’s method to find the root, modifying each step so all variables stay $> 0$.
 
 ::: notes
 We package the five optimality conditions into a vector function F. The domain and codomain are both R^{2n+2m}. F = 0 corresponds exactly to satisfying all optimality conditions (except non-negativity, which we handle separately). Newton’s method finds roots of nonlinear systems by iterating: at each step, linearize F around the current point, solve for the direction to move, take a step. The key modification for interior point: choose the step size α to ensure all variables remain strictly positive (stay in the interior of the non-negative orthant — hence "interior point").
@@ -534,117 +553,203 @@ We package the five optimality conditions into a vector function F. The domain a
 
 ## Primal-dual interior point method
 
+\fontsize{10pt}{11pt}\selectfont
+**Newton’s method** finds roots of nonlinear systems by repeating:
+
+> *Linearize $F$ around the current point. Solve for the direction to move. Take a step.*
+
+At iteration $k$, the Newton step finds direction $(\delta x, \delta y, \delta w, \delta z)$ by solving:
+
+$$\underbrace{F’(x^k, y^k, w^k, z^k)}_{\text{Jacobian: how fast } F \text{ is changing}} \begin{bmatrix} \delta x \\ \delta y \\ \delta w \\ \delta z \end{bmatrix} = \underbrace{-F(x^k, y^k, w^k, z^k)}_{\text{how far we are from } F=0}$$
+
+- If $F$ is large $\Rightarrow$ we’re far from optimal $\Rightarrow$ take a big step
+- If $F \approx 0$ $\Rightarrow$ we’re near optimal $\Rightarrow$ tiny correction needed
+
+::: notes
+The Jacobian F’ has a block structure — differentiating each row of F with respect to (x, y, w, z):
+F’ = [[A, 0, I, 0], [0, A^T, 0, -I], [Z^k, 0, 0, X^k], [0, W^k, Y^k, 0]]
+Rows 1–2 (primal/dual feasibility) are linear in all variables, so their Jacobian blocks are constant (A, I). Rows 3–4 (complementary slackness products) are nonlinear — their Jacobian blocks depend on the current iterate values (X^k, Z^k etc). This is exactly the matrix that appears in the "improved algorithm" slide. If students ask about the Jacobian explicitly, this is what it is — but the key message on the slide is just the structure of the Newton step: solve a linear system at each iteration to find the search direction.
+:::
+
+---
+
+## Primal-dual interior point: basic algorithm
+
+\fontsize{10pt}{11pt}\selectfont
+
+Putting it together — the **basic** interior point algorithm:
+
+1. Start from a strictly feasible point $(x^0, y^0, w^0, z^0)$ with all variables $> 0$
+2. Solve the Newton system $F'(\cdot)\,\delta = -F(\cdot)$ for the search direction $\delta$
+3. Update: $(x,y,w,z) \mathrel{+}= \alpha \cdot \delta$, choosing $\alpha$ small enough that all variables stay $> 0$
+4. Repeat until $F \approx 0$
+
+**The catch**: how small does $\alpha$ need to be?
+
+Near the optimum, complementary slackness requires $x_j \cdot z_j \to 0$ — meaning both $x_j$ and $z_j$ approach zero simultaneously. To prevent either from going negative, $\alpha$ must be tiny. The algorithm crawls to a halt near the finish line.
+
+::: notes
+This is a clean statement of the basic algorithm before the centering modification. The problem with step size α is real and important — it's not just a mathematical technicality. Near the boundary, the maximum feasible step shrinks to zero, so the algorithm makes essentially no progress on the complementary slackness conditions. This motivates the centering trick on the next slide.
+:::
+
+---
+
+## The problem: crawling near the boundary
+
+\fontsize{10pt}{11pt}\selectfont
+
+**1D picture**: suppose we want to solve $x \cdot z = 0$ with $x > 0$ and $z > 0$.
+
+At the optimum, one of them must be 0. But during the algorithm both must stay $> 0$.
+
+```{r, echo = FALSE, eval = TRUE, fig.height = 2.8, fig.width = 7, fig.align = "center"}
+library(ggplot2)
+x <- seq(0.05, 3, length.out = 200)
+df <- data.frame(
+  x = rep(x, 3),
+  z = c(3/x, 1/x, 0.2/x),
+  mu = rep(c("xz = 3 (far from optimal)",
+             "xz = 1 (getting closer)",
+             "xz = 0.2 (near optimal, tiny steps)"), each = 200)
+)
+pts <- data.frame(x = c(1.7, 1.0, 0.45), z = c(3/1.7, 1/1.0, 0.2/0.45),
+                  mu = c("xz = 3 (far from optimal)",
+                         "xz = 1 (getting closer)",
+                         "xz = 0.2 (near optimal, tiny steps)"))
+ggplot(df, aes(x, z, color = mu)) +
+  geom_line(linewidth = 1) +
+  geom_point(data = pts, size = 3) +
+  coord_cartesian(xlim = c(0, 3), ylim = c(0, 5)) +
+  labs(x = "x", y = "z", color = NULL,
+       title = "Feasible curves xz = μ; dots = current iterate") +
+  theme_minimal(base_size = 9) +
+  theme(legend.position = "bottom",
+        legend.text = element_text(size = 7))
+```
+
+Near the axes ($xz \approx 0$), steps toward the origin must be tiny to keep $x, z > 0$.
+
+::: notes
+The curves xz = μ are the "central path" — the set of points where complementary slackness holds at level μ. As μ → 0, the path approaches the axes (the optimal solution). The closer you are to the axes, the smaller the feasible steps. This is the fundamental limitation of the basic algorithm — it requires smaller and smaller step sizes as it converges, making the last part of convergence very slow.
+:::
+
+---
+
+## The fix: centering 
+
+\fontsize{10pt}{11pt}\selectfont
+
+**Key idea**: instead of targeting $x_j z_j = 0$, target $x_j z_j = \mu > 0$ and shrink $\mu$ each step.
+
+Replace the CS conditions in $F$ with a relaxed version:
+$$XZe = \mu_x e \qquad WYe = \mu_y e$$
+
+At each iteration, set $\mu$ = the **average current complementarity**:
+$$\mu_x^k = \frac{(x^k)^T z^k}{n}, \qquad \mu_y^k = \frac{(w^k)^T y^k}{m}$$
+
+When $x_j z_j$ is large, $\mu$ is large — we're far from optimal, take a big step.
+When $x_j z_j \approx 0$ for all $j$, $\mu \approx 0$ — we're near optimal, we're done.
+
+**Why this works**: the algorithm now follows the central path (the curve $xz = \mu$) toward the origin, staying away from the axes at each step $\Rightarrow$ large steps allowed throughout.
+
+::: notes
+The centering parameter μ has a direct interpretation: it is the duality gap per variable. When μ is large, the primal and dual objectives are far apart. When μ → 0, we're at the optimum. By targeting xz = μ instead of xz = 0, we keep the iterates on the central path and avoid the boundary. This is the key insight of the primal-dual interior point method, and it's what allows convergence in 20–50 iterations on problems of any size. Modern solvers (CPLEX, Gurobi, MOSEK) all use variants of this approach.
+:::
+
+---
+
+## The complete interior point algorithm
+
 \fontsize{9pt}{10pt}\selectfont
-At iteration $k$, solve $F’(\cdot)\,\delta = -F(\cdot)$ for the search direction $(\delta x, \delta y, \delta w, \delta z)$.
 
-The Jacobian $F’$ (differentiate each block of $F$ w.r.t. each variable group):
+With centering, the Newton step at iteration $k$ solves:
 
-$$F’ = \frac{\partial F}{\partial (x,y,w,z)} =
-\begin{bmatrix}
+$$\begin{bmatrix}
     A & 0 & I & 0 \\
     0 & A^T & 0 & -I \\
     Z^k & 0 & 0 & X^k \\
     0 & W^k & Y^k & 0
-\end{bmatrix}$$
-
-- Rows 1--2: linear in all variables $\Rightarrow$ constant Jacobian blocks ($A$, $I$)
-- Rows 3--4: nonlinear products $\Rightarrow$ Jacobian blocks depend on current iterate ($X^k$, $Z^k$, ...)
-
-So the Newton step solves:
-
-$$\begin{bmatrix} A & 0 & I & 0 \\ 0 & A^T & 0 & -I \\ Z^k & 0 & 0 & X^k \\ 0 & W^k & Y^k & 0 \end{bmatrix} \begin{bmatrix} \delta x \\ \delta y \\ \delta w \\ \delta z \end{bmatrix} = -F(x^k, y^k, w^k, z^k)$$
-
-::: notes
-This is Newton’s method written out explicitly. F’ is the Jacobian of F with respect to all the variables — a (2n+2m) × (2n+2m) matrix. The Newton step solves a linear system (Jacobian × direction = -F) to find the search direction (δx, δy, δw, δz). Notice that if we’re already primal and dual feasible (conditions 1 and 2 satisfied), the first two blocks of F are zero, and the Newton equation simplifies significantly — we only need to deal with the complementary slackness blocks. In practice, solvers maintain primal and dual feasibility throughout and only worry about reducing XZe and WYe to zero.
-:::
-
----
-
-## Primal-dual interior point method
-
-
-\fontsize{10pt}{11pt}\selectfont
-Then the update will be:
-
-$$
-(x^{k+1}, y^{k+1}, w^{k+1}, z^{k+1})= (x^k, y^k, w^k, z^k) + \alpha (\delta x, \delta y, \delta w, \delta z)
-$$
-
-with $\alpha \in (0,1]$ chosen so that the result from the next iteration is feasible.
-
-- Solving for $(\delta x, \delta y, \delta w, \delta z)$ using the equation on the previous slide enforces feasibility of solutions
-
-::: notes
-The update formula. After solving for the search direction, take a step of size α in that direction. The crucial constraint: α must be chosen so that all four variable vectors (x, y, w, z) remain strictly positive — no variable can hit zero. A simple approach: find the maximum step α_max that would bring any variable to zero (set it to that value and solve for α), then take α = 0.99 × α_max to stay in the interior. More sophisticated step selection rules (like Mehrotra's predictor-corrector) are used in production solvers. The name "interior point" comes from this: we always stay in the strict interior of the feasible region, never touching the boundary.
-:::
-
----
-
-
-## An improved algorithm
-
-
-\fontsize{7pt}{8pt}\selectfont
-**Problem**: near the optimum, some $x_j$ or $z_j \to 0$. The step size $\alpha$ must be tiny to keep all variables positive $\Rightarrow$ slow convergence.
-
-**1D intuition**: want to solve $xz = 0$ with $x, z > 0$. Newton step takes us to the boundary ($x=0$ or $z=0$), so $\alpha \to 0$. Instead, aim for $xz = \mu > 0$ and shrink $\mu$ each iteration:
-
-$$\mu = 1 \;\longrightarrow\; \mu = 0.1 \;\longrightarrow\; \mu = 0.01 \;\longrightarrow\; \cdots \;\longrightarrow\; 0$$
-
-Each target keeps us away from the boundary $\Rightarrow$ larger steps allowed.
-
-**Fix**: replace complementary slackness conditions with a relaxed target $\mu > 0$:
-
-\begin{align}
-XZe &= \mu_xe\\
-WYe &= \mu_ye
-\end{align}
-
-As $\mu_x, \mu_y\to 0$, this converges to the original optimality conditions. Set:
-$$\mu_x^{k+1}=\frac{(x^k)^Tz^k}{n}, \quad \mu_y^{k+1}=\frac{(w^k)^Ty^k}{m}$$
-(average complementarity at iteration $k$ — small when near optimal)
-
-::: notes
-The basic algorithm has a practical problem: near the boundary, the steps become tiny (to avoid violating non-negativity), so convergence slows dramatically. The fix: instead of driving XZe → 0 exactly, aim for XZe = μe where μ > 0 is a small positive number. This keeps the iterates away from the boundary and allows larger steps. μ is called the "centering parameter" — larger μ pushes you toward the center of the feasible region, smaller μ pushes toward the boundary (and toward optimality). The recommended choice for μ is the current average complementarity: (x^T z)/n and (w^T y)/m. These are the mean of the x_j z_j products — when all of these are small, we're near the optimal.
-:::
-
----
-
-## An improved algorithm
-
-
-\fontsize{10pt}{11pt}\selectfont
-Under the new algorithm, at the $k$th iteration, the Newton equations become:
-
-$$\begin{bmatrix}
-    A & 0 & I & -0 \\
-    0 & A^T & 0 & -I \\
-    Z & 0 & 0 & X \\
-    0 & W & Y & 0
 \end{bmatrix}
-\begin{bmatrix}
-    \delta x \\
-    \delta y \\
-    \delta w \\
-    \delta z
-\end{bmatrix}
+\begin{bmatrix} \delta x \\ \delta y \\ \delta w \\ \delta z \end{bmatrix}
 =
 \begin{bmatrix}
-    0 \\
-    0 \\
-    -X^k Z^k e + \mu_x^k e \\
-    -W^k Y^k e + \mu_y^k e
+    0 \\ 0 \\
+    \red{-X^k Z^k e + \mu_x^k e} \\
+    \red{-W^k Y^k e + \mu_y^k e}
 \end{bmatrix}$$
 
-This provides the **general primal-dual interior point method** as follows:
+\red{Only the CS rows change}: replace the target $0$ with $\mu^k e$. Everything else is identical to the basic algorithm.
 
-1. Choose strictly feasible initial solution $(x^0, y^0, w^0, z^0)$, and set $k = 0$. Then repeat (2) and (3) until convergence:
-2. Solve system (1) to obtain the updates $(\delta x, \delta y, \delta w, \delta z)$
-3. Update the solution $(x^{k+1}, y^{k+1}, w^{k+1}, z^{k+1}) = (x^k, y^k, w^k, z^k)+ \alpha^k(\delta x, \delta y, \delta w, \delta z)$. $\alpha^k$ is chosen so that all variables are $\ge$ 0.
+**Algorithm**:
 
+1. Start from strictly feasible $(x^0, y^0, w^0, z^0)$
+2. Compute $\mu^k$ = average complementarity
+3. Solve Newton system above for $(\delta x, \delta y, \delta w, \delta z)$
+4. Update $(x,y,w,z) \mathrel{+}= \alpha^k \cdot \delta$ (choose $\alpha^k$ to keep all variables $> 0$)
+5. Repeat until $\mu^k < \varepsilon$
+
+**Convergence**: ~20–50 iterations regardless of problem size.
 
 ::: notes
-The full matrix system for the Newton step at each iteration. The 4×4 block structure comes from the four groups of variables (x, y, w, z). The right-hand side has zeros in the first two blocks (because we maintain primal and dual feasibility throughout) and the relaxed complementary slackness terms in the last two blocks. This is the algorithm that underlies modern LP solvers like CPLEX, Gurobi, and MOSEK. They use sophisticated variants of this with Mehrotra's predictor-corrector, warm starts, and preconditioning — but the core is this primal-dual interior point iteration. Convergence is typically in 20-50 iterations regardless of problem size, which is why it scales so well.
+The complete algorithm is just the basic Newton iteration with μ substituted for 0 in the RHS. The Jacobian is unchanged. The only modification is the target on the right-hand side. The top two rows of the RHS are 0 because we maintain primal and dual feasibility throughout — the algorithm only needs to improve complementary slackness. The stopping criterion is μ < ε (small duality gap), which by strong duality means we're at the optimum. This is the algorithm inside CPLEX, Gurobi, MOSEK, and HiGHS — they use sophisticated variants (Mehrotra's predictor-corrector, etc.) but the core idea is exactly this.
+:::
+
+---
+
+## LP in R: simplex vs interior point
+
+\fontsize{10pt}{11pt}\selectfont
+Use the LP from class: $\max\ x_1 + x_2$ s.t. $x_1 + 2x_2 \le 100,\ 2x_1 + x_2 \le 100,\ x_1, x_2 \ge 0$
+
+```{r, eval = TRUE}
+library(lpSolve)   # simplex method
+library(CVXR)      # interior point method (ECOS solver)
+
+obj <- c(1, 1)
+A   <- matrix(c(1, 2, 2, 1), nrow = 2, byrow = TRUE)
+rhs <- c(100, 100)
+```
+
+::: notes
+We'll solve the same LP two ways so students can see that the answer is the same — only the algorithm differs. lpSolve uses the revised simplex method. CVXR is a disciplined convex programming interface that calls ECOS (Embedded Conic Solver) by default — ECOS is a pure primal-dual interior point solver. Make sure both packages are installed before class: install.packages(c("lpSolve", "CVXR")).
+:::
+
+---
+
+## LP in R: simplex
+
+\fontsize{10pt}{11pt}\selectfont
+```{r, eval = TRUE}
+# lpSolve uses the simplex method
+sol_s <- lp("max", obj, const.mat = A,
+            const.dir = c("<=", "<="), const.rhs = rhs)
+
+sol_s$solution   # optimal x1, x2
+sol_s$objval     # optimal objective value
+```
+
+::: notes
+lp() arguments: "max" sets direction, objective vector, constraint matrix, direction vector, RHS vector. Non-negativity (x >= 0) is enforced by default. The solution matches what we derived analytically: x = (100/3, 100/3) ≈ (33.3, 33.3) with objective value ≈ 66.7.
+:::
+
+---
+
+## LP in R: interior point
+
+\fontsize{10pt}{11pt}\selectfont
+```{r, eval = TRUE}
+# CVXR calls ECOS: a pure primal-dual interior point solver
+x     <- Variable(2, nonneg = TRUE)
+prob  <- Problem(Maximize(sum(obj * x)),
+                 list(A %*% x <= rhs))
+sol_i <- solve(prob, solver = "ECOS")
+
+sol_i$getValue(x)   # optimal x1, x2
+sol_i$value         # optimal objective value
+```
+
+::: notes
+CVXR lets you write the problem in the same form as the math — no need to negate for maximization. The solver = "ECOS" argument explicitly selects ECOS (Embedded Conic Solver), a well-known primal-dual interior point method. nonneg = TRUE enforces x1, x2 >= 0. Both methods give the same answer: x ≈ (33.3, 33.3), objective ≈ 66.7.
 :::
 
 ---
@@ -677,22 +782,22 @@ Transition from LP to QP. The only difference is the objective: LP has linear ob
 
 
 \fontsize{9pt}{10pt}\selectfont
-For LP, complementary slackness gave us conditions for optimality. **KKT conditions** generalize this to non-linear objective functions. They are necessary conditions for a solution to be optimal in a general non-linear programming problem.
+**KKT conditions** = complementary slackness, generalized to nonlinear objectives.
 
-Consider the following problem:
+- For LP: $\nabla f = c$ (constant) $\Rightarrow$ CS conditions were enough
+- For QP/general NLP: $\nabla f(x)$ depends on $x$ $\Rightarrow$ need one extra condition
 
-\begin{align*}
-        \max \quad &f(x)\\
-        s.t. \quad &g_i(x) \le 0, i = 1,\ldots,I\\
-        &h_j(x)=0, j = 1,\ldots, J
-    \end{align*}
+For a general constrained problem with inequality constraints $g_i(x) \le 0$ and equality constraints $h_j(x) = 0$, the **KKT conditions** at the optimal $x^*$ are:
 
-The Lagrangian is: $L(x,y,z) = f(x) - \sum_iy_ig_i(x) - \sum_jz_jh_j(x)$. Then at the optimal solution, the following **KKT** conditions must be satisfied:
+\begin{tabular}{ll}
+Primal feasibility & $g_i(x^*)\le 0,\ h_j(x^*)=0$ \\
+Dual feasibility & $y_i\ge 0$ \quad (multipliers for $\leq$ constraints are non-negative) \\
+Complementary slackness & $y_ig_i(x^*)=0$ \quad (inactive constraint $\Rightarrow$ zero multiplier) \\
+Stationarity & $\nabla f(x^*) = \sum_iy_i\nabla g_i(x^*)+\sum_jz_j\nabla h_j(x^*)$ \\
+\end{tabular}
 
-- Primal feasibility: $g_i(x^*)\le 0, h_j(x^*)=0$
-- Dual feasibility: $y_i\ge 0$
-- Complementary slackness: $y_ig_i(x^*)=0$
-- Stationary: $\nabla f(x^*)-\sum_iy_i\nabla g_i(x)-\sum_jz_j\nabla h_j(x) = 0$
+\vspace{2mm}
+The stationarity condition is new: it says the gradient of $f$ must be expressible as a combination of the constraint gradients — you can't improve $f$ without violating a constraint.
 
 ::: notes
 KKT conditions are the generalization of complementary slackness to nonlinear programming. For LP, the objective was linear so ∇f = c (a constant). For QP and beyond, ∇f depends on x. The four conditions: (1) Primal feasibility — the constraints must hold at x*. (2) Dual feasibility — multipliers for inequality constraints must be non-negative. (3) Complementary slackness — same idea as LP: inactive constraint implies zero dual variable. (4) Stationarity — the gradient of the Lagrangian with respect to x is zero at the optimum. For convex problems (convex f, convex feasible set), KKT conditions are both necessary AND sufficient for a global optimum. QP with a positive semidefinite B is convex.
@@ -704,18 +809,20 @@ KKT conditions are the generalization of complementary slackness to nonlinear pr
 
 
 \fontsize{10pt}{11pt}\selectfont
-The Lagrangian for the QP problem is
+Apply KKT to the QP problem. Use multiplier $y$ for $Ax \le b$ and $z$ for $x \ge 0$:
 
-$$L(x,\mu,\lambda) = \frac12 x^TBx + cx - y^T(Ax-b)+z^Tx$$
+$$L(x,y,z) = \underbrace{\tfrac12 x^TBx + cx}_{\text{QP objective}} - \underbrace{y^T(Ax-b)}_{\text{penalty for violating } Ax \le b}+\underbrace{z^Tx}_{\text{penalty for violating } x \ge 0}$$
 
-The KKT conditions for the QP problem are:
+KKT conditions — same four categories as before, but stationarity now has a $Bx$ term:
 
-- Primal feasibility: $Ax\le b, x\ge 0$
-- Dual feasibility: $y\ge 0, z\ge 0$ ($z$ multiplies the constraint $x\ge 0$, written as $-x\le 0$, so it requires the same non-negativity as $y$)
-- Complementary slackness: $Y(Ax-b)=0, Zx = 0$
-- Stationary: $Bx+c-A^Ty+z = 0$
+| Condition | Equation | vs. LP |
+|-----------|----------|--------|
+| Primal feasibility | $Ax\le b,\ x\ge 0$ | same |
+| Dual feasibility | $y\ge 0,\ z\ge 0$ | same |
+| Complementary slackness | $Y(Ax-b)=0,\ Zx = 0$ | same |
+| **Stationarity** | $\mathbf{Bx}+c-A^Ty+z = 0$ | **new: $Bx$ term from quadratic objective** |
 
-Here, $Y$ and $Z$ are diagonal matrices with $y$ and $z$ at the diagonal.  This can be solved using an interior point method.
+($Y$, $Z$ diagonal.) Solve using interior point — same approach as LP.
 
 ::: notes
 Apply KKT to the QP problem specifically. The Lagrangian uses y for the constraints Ax ≤ b and z for the non-negativity constraints x ≥ 0 (written as -x ≤ 0). Stationarity gives Bx + c - A^T y + z = 0 — note the Bx term, which is what makes QP different from LP (where B = 0 and stationarity reduces to dual feasibility). Complementary slackness: Y(Ax - b) = 0 means inactive constraint i implies y_i = 0. Zx = 0 means x_j = 0 or z_j = 0. Same structure as LP complementary slackness — interior point will exploit this just as before.
@@ -784,7 +891,7 @@ We have now covered:
 
 Now you should be able to formulate an LP/QP problem and solve it. But how are these useful in statistics?
 
-- Remember that LP is an optimization algorithm
+- LP is an optimization algorithm
 - There are plenty of optimization problems in statistics, e.g. MLE
 - It's just a matter of formulating the objective function and constraints.
 
