@@ -396,17 +396,17 @@ The bakery example makes shadow prices concrete. If you're out of flour (binding
 Both are non-negative variables added to convert an inequality constraint into an equality.
 
 **Slack variable**: added to a $\leq$ constraint:
-$$2x_1 + x_2 \leq 100 \quad\longrightarrow\quad 2x_1 + x_2 + \underbrace{w}_{\geq 0} = 100$$
-$w$ absorbs the difference: $w = 100 - 2x_1 - x_2$ (unused capacity). If $w = 0$, the constraint is **binding**.
-
-**Surplus variable**: subtracted from a $\geq$ constraint:
-$$y_1 + 2y_2 \geq 1 \quad\longrightarrow\quad y_1 + 2y_2 - \underbrace{z}_{\geq 0} = 1$$
-$z$ measures the excess: $z = y_1 + 2y_2 - 1$ (how far above the bound). If $z = 0$, the constraint is **binding**.
-
+  $$2x_1 + x_2 \leq 100 \quad\longrightarrow\quad 2x_1 + x_2 + \underbrace{w}_{\geq 0} = 100$$
+  $w$ absorbs the difference: $w = 100 - 2x_1 - x_2$ (unused capacity). If $w = 0$, the constraint is **binding**.
+  
+  **Surplus variable**: subtracted from a $\geq$ constraint:
+  $$y_1 + 2y_2 \geq 1 \quad\longrightarrow\quad y_1 + 2y_2 - \underbrace{z}_{\geq 0} = 1$$
+  $z$ measures the excess: $z = y_1 + 2y_2 - 1$ (how far above the bound). If $z = 0$, the constraint is **binding**.
+  
 ::: notes
-Students typically know slack variables but surplus is less familiar. The key difference: slack is added to ≤ constraints (primal), surplus is subtracted from ≥ constraints (dual). Both play the same role — they record how far a constraint is from being active. When the slack or surplus is zero, the constraint is binding. This is exactly what complementary slackness tracks: at the optimum, a constraint is either binding (slack/surplus = 0) or its shadow price is zero — never both nonzero at the same time.
+  Students typically know slack variables but surplus is less familiar. The key difference: slack is added to ≤ constraints (primal), surplus is subtracted from ≥ constraints (dual). Both play the same role — they record how far a constraint is from being active. When the slack or surplus is zero, the constraint is binding. This is exactly what complementary slackness tracks: at the optimum, a constraint is either binding (slack/surplus = 0) or its shadow price is zero — never both nonzero at the same time.
 :::
-
+  
 ---
 
 
@@ -485,7 +485,7 @@ Walk through each condition. Conditions 1 and 2 are just primal and dual feasibi
 
 \fontsize{10pt}{11pt}\selectfont
 
-Ignoring non-negativity, conditions 1--4 give $2n + 2m$ equations in $2n + 2m$ unknowns:
+Conditions 1--4 give $2n + 2m$ equations in $2n + 2m$ unknowns:
 
 | Condition | Equations | Unknowns involved |
 |-----------|-----------|------------------|
@@ -524,6 +524,15 @@ The name "interior point" comes from the path the algorithm takes: unlike simple
 
 ---
 
+## Two strategies for solving LP  
+
+```{r, echo = FALSE, eval = TRUE, fig.align = 'center', out.width = '90%'}
+knitr::include_graphics("simplex_vs_interior_point.png")
+```
+
+
+---
+
 ## Primal-dual interior point method
 
 \fontsize{10pt}{11pt}\selectfont
@@ -554,152 +563,134 @@ We package the five optimality conditions into a vector function F. The domain a
 ## Primal-dual interior point method
 
 \fontsize{10pt}{11pt}\selectfont
-**Newton’s method** finds roots of nonlinear systems by repeating:
+Applying Newton’s method, if at iteration $k$ the variables are $(x^k, y^k, w^k, z^k)$,
+we obtain a search direction  
+$(\delta x, \delta y, \delta w, \delta z)$
+by solving the linear equations:
 
-> *Linearize $F$ around the current point. Solve for the direction to move. Take a step.*
+$$
+F'(x^k, y^k, w^k, z^k)
+\begin{bmatrix}
+    \delta x \\
+    \delta y \\
+    \delta w \\
+    \delta z
+\end{bmatrix}
+=
+-F(x^k, y^k, w^k, z^k).
+$$
 
-At iteration $k$, the Newton step finds direction $(\delta x, \delta y, \delta w, \delta z)$ by solving:
-
-$$\underbrace{F’(x^k, y^k, w^k, z^k)}_{\text{Jacobian: how fast } F \text{ is changing}} \begin{bmatrix} \delta x \\ \delta y \\ \delta w \\ \delta z \end{bmatrix} = \underbrace{-F(x^k, y^k, w^k, z^k)}_{\text{how far we are from } F=0}$$
-
-- If $F$ is large $\Rightarrow$ we’re far from optimal $\Rightarrow$ take a big step
-- If $F \approx 0$ $\Rightarrow$ we’re near optimal $\Rightarrow$ tiny correction needed
-
-::: notes
-The Jacobian F’ has a block structure — differentiating each row of F with respect to (x, y, w, z):
-F’ = [[A, 0, I, 0], [0, A^T, 0, -I], [Z^k, 0, 0, X^k], [0, W^k, Y^k, 0]]
-Rows 1–2 (primal/dual feasibility) are linear in all variables, so their Jacobian blocks are constant (A, I). Rows 3–4 (complementary slackness products) are nonlinear — their Jacobian blocks depend on the current iterate values (X^k, Z^k etc). This is exactly the matrix that appears in the "improved algorithm" slide. If students ask about the Jacobian explicitly, this is what it is — but the key message on the slide is just the structure of the Newton step: solve a linear system at each iteration to find the search direction.
-:::
-
----
-
-## Primal-dual interior point: basic algorithm
-
-\fontsize{10pt}{11pt}\selectfont
-
-Putting it together — the **basic** interior point algorithm:
-
-1. Start from a strictly feasible point $(x^0, y^0, w^0, z^0)$ with all variables $> 0$
-2. Solve the Newton system $F'(\cdot)\,\delta = -F(\cdot)$ for the search direction $\delta$
-3. Update: $(x,y,w,z) \mathrel{+}= \alpha \cdot \delta$, choosing $\alpha$ small enough that all variables stay $> 0$
-4. Repeat until $F \approx 0$
-
-**The catch**: how small does $\alpha$ need to be?
-
-Near the optimum, complementary slackness requires $x_j \cdot z_j \to 0$ — meaning both $x_j$ and $z_j$ approach zero simultaneously. To prevent either from going negative, $\alpha$ must be tiny. The algorithm crawls to a halt near the finish line.
-
-::: notes
-This is a clean statement of the basic algorithm before the centering modification. The problem with step size α is real and important — it's not just a mathematical technicality. Near the boundary, the maximum feasible step shrinks to zero, so the algorithm makes essentially no progress on the complementary slackness conditions. This motivates the centering trick on the next slide.
-:::
-
----
-
-## The problem: crawling near the boundary
-
-\fontsize{10pt}{11pt}\selectfont
-
-**1D picture**: suppose we want to solve $x \cdot z = 0$ with $x > 0$ and $z > 0$.
-
-At the optimum, one of them must be 0. But during the algorithm both must stay $> 0$.
-
-```{r, echo = FALSE, eval = TRUE, fig.height = 2.8, fig.width = 7, fig.align = "center"}
-library(ggplot2)
-x <- seq(0.05, 3, length.out = 200)
-df <- data.frame(
-  x = rep(x, 3),
-  z = c(3/x, 1/x, 0.2/x),
-  mu = rep(c("xz = 3 (far from optimal)",
-             "xz = 1 (getting closer)",
-             "xz = 0.2 (near optimal, tiny steps)"), each = 200)
-)
-pts <- data.frame(x = c(1.7, 1.0, 0.45), z = c(3/1.7, 1/1.0, 0.2/0.45),
-                  mu = c("xz = 3 (far from optimal)",
-                         "xz = 1 (getting closer)",
-                         "xz = 0.2 (near optimal, tiny steps)"))
-ggplot(df, aes(x, z, color = mu)) +
-  geom_line(linewidth = 1) +
-  geom_point(data = pts, size = 3) +
-  coord_cartesian(xlim = c(0, 3), ylim = c(0, 5)) +
-  labs(x = "x", y = "z", color = NULL,
-       title = "Feasible curves xz = μ; dots = current iterate") +
-  theme_minimal(base_size = 9) +
-  theme(legend.position = "bottom",
-        legend.text = element_text(size = 7))
-```
-
-Near the axes ($xz \approx 0$), steps toward the origin must be tiny to keep $x, z > 0$.
-
-::: notes
-The curves xz = μ are the "central path" — the set of points where complementary slackness holds at level μ. As μ → 0, the path approaches the axes (the optimal solution). The closer you are to the axes, the smaller the feasible steps. This is the fundamental limitation of the basic algorithm — it requires smaller and smaller step sizes as it converges, making the last part of convergence very slow.
-:::
-
----
-
-## The fix: centering 
-
-\fontsize{10pt}{11pt}\selectfont
-
-**Key idea**: instead of targeting $x_j z_j = 0$, target $x_j z_j = \mu > 0$ and shrink $\mu$ each step.
-
-Replace the CS conditions in $F$ with a relaxed version:
-$$XZe = \mu_x e \qquad WYe = \mu_y e$$
-
-At each iteration, set $\mu$ = the **average current complementarity**:
-$$\mu_x^k = \frac{(x^k)^T z^k}{n}, \qquad \mu_y^k = \frac{(w^k)^T y^k}{m}$$
-
-When $x_j z_j$ is large, $\mu$ is large — we're far from optimal, take a big step.
-When $x_j z_j \approx 0$ for all $j$, $\mu \approx 0$ — we're near optimal, we're done.
-
-**Why this works**: the algorithm now follows the central path (the curve $xz = \mu$) toward the origin, staying away from the axes at each step $\Rightarrow$ large steps allowed throughout.
-
-::: notes
-The centering parameter μ has a direct interpretation: it is the duality gap per variable. When μ is large, the primal and dual objectives are far apart. When μ → 0, we're at the optimum. By targeting xz = μ instead of xz = 0, we keep the iterates on the central path and avoid the boundary. This is the key insight of the primal-dual interior point method, and it's what allows convergence in 20–50 iterations on problems of any size. Modern solvers (CPLEX, Gurobi, MOSEK) all use variants of this approach.
-:::
-
----
-
-## The complete interior point algorithm
-
-\fontsize{9pt}{10pt}\selectfont
-
-With centering, the Newton step at iteration $k$ solves:
+Here $F'$ is the Jacobian. At iteration $k$, the equations are:
 
 $$\begin{bmatrix}
     A & 0 & I & 0 \\
     0 & A^T & 0 & -I \\
-    Z^k & 0 & 0 & X^k \\
-    0 & W^k & Y^k & 0
+    Z & 0 & 0 & X \\
+    0 & W & Y & 0
 \end{bmatrix}
-\begin{bmatrix} \delta x \\ \delta y \\ \delta w \\ \delta z \end{bmatrix}
+\begin{bmatrix}
+    \delta x \\
+    \delta y \\
+    \delta w \\
+    \delta z
+\end{bmatrix}
 =
 \begin{bmatrix}
-    0 \\ 0 \\
-    \red{-X^k Z^k e + \mu_x^k e} \\
-    \red{-W^k Y^k e + \mu_y^k e}
+    -A x^k - w^k + b \\
+    -A^T y^k + z^k + c^T \\
+    -X^k Z^k e \\
+    -W^k Y^k e
 \end{bmatrix}$$
 
-\red{Only the CS rows change}: replace the target $0$ with $\mu^k e$. Everything else is identical to the basic algorithm.
+---
 
-**Algorithm**:
+## Primal-dual interior point method
 
-1. Start from strictly feasible $(x^0, y^0, w^0, z^0)$
-2. Compute $\mu^k$ = average complementarity
-3. Solve Newton system above for $(\delta x, \delta y, \delta w, \delta z)$
-4. Update $(x,y,w,z) \mathrel{+}= \alpha^k \cdot \delta$ (choose $\alpha^k$ to keep all variables $> 0$)
-5. Repeat until $\mu^k < \varepsilon$
+\fontsize{10pt}{11pt}\selectfont
+Then the update will be:
 
-**Convergence**: ~20–50 iterations regardless of problem size.
+$$
+(x^{k+1}, y^{k+1}, w^{k+1}, z^{k+1})= (x^k, y^k, w^k, z^k) + \alpha (\delta x, \delta y, \delta w, \delta z)
+$$
+
+with $\alpha \in (0,1]$ chosen so that the result from the next iteration is feasible.
+
+- Solving for $(\delta x, \delta y, \delta w, \delta z)$ using the equation on the previous slide enforces feasibility of solutions
 
 ::: notes
-The complete algorithm is just the basic Newton iteration with μ substituted for 0 in the RHS. The Jacobian is unchanged. The only modification is the target on the right-hand side. The top two rows of the RHS are 0 because we maintain primal and dual feasibility throughout — the algorithm only needs to improve complementary slackness. The stopping criterion is μ < ε (small duality gap), which by strong duality means we're at the optimum. This is the algorithm inside CPLEX, Gurobi, MOSEK, and HiGHS — they use sophisticated variants (Mehrotra's predictor-corrector, etc.) but the core idea is exactly this.
+Given that at current iteration, both primal and dual are strictly feasible, the first two terms on the right hand side are 0.
 :::
 
 ---
 
+
+## An improved algorithm
+
+\fontsize{9pt}{10pt}\selectfont
+The algorithm in its current setup is not ideal because often the steps are small to
+avoid violating the positivity constraints. Instead:
+
+- The value of $XZe + WYe$ represents the duality gap
+- Instead of trying to eliminate the duality gap (set it to 0), reduce the duality gap by some factor in each step
+
+We replace the complementary slackness by:
+
+\begin{align*}
+XZe &= \mu_xe\\
+WYe &= \mu_ye
+\end{align*}
+
+When $\mu_x, \mu_y\to 0$ as $k\to\infty$ the solution from this system will converge to the optimal solution of the original LP problem. Good selections of $\mu$ are $\mu_x^{k+1}=(x^k)^Tz^k/n$ and $\mu_y^{k+1}=(w^k)^Ty^k/m$ 
+
+- $n$ and $m$ are the dimensions of $x$ and $y$
+
+---
+
+## An improved algorithm
+
+\fontsize{10pt}{11pt}\selectfont
+Under the new algorithm, at the $k$th iteration, the Newton equations become:
+
+$$\begin{bmatrix}
+    A & 0 & I & -0 \\
+    0 & A^T & 0 & -I \\
+    Z & 0 & 0 & X \\
+    0 & W & Y & 0
+\end{bmatrix}
+\begin{bmatrix}
+    \delta x \\
+    \delta y \\
+    \delta w \\
+    \delta z
+\end{bmatrix}
+=
+\begin{bmatrix}
+    0 \\
+    0 \\
+    -X^k Z^k e + \mu_x^k e \\
+    -W^k Y^k e + \mu_y^k e
+\end{bmatrix}$$
+
+This provides the **general primal-dual interior point method** as follows:
+
+1. Choose strictly feasible initial solution $(x^0, y^0, w^0, z^0)$, and set $k = 0$. Then repeat (2) and (3) until convergence:
+2. Solve system (1) to obtain the updates $(\delta x, \delta y, \delta w, \delta z)$
+3. Update the solution $(x^{k+1}, y^{k+1}, w^{k+1}, z^{k+1}) = (x^k, y^k, w^k, z^k)+ \alpha^k(\delta x, \delta y, \delta w, \delta z)$. $\alpha^k$ is chosen so that all variables are $\ge$ 0.
+
+
+::: notes
+System (1) is the system above  
+:::
+
+---
+
+
+
+
 ## LP in R: simplex vs interior point
 
 \fontsize{10pt}{11pt}\selectfont
-Use the LP from class: $\max\ x_1 + x_2$ s.t. $x_1 + 2x_2 \le 100,\ 2x_1 + x_2 \le 100,\ x_1, x_2 \ge 0$
+Use the following simple LP: $\max\ x_1 + x_2$ s.t. $x_1 + 2x_2 \le 100,\ 2x_1 + x_2 \le 100,\ x_1, x_2 \ge 0$
 
 ```{r, eval = TRUE}
 library(lpSolve)   # simplex method
@@ -859,7 +850,7 @@ Add slack variable w = b - Ax to convert Ax ≤ b into an equality constraint Ax
 
 \fontsize{10pt}{11pt}\selectfont
 The `quadprog` package provides functions (`solve.QP.compact`) to solve quadratic
-programming problem. Pay attention to the definition of function parameters. They are slightly different from what I have used in the standard form!  
+programming problems.
 
 - Solve $\min \frac12 (x_1^2 + x_2^2)$ s.t. $2x_1+x_2\ge 1$:
 
@@ -897,20 +888,6 @@ Now you should be able to formulate an LP/QP problem and solve it. But how are t
 
 ::: notes
 Quick recap before the applied examples. We've built up from scratch: LP formulation → simplex (combinatorial, hitting corner points) → duality (shadow prices, primal-dual symmetry) → interior point (Newton on the KKT system, scales to large problems) → QP (same structure, quadratic objective). Everything is connected. The punchline for the rest of today: many statistical estimation problems ARE optimization problems. Once you can write down an objective function and constraints, you can hand it to a solver. The examples coming up (QR and LASSO) make this concrete.
-:::
-
----
-
-## Lab problem
-
-Write out the primal and dual for the carpenter problem.
-
-- Check the set of feasible solutions (corner points).  
-  - What are the values of the objective functions of the primal and dual at each vertex?
-  - Does weak duality appear to hold?
-
-::: notes
-The carpenter problem: a carpenter makes tables and chairs, limited by lumber and labor hours. Set up the primal (maximize profit), identify the corner points of the feasible region by solving pairwise constraint intersections, and evaluate both the primal and dual objectives at each corner. Students should observe that the dual objective ≥ primal objective at every feasible point (weak duality). At the optimal corner, they should be equal (strong duality). This is a good concrete numerical verification before abstract theory, and also reinforces how to find corner points of a feasible polytope.
 :::
 
 ---
@@ -1041,8 +1018,7 @@ The model Q_τ(Y|X) = Xβ_τ is simple but important. Note β_τ changes with τ
 **Advantages**:
 
 - Regression at a sequence of quantiles provides a more complete view of data
-- Inference is robust to outliers
-- Estimation is more efficient when residual normality is highly violated
+- Inference is robust to outliers 
 - Allows interpretation in the outcome's original scale of measurement
 
 **Disadvantages**:
@@ -1272,7 +1248,7 @@ Now we're going to fit this quantile regression
 
 ## QR in R
 
-\fontsize{9pt}{10pt}\selectfont
+\fontsize{8pt}{9pt}\selectfont
 Want to compare linear and quantile regression
 
 ```{r, eval = TRUE}
@@ -1282,6 +1258,12 @@ ols = lm(t_mmr1 ~ p_change, data = cannabis)
 median_regression = rq(t_mmr1 ~ p_change, tau = 0.5, data = cannabis, 
                        method = "br")
 qr.9 = rq(t_mmr1 ~ p_change, tau = 0.9, data = cannabis, 
+          method = "br")
+qr.1 = rq(t_mmr1 ~ p_change, tau = 0.1, data = cannabis, 
+          method = "br")
+qr.7 = rq(t_mmr1 ~ p_change, tau = 0.7, data = cannabis, 
+          method = "br")
+qr.8 = rq(t_mmr1 ~ p_change, tau = 0.8, data = cannabis, 
           method = "br")
 
 summary(ols)$coefficients
@@ -1304,7 +1286,10 @@ Blue is ols, red is median regression, pink is tau = 0.9
 p2 + 
   geom_abline(slope = coef(ols)[2], intercept = coef(ols)[1], color = "blue") +
   geom_abline(slope = coef(median_regression)[2], intercept = coef(median_regression)[1], color = "red") +
-  geom_abline(slope = coef(qr.9)[2], intercept = coef(qr.9)[1], color = "pink")
+  geom_abline(slope = coef(qr.9)[2], intercept = coef(qr.9)[1], color = "pink") +
+geom_abline(slope = coef(qr.1)[2], intercept = coef(qr.1)[1], color = "pink") +
+geom_abline(slope = coef(qr.7)[2], intercept = coef(qr.7)[1], color = "pink") +
+geom_abline(slope = coef(qr.8)[2], intercept = coef(qr.8)[1], color = "pink")
 
 
 ```
@@ -1365,7 +1350,7 @@ sum of the absolute values of the coefficients.
 
 LASSO is a regularization approach- regularization prevents overfitting by adding a penalty term to the objective function.
 
-- LASSO tries to minimize the residual sum of square, with a constraint on the sum of the absolute values of the coefficients.
+- LASSO tries to minimize the residual sum of squares, with a constraint on the sum of the absolute values of the coefficients.
 
 
 - There are other types of regularized regressions
